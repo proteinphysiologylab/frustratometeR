@@ -74,3 +74,5 @@ perl
 modeller
 
 https://salilab.org/modeller/
+
+**You can find an example of how to use the package at:**
