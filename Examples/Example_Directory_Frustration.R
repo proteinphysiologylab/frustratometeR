@@ -6,8 +6,6 @@ library(ggplot2)
 library(reshape2)
 library(magick)
 
-install.packages("/home/atilio/FrustratometeR", repos = NULL, type="source")
-
 install_github("proteinphysiologylab/frustratometeR")
 
 library(frustratometeR)
