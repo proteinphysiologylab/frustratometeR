@@ -1,6 +1,4 @@
 # frustratometeR
-
-# frustratometeR
 An R package for calculating energetic local frustration, frame analysis across simulations of molecular dynamics and point mutations.
 
 # installation 
