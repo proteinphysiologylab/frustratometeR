@@ -52,3 +52,5 @@ modeller (you need to install a licenced version of modeller in order to use som
 https://salilab.org/modeller/
 
 **You can find an example of how to use the package at:**
+
+https://github.com/proteinphysiologylab/frustratometeR/tree/master/Examples
