@@ -20,31 +20,7 @@ An R package for calculating energetic local frustration in protein structures. 
 # dependencies
 
 **R packages**
-
-bio3D
-
-`install.packages("bio3d")`
-
-usethis
-
-`install.packages("usethis")`
-
-devtools
-
-`install.packages("devtools")`
-
-ggplot2
-
-`install.packages("ggplot2")`
-
-reshape2
-
-`install.packages("reshape2")`
-
-magick
-
-`install.packages("magick")`
-
+`install.packages(c("bio3d", "usethis", "devtools", "ggplot2", "reshape2", "magick"))`
 
 **Python 3**
 
@@ -71,7 +47,7 @@ perl
 
 'sudo apt-get install perl'
 
-modeller
+modeller (you need to install a licenced version of modeller in order to use some of the frustratometeR functionalities)
 
 https://salilab.org/modeller/
 
