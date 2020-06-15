@@ -3,13 +3,13 @@ An R package for calculating energetic local frustration, frame analysis across 
 
 # installation 
 
-`library(usethis)
-library(devtools)
-library(bio3d)
-library(ggplot2)
-library(reshape2)
-library(magick)
-install_github("proteinphysiologylab/frustratometeR")`
+`library(usethis)`
+`library(devtools)`
+`library(bio3d)`
+`library(ggplot2)`
+`library(reshape2)`
+`library(magick)`
+`install_github("proteinphysiologylab/frustratometeR")`
 
 # dependencies
 
