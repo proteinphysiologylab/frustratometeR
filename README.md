@@ -41,15 +41,13 @@ pymol
 
 magick
 
-'sudo apt-get install -y libmagick++-dev'
+`sudo apt-get install -y libmagick++-dev`
 
 perl
 
-'sudo apt-get install perl'
+`sudo apt-get install perl`
 
-modeller (you need to install a licenced version of modeller in order to use some of the frustratometeR functionalities)
-
-https://salilab.org/modeller/
+modeller (you need to install a licenced version of modeller in order to use some of the frustratometeR functionalities, https://salilab.org/modeller/)
 
 **You can find an example of how to use the package at:**
 
