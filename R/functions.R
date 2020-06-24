@@ -27,7 +27,7 @@ check_backbone_complete <- function(Pdb)
   # Only for those atoms with ATOM coords
   atom_res <- backpdb$atom[backpdb$atom$type=="ATOM",]
   # Check there are no missing atoms in the backbone
-  Complete <- length(which(atom_res$elety=="CA"))==dim(Pdb$equivalences)[1] & length(which(atom_res$elety=="O"))==dim(Pdb$equivalences)[1] & (length(which(atom_res$elety=="CB")) + length(which(Pdb$equivalences[,4]=="GLY")))==dim(Pdb$equivalences)[1]
+  Complete <- length(which(atom_res$elety=="CA"))==dim(Pdb$equivalences)[1] & length(which(atom_res$elety=="O"))==dim(Pdb$equivalences)[1] & (length(which(atom_res$elety=="CB")) + length(which(Pdb$equivalences[,4]=="GLY")))==dim(Pdb$equivalences)[1] & length(which(atom_res$elety=="N"))==dim(Pdb$equivalences)[1]
 
   return(Complete)
 }
