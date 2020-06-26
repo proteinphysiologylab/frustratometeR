@@ -136,7 +136,7 @@ plot_contact_map <-function(Pdb, Chain=NULL)
   MinimallyFrst=as.numeric(AdensTable[,6])
   Total=as.numeric(AdensTable[,3])
 
-  PositionsTotal=seq(from=1, to=length(Positions), by=1)
+  PositionsTotal=seq(from=1, to=length(Positions))
 
   datos<-read.table(file=paste(Dir,"FrustrationData/", JobID, ".pdb_", Pdb$mode ,sep=""),stringsAsFactors = F)
 
