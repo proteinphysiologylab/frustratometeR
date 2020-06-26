@@ -86,7 +86,7 @@ calculate_frustration <- function(PdbFile=NULL, PdbID=NULL, Chain=NULL, Electros
     #Get URL and download
     print("-----------------------------Download files-----------------------------")
     pdbURL<-get.pdb( id = PdbID, split = boolsplit, URLonly = TRUE)
-    system(paste("wget --no-check-certificate -P",tempfolder,pdbURL,sep = ' '))
+    system(paste("wget --no-check-certificate -P ",tempfolder,pdbURL," -q --progress=bar:force:noscroll --show-progress",sep = ' '))
 
     if(!boolsplit)
     {
