@@ -7,9 +7,11 @@
 mutate_res(
   PdbPath = NULL,
   JobDir = NULL,
-  Modes = NULL,
+  Modes = "configurational",
   Chain = NULL,
-  Resno = NULL
+  Resno = NULL,
+  Split = TRUE,
+  Method = "Threading"
 )
 }
 \arguments{
@@ -22,6 +24,10 @@ mutate_res(
 \item{Chain}{Chain of residue to analyze. Default: NULL}
 
 \item{Resno}{Resno of residue to analyze. If it is NULL, not analyze. Default: NULL}
+
+\item{Split}{Split that you are going to calculate frustration. If it is TRUE specific string, if it is FALSE full complex. Default: TRUE}
+
+\item{Method}{Method indicates the method to use to perform the mutation (Threading or Modeller). Default: Threading}
 }
 \value{
 Table of frustration results in file
