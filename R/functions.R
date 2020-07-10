@@ -567,7 +567,10 @@ mutate_res<-function(PdbPath=NULL,JobDir=NULL,Modes="configurational",Chain=NULL
 
 	    system(paste("cd ",JobDir," ;python3 make_ali.py modelo",sep = ""))
 	    if(Split){system(paste("cd ",JobDir," ;python3 align2d.py ",basename.pdb(PdbPath)," ","modelo ",Chain,sep = ""))}
-	    else{system(paste("cd ",JobDir," ;python3 align2d.py ",basename.pdb(PdbPath)," modelo NULL",sep = ""))}
+	    else{
+		 stop("Complex modeling not enabled")
+		 #system(paste("cd ",JobDir," ;python3 align2d.py ",basename.pdb(PdbPath)," modelo NULL",sep = ""))
+	    }
 	    system(paste("cd ",JobDir," ;python3 model-single.py ",basename.pdb(PdbPath)," modelo",sep=""))
 	    system(paste("cd ",JobDir," ;mv modelo.B99990001.pdb ",JobDir,"/",basename.pdb(PdbPath),"_",Resno,"_",AA,"_",Chain,".pdb",sep=""))
 	    system(paste("cd ",JobDir," ;rm *D00000001 *ini *rsr *sch *V99990001 *ali *pap *fa"))
