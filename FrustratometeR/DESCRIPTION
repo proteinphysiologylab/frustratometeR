@@ -1,0 +1,16 @@
+Package: frustratometeR
+Type: Package
+Title: frustratometeR
+Version: 0.1.0
+Authors: R. Gonzalo Parra, Atilio O. Rausch
+Maintainer: R. Gonzalo Parra <gonzaloparra@embl.de> , Atilio O. Rausch <atiliorau@gmail.com>
+Description: Frustratometer an R package to calculate local energetic frustration
+License: GPL
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.0
+Imports:
+    bio3d,
+    ggplot2,
+    magick,
+    reshape2
