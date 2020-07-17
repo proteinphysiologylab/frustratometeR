@@ -136,7 +136,7 @@ plot_contact_map <-function(Pdb, Chain=NULL)
   MinimallyFrst=as.numeric(AdensTable[,6])
   Total=as.numeric(AdensTable[,3])
 
-  PositionsTotal=seq(from=1, to=length(Positions))
+  PositionsTotal=seq(from=1, to=length(Positions), by=1)
 
   datos<-read.table(file=paste(Dir,"FrustrationData/", JobID, ".pdb_", Pdb$mode ,sep=""),stringsAsFactors = F)
 
@@ -172,22 +172,37 @@ plot_contact_map <-function(Pdb, Chain=NULL)
   total.positions<-sum(apply(positions,1,function(x){x[2]-x[1]+1}))
   matrz <- matrix(NA,ncol=total.positions,nrow=total.positions)
   for(i in 1:nrow(datos)){
-    matrz[datos$pos1[i],datos$pos2[i]]<-datos$V12[i]
+    if(datos$V13[i]=="short") matrz[datos$pos1[i],datos$pos2[i]]<-20
+    else if(datos$V13[i]=="long") matrz[datos$pos1[i],datos$pos2[i]]<-30
+    else matrz[datos$pos1[i],datos$pos2[i]]<-40
     matrz[datos$pos2[i],datos$pos1[i]]<-datos$V12[i]
-
   }
+  #PARA HACERLO TRIANGULAR SUPERIOR
+  #matrz[upper.tri(matrz,diag = T)] <- 0
 
   longData<-melt(matrz)
-  longData<-longData[longData$value!=0,]
-  Graphic<-ggplot(longData, aes(x = Var2, y = Var1)) +
-  geom_tile(aes(fill=value),na.rm=TRUE) +
-  scale_fill_gradient2(low="red",mid="grey",high="green",limits=c(-4,4),breaks=c(-4,-3,-2,-1,0,1,2,3,4),labels=c("-4","-3","-2","-1","0","1","2","3","4"),
-  guide=guide_colourbar(title=paste("Local ",Pdb$mode," Frustration Index"),barwidth=2,barheight=20,title.position="right",title.hjust=0.5)) +
-  labs(x="Residue i", y="Residue j") + ggtitle(paste("Contact map ",Pdb$PdbBase,sep=""))+
-  theme_bw() + theme(axis.text.x=element_text(size=9, angle=0, vjust=0.3),
-                     axis.text.y=element_text(size=9),
-                     plot.title=element_text(size=11,hjust=0.5),
-                     legend.title=element_text(angle=-90))
+  # Graphic<-ggplot() + geom_tile(data=longData[longData$value<20& !is.na(longData$value),],aes(x = Var2, y = Var1, fill=value))+
+  # scale_fill_gradient2(low="red",mid="grey",high="green",limits=c(-4,4),breaks=c(-4,-3,-2,-1,0,1,2,3,4),labels=c("-4","-3","-2","-1","0","1","2","3","4"),
+  # guide=guide_colourbar(title=paste("Local ",Pdb$mode," Frustration Index"),barwidth=2,barheight=20,title.position="right",title.hjust=0.5)) +
+  # geom_tile(data=longData[longData$value>=20& !is.na(longData$value),],aes(x = Var2, y = Var1, color=value))+
+  # scale_color_discrete("",breaks=c(20,30,40),labels=c("Short","Long","Water mediated"),values = c("yellow","violet","black"))+
+  # labs(x="Residue i", y="Residue j") + ggtitle(paste("Contact map ",Pdb$PdbBase,sep=""))+
+  #   theme_bw() + theme(axis.text.x=element_text(size=9, angle=0, vjust=0.3),
+  #                      axis.text.y=element_text(size=9),
+  #                      plot.title=element_text(size=11,hjust=0.5),
+  #                      legend.title=element_text(angle=-90))
+
+  Graphic<-ggplot() + geom_raster(data=longData[longData$value<20& !is.na(longData$value),],aes(x = Var2, y = Var1, fill=value))+
+    scale_fill_gradient2(low="red",mid="grey",high="green",limits=c(-4,4),breaks=c(-4,-3,-2,-1,0,1,2,3,4),labels=c("-4","-3","-2","-1","0","1","2","3","4"),
+                         guide=guide_colourbar(barwidth=2,barheight=20,title=paste("Local ",Pdb$mode," Frustration Index"),title.position="right",title.hjust=0.5))+
+    labs(x="Residue i", y="Residue j") + ggtitle(paste("Contact map ",Pdb$PdbBase,sep=""))+
+    theme_bw() + theme(axis.text.x=element_text(size=9, angle=0, vjust=0.3),
+                         axis.text.y=element_text(size=9),
+                         plot.title=element_text(size=11,hjust=0.5),
+                         legend.title=element_text(angle = -90))+
+    geom_point(data=longData[longData$value>=20& !is.na(longData$value),],aes(x = Var2, y = Var1, color=as.factor(value)),shape=15,size=1)+
+    scale_color_manual("Contact distance",breaks=c(20,30,40),labels=c("Short","Long","Water mediated"),values = c("black","gray","cyan"),guide=guide_legend( title.theme = element_text(angle = 360)))
+
 
   if(length(chains)>1){
     breaks <- round(seq(1,total.positions,total.positions/15))
@@ -259,8 +274,8 @@ plot_dynamic_res <- function(DynDir=NULL, Resno=NULL, Modes="configurational"){
     adens5Frame <- adens5Frame + geom_line( aes( x = FrustrationResults$Frame , y = FrustrationResults$MinimallyFrst , colour =  "3" ) )
     adens5Frame <- adens5Frame + ylab( "Local frustration density (5A sphere)" ) + xlab( "Frame" ) + ggtitle(paste("Frustration of resid",Resno, Modes))
     adens5Frame <- adens5Frame + scale_colour_manual( name="",labels = c("Highly frustrated","Neutral","Minimally frustrated" ) , values = c( "red" ,"gray","green"))
-    adens5Frame <- adens5Frame + scale_y_continuous( breaks = seq(0.0,1.0,0.2),labels =as.character(seq(0.0,1.0,0.2)))
-    adens5Frame <- adens5Frame + scale_x_continuous( breaks = seq( 1 , length(FrustrationResults$Frame),2 ))
+    adens5Frame <- adens5Frame + scale_y_continuous(limits=c(0,1), breaks = seq(0.0,1.0,0.2),labels =as.character(seq(0.0,1.0,0.2)))
+    adens5Frame <- adens5Frame + scale_x_continuous( breaks = seq( 1 , length(FrustrationResults$Frame),trunc(length(FrustrationResults$Frame)*0.05) ))
     adens5Frame <- adens5Frame + theme_classic() + theme(plot.title=element_text(size=11,hjust=0.5),axis.text.x = element_text(angle = 90))
 
     ggsave(paste(DynDir,"/dynamic5adens_",Modes,"_Res",Resno,".png", sep=""),plot=adens5Frame,width=10, height= 6)
@@ -284,8 +299,8 @@ plot_dynamic_res <- function(DynDir=NULL, Resno=NULL, Modes="configurational"){
     IndexFrusFrame <- ggplot( data = FrustrationResults,aes( x = Frame , y = IndexFrst,colour=Type )) + geom_point()
     IndexFrusFrame <- IndexFrusFrame + ylab( "Index Frustration" ) + xlab( "Frame" ) + ggtitle(paste("Index Frustration of resid",Resno, "Single residue"))
     cols <- c("Minimally frustrated" = "green", "Neutral" = "gray", "Highly frustrated" = "red")
-    IndexFrusFrame <- IndexFrusFrame + scale_colour_manual( name="",values=cols)+ scale_y_reverse(limits=c(4.0,-4.0),breaks=seq(4.0, -4.0, -0.6),labels=as.character(seq(4.0, -4.0, -0.6)))
-    IndexFrusFrame <- IndexFrusFrame + scale_x_continuous( breaks = seq( 1 , length(FrustrationResults$Frame),2 ) )
+    IndexFrusFrame <- IndexFrusFrame + scale_colour_manual( name="",values=cols)+ scale_y_reverse(limits=c(4,-4), breaks=seq(4.0, -4.0, -0.5),labels=as.character(seq(4.0, -4.0, -0.5)))
+    IndexFrusFrame <- IndexFrusFrame + scale_x_continuous( breaks = seq( 1 , length(FrustrationResults$Frame),trunc(length(FrustrationResults$Frame)*0.05) ) )
     IndexFrusFrame <- IndexFrusFrame + theme_classic() + theme(plot.title=element_text(size=11,hjust=0.5),axis.text.x = element_text(angle = 90))
 
     ggsave(paste(DynDir,"/dynamic_IndexFrustration_",Modes,"_Res",Resno,".png", sep=""),plot=IndexFrusFrame,width=10, height= 6)
@@ -346,9 +361,11 @@ gif_5adens_proportions<-function(PdbDir=NULL, OrderList=NULL,Modes="configuratio
   for (i in seq(1,length(OrderList))) {
     images[[i]]<-image_read(paths[i])
   }
-  images <- image_join(images)
-  animation <- image_animate(images, fps = 2, optimize = TRUE)
-  image_write(animation,paste(PdbDir,"5Adens_proportions_",Modes,".gif",sep=""))
+
+  images = image_join(images)
+
+  animation <- image_animate(images, fps = 2,optimize = TRUE)
+  image_write(image = animation,path = paste(PdbDir,"5Adens_proportions_",Modes,".gif",sep=""))
 
 }
 
@@ -507,39 +524,48 @@ plot_mutate_res<-function(PdbPath=NULL,DataFile=NULL,ResultDir=NULL,Chain=NULL,M
   DataFrus=read.table(DataFile, header=F,stringsAsFactors=F)
   DataFrus<-as.data.frame(DataFrus)
   DataFrus<-cbind(DataFrus,seq(1,length(DataFrus[,1])))
-  colnames(DataFrus)<-c("Res1","Res2","AA1","AA2","FrstIndex","FrstState","Color")
+  colnames(DataFrus)<-c("Res1","Res2","Chain1","Chain2","AA1","AA2","FrstIndex","FrstState","Color")
   DataFrus$FrstState<-as.factor(DataFrus$FrstState)
 
   Native<-atom.select(Pdb,resno=Resno,chain=Chain,value=TRUE)
   Native<-aa321(unique(Native$atom$resid))
 
-  DataFrus[DataFrus$Res2==Resno,c(2,3,4)]<-c(DataFrus$Res1[DataFrus$Res2==Resno],DataFrus$AA2[DataFrus$Res2==Resno],DataFrus$AA1[DataFrus$Res2==Resno])
+  DataFrus[DataFrus$Res2==Resno,c(2,4,5,6)]<-c(DataFrus$Res1[DataFrus$Res2==Resno],DataFrus$Chain1[DataFrus$Res2==Resno],DataFrus$AA2[DataFrus$Res2==Resno],DataFrus$AA1[DataFrus$Res2==Resno])
+  #Agregue por las cadenas
+  DataFrus$Chain1[DataFrus$Chain1!=Chain]<-Chain
   DataFrus$Res1[DataFrus$Res1!=Resno]<-Resno
 
   DataFrus$Color[DataFrus$FrstState=="neutral"]<-"gray"
   DataFrus$Color[DataFrus$FrstState=="highly"]<-"red"
   DataFrus$Color[DataFrus$FrstState=="minimally"]<-"green"
   DataFrus$Color[DataFrus$AA1==Native]<-"blue"
+  #Agregar color orange de las glicinas aca
+  #DataFrus$Color[DataFrus$AA1=='G']<-"orange"
+
   DataFrus$Color<-as.factor(DataFrus$Color)
 
-  Contacts<-unique(as.numeric(DataFrus$Res2))
-  Contacts<-Contacts[order(Contacts[])]
-  Contacts<-cbind(Contacts,1:length(Contacts))
+  Contacts<-unique(DataFrus[,c("Res2","Chain2")])
+  Contacts<-Contacts[order(Contacts[,1]),]
+  Contacts<-cbind(Contacts,1:length(Contacts[,1]))
   Contacts<-as.data.frame(Contacts)
-  colnames(Contacts)<-c("Res","Index")
+  colnames(Contacts)<-c("Res","Chain","Index")
 
+  Contacts$Res<-as.numeric(Contacts$Res)
   Resid<-atom.select(Pdb,resno=Contacts$Res,elety="CA",chain=Chain,value=T)$atom$resid
 
-  DataFrus$Res2<-Contacts[match(DataFrus$Res2,Contacts$Res),2]
+  DataFrus$Res2<-Contacts[match(DataFrus$Res2,Contacts$Res),3]
+
+  DataFrus<-rbind(DataFrus[DataFrus$Color!="orange",],DataFrus[DataFrus$Color=="orange",])
   DataFrus<-rbind(DataFrus[DataFrus$Color!="blue",],DataFrus[DataFrus$Color=="blue",])
 
   y1<-(-4)
   y2<-4
   Graphic<-ggplot(data=DataFrus)+geom_point(aes(x=Res2,y=FrstIndex,color=Color),shape=DataFrus$AA1,size=3)
-  Graphic<-Graphic+ xlab("Contact residue") + ylab("Frustration Index") +  scale_x_continuous(breaks=Contacts$Index,labels=paste(Resid,Contacts$Res))
-  Graphic<-Graphic+ scale_y_continuous(breaks=seq(y1,y2,0.5),labels=as.character(seq(y1,y2,0.5)),limits = c(y1,y2))
+  Graphic<-Graphic+ xlab("Contact residue") + ylab("Frustration Index")
+  Graphic<-Graphic+ scale_x_continuous(breaks=Contacts$Index,labels=paste(Resid,Contacts$Res,Contacts$Chain))+ scale_y_continuous(breaks=seq(y1,y2,0.5),labels=as.character(seq(y1,y2,0.5)),limits = c(y1,y2))
+  Graphic<-Graphic+ geom_hline(yintercept=c(0.78,-1),color="gray",linetype="longdash")
   Graphic<-Graphic+ ggtitle(paste("Contact Frustration ",Modes," of residue ",DataFrus$Res1[1],sep=""))+ theme(plot.title = element_text(hjust = 0.5),axis.text.x = element_text(angle = 90))
-  Graphic<-Graphic+ scale_color_manual("Frustration",breaks=levels(DataFrus$Color),labels=c("Native","Neutral","Minimally frustrated","Highly frustrated" ),values=c("blue","gray","green","red"))
+  Graphic<-Graphic+ scale_color_manual("",breaks=c("green","gray","red","blue","orange"),labels=c("Minimally frustrated","Neutral","Highly frustrated","Native","Glycine"),values=c("green","gray","red","blue","orange"))
 
 
   ggsave(plot=Graphic,paste(ResultDir,"/",Modes,"_",DataFrus$Res1[1],".png",sep=""),width=10, height= 6)

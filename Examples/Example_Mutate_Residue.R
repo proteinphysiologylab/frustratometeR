@@ -5,7 +5,6 @@ library(devtools)
 library(ggplot2)
 library(reshape2)
 library(magick)
-library(msa)
 
 install_github("proteinphysiologylab/frustratometeR")
 

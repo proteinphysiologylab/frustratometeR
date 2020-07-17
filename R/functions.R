@@ -163,7 +163,7 @@ calculate_frustration <- function(PdbFile=NULL, PdbID=NULL, Chain=NULL, Electros
 
   print("-----------------------------Preparing files-----------------------------")
   #Prepare the PDB file to get awsem input files, create the workdir and move neccessary files to it.
-  system(paste("cd ", Pdb$JobDir, "; pwd; sh ", Pdb$scriptsDir, "/AWSEMFiles/AWSEMTools/PdbCoords2Lammps.sh ", Pdb$PdbBase, " ", Pdb$PdbBase, " ", Pdb$scriptsDir, sep=""))
+  system(paste("cd ", Pdb$JobDir, "; pwd; ", Pdb$scriptsDir, "/AWSEMFiles/AWSEMTools/PdbCoords2Lammps.sh ", Pdb$PdbBase, " ", Pdb$PdbBase, " ", Pdb$scriptsDir, sep=""))
   system(paste("cp ", Pdb$scriptsDir, "/AWSEMFiles/*.dat* ", Pdb$JobDir, sep=""))
 
   print("-----------------------------Setting options-----------------------------")
@@ -180,7 +180,7 @@ calculate_frustration <- function(PdbFile=NULL, PdbID=NULL, Chain=NULL, Electros
 
   print("-----------------------------Calculating-----------------------------")
 
-  system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", seqdist, " ", Pdb$JobDir, "; cd ", Pdb$JobDir, ";chmod +x lmp_serial_", seqdist, "; ./lmp_serial_", seqdist," < ", Pdb$PdbBase, ".in", sep=""))
+  system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", seqdist, " ", Pdb$JobDir, "; cd ", Pdb$JobDir, "; ./lmp_serial_", seqdist, " < ", Pdb$PdbBase, ".in", sep=""))
 
   if(Pdb$mode == "configurational" | Pdb$mode == "mutational")
   {
@@ -523,6 +523,7 @@ mutate_res<-function(PdbPath=NULL,JobDir=NULL,Modes="configurational",Chain=NULL
 
 
 	  SeqGap<-cbind(SeqGap,rep(0,length(SeqGap)),1:length(SeqGap))
+
 	  j<-1
 	  for (i in 1:length(SeqGap[,1])) {
 	    if(SeqGap[i,1]!="-"&&SeqGap[i,1]==SeqPdb$AA[j]){
@@ -563,10 +564,7 @@ mutate_res<-function(PdbPath=NULL,JobDir=NULL,Modes="configurational",Chain=NULL
 
 	    system(paste("cd ",JobDir," ;python3 make_ali.py modelo",sep = ""))
 	    if(Split){system(paste("cd ",JobDir," ;python3 align2d.py ",basename.pdb(PdbPath)," ","modelo ",Chain,sep = ""))}
-	    else{
-		 stop("Complex modeling not enabled")
-		 #system(paste("cd ",JobDir," ;python3 align2d.py ",basename.pdb(PdbPath)," modelo NULL",sep = ""))
-	    }
+	    else{system(paste("cd ",JobDir," ;python3 align2d.py ",basename.pdb(PdbPath)," modelo NULL",sep = ""))}
 	    system(paste("cd ",JobDir," ;python3 model-single.py ",basename.pdb(PdbPath)," modelo",sep=""))
 	    system(paste("cd ",JobDir," ;mv modelo.B99990001.pdb ",JobDir,"/",basename.pdb(PdbPath),"_",Resno,"_",AA,"_",Chain,".pdb",sep=""))
 	    system(paste("cd ",JobDir," ;rm *D00000001 *ini *rsr *sch *V99990001 *ali *pap *fa"))

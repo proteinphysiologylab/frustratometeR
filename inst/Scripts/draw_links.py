@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # Copyright (c) 2010 Robert L. Campbell
 # rlc draw_links.py version 0.1
 
