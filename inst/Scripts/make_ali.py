@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 ###makes .PIR file from .fas
 
 from sys import argv

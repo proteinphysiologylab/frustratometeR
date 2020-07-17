@@ -1,8 +1,8 @@
+#!/usr/bin/python3
+
 ###estoy corriendo script desde un folder que scripts, que tiene el nombre de la secuencia
 ###tengo pdb en mismo folder que scripts
 ###tengo uniprot en folder /scripts/UniprotsLahey
-
-
 
 from modeller import *
 from sys import argv

@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 ###estoy corriendo script desde un folder que scripts, que tiene el nombre de la secuencia
 ###alineamiento esta en mismo folder de corrida
 
