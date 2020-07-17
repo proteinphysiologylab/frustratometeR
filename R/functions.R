@@ -530,7 +530,6 @@ mutate_res<-function(PdbPath=NULL,JobDir=NULL,Modes="configurational",Chain=NULL
 	  for (i in 1:length(SeqGap[,1])) {
 	    if(SeqGap[i,1]!="-"&&SeqGap[i,1]==SeqPdb$AA[j]){
 	       SeqGap[i,2]<-SeqPdb$resno[j]
-	       print(paste("Entra",SeqGap[i,1],SeqGap[i,2],SeqPdb$AA[j]))
 	       j<-j+1
 	     }
 	  }
