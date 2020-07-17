@@ -180,7 +180,7 @@ calculate_frustration <- function(PdbFile=NULL, PdbID=NULL, Chain=NULL, Electros
 
   print("-----------------------------Calculating-----------------------------")
 
-  system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", seqdist, " ", Pdb$JobDir, "; cd ", Pdb$JobDir, "; ./lmp_serial_", seqdist, " < ", Pdb$PdbBase, ".in", sep=""))
+  system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", seqdist, " ", Pdb$JobDir, "; cd ", Pdb$JobDir, ";sh ./lmp_serial_", seqdist, " < ", Pdb$PdbBase, ".in", sep=""))
 
   if(Pdb$mode == "configurational" | Pdb$mode == "mutational")
   {
