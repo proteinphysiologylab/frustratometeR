@@ -523,9 +523,6 @@ mutate_res<-function(PdbPath=NULL,JobDir=NULL,Modes="configurational",Chain=NULL
 
 
 	  SeqGap<-cbind(SeqGap,rep(0,length(SeqGap)),1:length(SeqGap))
-	  View(SeqGap)
-	  View(align$ali)
-	  View(SeqPdb)
 	  j<-1
 	  for (i in 1:length(SeqGap[,1])) {
 	    if(SeqGap[i,1]!="-"&&SeqGap[i,1]==SeqPdb$AA[j]){
