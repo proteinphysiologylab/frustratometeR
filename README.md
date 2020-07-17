@@ -9,7 +9,7 @@ An R package for calculating energetic local frustration in protein structures. 
 
 # dependencies
 
-**R packages**
+**R packages (R version >= 3.6.3 required)**
 `install.packages(c("bio3d", "usethis", "devtools", "ggplot2", "reshape2", "magick","msa"))`
 
 **Python 3**
