@@ -163,7 +163,7 @@ calculate_frustration <- function(PdbFile=NULL, PdbID=NULL, Chain=NULL, Electros
 
   print("-----------------------------Preparing files-----------------------------")
   #Prepare the PDB file to get awsem input files, create the workdir and move neccessary files to it.
-  system(paste("cd ", Pdb$JobDir, "; pwd; ", Pdb$scriptsDir, "/AWSEMFiles/AWSEMTools/PdbCoords2Lammps.sh ", Pdb$PdbBase, " ", Pdb$PdbBase, " ", Pdb$scriptsDir, sep=""))
+  system(paste("cd ", Pdb$JobDir, "; pwd; sh ", Pdb$scriptsDir, "/AWSEMFiles/AWSEMTools/PdbCoords2Lammps.sh ", Pdb$PdbBase, " ", Pdb$PdbBase, " ", Pdb$scriptsDir, sep=""))
   system(paste("cp ", Pdb$scriptsDir, "/AWSEMFiles/*.dat* ", Pdb$JobDir, sep=""))
 
   print("-----------------------------Setting options-----------------------------")
@@ -180,7 +180,7 @@ calculate_frustration <- function(PdbFile=NULL, PdbID=NULL, Chain=NULL, Electros
 
   print("-----------------------------Calculating-----------------------------")
 
-  system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", seqdist, " ", Pdb$JobDir, "; cd ", Pdb$JobDir, "; ./lmp_serial_", seqdist, " < ", Pdb$PdbBase, ".in", sep=""))
+  system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", seqdist, " ", Pdb$JobDir, "; cd ", Pdb$JobDir, "; chmod +x lmp_serial_", seqdist, "; ./lmp_serial_", seqdist," < ", Pdb$PdbBase, ".in", sep=""))
 
   if(Pdb$mode == "configurational" | Pdb$mode == "mutational")
   {
