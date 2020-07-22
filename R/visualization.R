@@ -192,7 +192,7 @@ plot_contact_map <-function(Pdb, Chain=NULL)
   #                      plot.title=element_text(size=11,hjust=0.5),
   #                      legend.title=element_text(angle=-90))
 
-  Graphic<-ggplot() + geom_raster(data=longData[longData$value<20& !is.na(longData$value),],aes(x = Var2, y = Var1, fill=value))+
+  Graphic<-ggplot() + geom_tile(data=longData[longData$value<20& !is.na(longData$value),],aes(x = Var2, y = Var1, fill=value))+
     scale_fill_gradient2(low="red",mid="grey",high="green",limits=c(-4,4),breaks=c(-4,-3,-2,-1,0,1,2,3,4),labels=c("-4","-3","-2","-1","0","1","2","3","4"),
                          guide=guide_colourbar(barwidth=2,barheight=20,title=paste("Local ",Pdb$mode," Frustration Index"),title.position="right",title.hjust=0.5))+
     labs(x="Residue i", y="Residue j") + ggtitle(paste("Contact map ",Pdb$PdbBase,sep=""))+
