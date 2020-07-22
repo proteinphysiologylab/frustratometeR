@@ -500,6 +500,11 @@ mutate_res<-function(PdbPath=NULL,JobDir=NULL,Modes="configurational",Chain=NULL
   }
 	else if(Method=="Modeller"){
 
+	  if (!requireNamespace("msa", quietly = TRUE)){
+		if(!requireNamespace("BiocManager", quietly = TRUE)) {install.packages("BiocManager")} 
+		BiocManager::install("msa")
+	  }
+		
 	  AAvector<-c('L','D','I','N','T','V','A','G','E','R','K','H','Q','S','P','F','Y','M','W','C');
 
 	  sequence<-get.seq(ids = c(basename.pdb(PdbPath)),db = "PDB",outfile = paste(JobDir,"/seqs.fasta",sep=""))
