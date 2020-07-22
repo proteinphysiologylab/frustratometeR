@@ -13,7 +13,6 @@ Imports:
     bio3d,
     ggplot2,
     magick,
-    reshape2,
-    msa
+    reshape2
 Suggests:
     magick
