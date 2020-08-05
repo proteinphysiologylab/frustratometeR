@@ -257,7 +257,7 @@ plot_dynamic_res <- function(DynDir=NULL, Resno=NULL, Modes="configurational"){
     FrustrationResults <- cbind(seq(1, dim(FrustrationResults)[1]),FrustrationResults[1])
     FrustrationResults[ which(FrustrationResults[,2]>=0.58) ,3] <- "Minimally frustrated"
     FrustrationResults[ which( (FrustrationResults[,2]<0.58) & (FrustrationResults[,2]>-1.0) )  ,3] <- "Neutral"
-    FrustrationResults[ which(FrustrationResults[,2]<(-1.0)) ,3] <- "Highly frustrated"
+    FrustrationResults[ which(FrustrationResults[,2]<=(-1.0)) ,3] <- "Highly frustrated"
     colnames(FrustrationResults)<-c("Frame","IndexFrst","Type")
     FrustrationResults$Type<-factor(x=FrustrationResults$Type,levels=c("Minimally frustrated","Neutral","Highly frustrated"))
   }
