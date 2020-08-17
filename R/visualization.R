@@ -172,36 +172,37 @@ plot_contact_map <-function(Pdb, Chain=NULL)
   total.positions<-sum(apply(positions,1,function(x){x[2]-x[1]+1}))
   matrz <- matrix(NA,ncol=total.positions,nrow=total.positions)
   for(i in 1:nrow(datos)){
-    if(datos$V13[i]=="short") matrz[datos$pos1[i],datos$pos2[i]]<-20
-    else if(datos$V13[i]=="long") matrz[datos$pos1[i],datos$pos2[i]]<-30
-    else matrz[datos$pos1[i],datos$pos2[i]]<-40
+    #if(datos$V13[i]=="short") matrz[datos$pos1[i],datos$pos2[i]]<-20
+    #else if(datos$V13[i]=="long") matrz[datos$pos1[i],datos$pos2[i]]<-30
+    #else matrz[datos$pos1[i],datos$pos2[i]]<-40
     matrz[datos$pos2[i],datos$pos1[i]]<-datos$V12[i]
+    matrz[datos$pos1[i],datos$pos2[i]]<-datos$V12[i]
   }
   #PARA HACERLO TRIANGULAR SUPERIOR
   #matrz[upper.tri(matrz,diag = T)] <- 0
 
   longData<-melt(matrz)
-  # Graphic<-ggplot() + geom_tile(data=longData[longData$value<20& !is.na(longData$value),],aes(x = Var2, y = Var1, fill=value))+
-  # scale_fill_gradient2(low="red",mid="grey",high="green",limits=c(-4,4),breaks=c(-4,-3,-2,-1,0,1,2,3,4),labels=c("-4","-3","-2","-1","0","1","2","3","4"),
-  # guide=guide_colourbar(title=paste("Local ",Pdb$mode," Frustration Index"),barwidth=2,barheight=20,title.position="right",title.hjust=0.5)) +
-  # geom_tile(data=longData[longData$value>=20& !is.na(longData$value),],aes(x = Var2, y = Var1, color=value))+
-  # scale_color_discrete("",breaks=c(20,30,40),labels=c("Short","Long","Water mediated"),values = c("yellow","violet","black"))+
-  # labs(x="Residue i", y="Residue j") + ggtitle(paste("Contact map ",Pdb$PdbBase,sep=""))+
-  #   theme_bw() + theme(axis.text.x=element_text(size=9, angle=0, vjust=0.3),
-  #                      axis.text.y=element_text(size=9),
-  #                      plot.title=element_text(size=11,hjust=0.5),
-  #                      legend.title=element_text(angle=-90))
+  longData<-longData[longData$value!=0,]
+  Graphic<-ggplot(longData, aes(x = Var2, y = Var1)) + 
+           geom_tile(aes(fill=value),na.rm=TRUE) + 
+           scale_fill_gradient2(low="red",mid="grey",high="green",limits=c(-4,4),breaks=c(-4,-3,-2,-1,0,1,2,3,4),labels=c("-4","-3","-2","-1","0","1","2","3","4"),
+           guide=guide_colourbar(title=paste("Local ",Pdb$mode," Frustration Index"),barwidth=2,barheight=20,title.position="right",title.hjust=0.5)) +
+           labs(x="Residue i", y="Residue j") + ggtitle(paste("Contact map ",Pdb$PdbBase,sep=""))+
+           theme_bw() + theme(axis.text.x=element_text(size=9, angle=0, vjust=0.3),
+                              axis.text.y=element_text(size=9),
+                              plot.title=element_text(size=11,hjust=0.5),
+                              legend.title=element_text(angle=-90))
 
-  Graphic<-ggplot() + geom_tile(data=longData[longData$value<20& !is.na(longData$value),],aes(x = Var2, y = Var1, fill=value))+
-    scale_fill_gradient2(low="red",mid="grey",high="green",limits=c(-4,4),breaks=c(-4,-3,-2,-1,0,1,2,3,4),labels=c("-4","-3","-2","-1","0","1","2","3","4"),
-                         guide=guide_colourbar(barwidth=2,barheight=20,title=paste("Local ",Pdb$mode," Frustration Index"),title.position="right",title.hjust=0.5))+
-    labs(x="Residue i", y="Residue j") + ggtitle(paste("Contact map ",Pdb$PdbBase,sep=""))+
-    theme_bw() + theme(axis.text.x=element_text(size=9, angle=0, vjust=0.3),
-                         axis.text.y=element_text(size=9),
-                         plot.title=element_text(size=11,hjust=0.5),
-                         legend.title=element_text(angle = -90))+
-    geom_point(data=longData[longData$value>=20& !is.na(longData$value),],aes(x = Var2, y = Var1, color=as.factor(value)),shape=15,size=1)+
-    scale_color_manual("Contact distance",breaks=c(20,30,40),labels=c("Short","Long","Water mediated"),values = c("black","gray","cyan"),guide=guide_legend( title.theme = element_text(angle = 360)))
+  #Graphic<-ggplot() + geom_tile(data=longData[longData$value<20& !is.na(longData$value),],aes(x = Var2, y = Var1, fill=value))+
+    #scale_fill_gradient2(low="red",mid="grey",high="green",limits=c(-4,4),breaks=c(-4,-3,-2,-1,0,1,2,3,4),labels=c("-4","-3","-2","-1","0","1","2","3","4"),
+                         #guide=guide_colourbar(barwidth=2,barheight=20,title=paste("Local ",Pdb$mode," Frustration Index"),title.position="right",title.hjust=0.5))+
+    #labs(x="Residue i", y="Residue j") + ggtitle(paste("Contact map ",Pdb$PdbBase,sep=""))+
+    #theme_bw() + theme(axis.text.x=element_text(size=9, angle=0, vjust=0.3),
+                         #axis.text.y=element_text(size=9),
+                         #plot.title=element_text(size=11,hjust=0.5),
+                         #legend.title=element_text(angle = -90))+
+    #geom_point(data=longData[longData$value>=20& !is.na(longData$value),],aes(x = Var2, y = Var1, color=as.factor(value)),shape=15,size=1)+
+    #scale_color_manual("Contact distance",breaks=c(20,30,40),labels=c("Short","Long","Water mediated"),values = c("black","gray","cyan"),guide=guide_legend( title.theme = element_text(angle = 360)))
 
 
   if(length(chains)>1){
