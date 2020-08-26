@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
 # ----------------------------------------------------------------------
 # Copyright (2010) Aram Davtyan and Garegin Papoian
@@ -42,18 +42,18 @@ class Bond:
 
 inp_file = ""
 out_file = ""
-if len(sys.argv)>1: inp_file = sys.argv[2]
-if len(sys.argv)>2: out_file = sys.argv[3]
+if len(sys.argv)>1: inp_file = sys.argv[1]
+if len(sys.argv)>2: out_file = sys.argv[2]
 
 if inp_file=="":
-    print("\nCoordinatesToLammpsDataFile.py input_file [output_file] [-b] [-go]\n\n")
-    print("\t-b\tadd bonds between CA & CA, CA & O and CA & CB in the case of coarse graining\n")
-    print("\t-go\tcoarse-grained setup\n\n")
+    print "\nCoordinatesToLammpsDataFile.py input_file [output_file] [-b] [-go]\n\n"
+    print "\t-b\tadd bonds between CA & CA, CA & O and CA & CB in the case of coarse graining\n"
+    print "\t-go\tcoarse-grained setup\n\n"
     exit()
 
 cg_bonds = False
 go = False
-for cl in sys.argv[4:]:
+for cl in sys.argv[3:]:
 	if cl == '-b': cg_bonds = True
 	if cl == '-go': go = True
 		
@@ -73,15 +73,16 @@ else:
 
 cg = True
 
-xlo = -20000.0
-xhi = 20000.0
-ylo = -20000.0
-yhi = 20000.0
-zlo = -20000.0
-zhi = 20000.0
+xlo = -200.0
+xhi = 200.0
+ylo = -200.0
+yhi = 200.0
+zlo = -200.0
+zhi = 200.0
+edge = 10.0
 masses = [12.0, 14.0, 16.0, 12.0, 1.0]
 if cg and not go:
-	masses = [27.0, 14.0, 28.0, 60.0, 60.0]
+	masses = [27.0, 14.0, 28.0, 60.0, 2.0]
 n_atom_types = 5
 if cg:
 	if cg_bonds: n_bond_types = 5
@@ -113,17 +114,17 @@ atom_type = 0
 for l in inp:
     l = l.strip().split()
     if len(l)==6:
-        print("Input file lacks description field!")
+        print "Input file lacks description field!"
         exit()
 
     desc = l[6]
     chain_no = l[1]
     if not go:
-	    if desc == 'C-Beta' or desc == 'H-Beta' or desc == 'C-Alpha' or desc == 'O':
-		    n_atoms += 1
+	if desc == 'C-Beta' or desc == 'H-Beta' or desc == 'C-Alpha' or desc == 'O':
+		n_atoms += 1
     else:
-	    if desc == 'C-Alpha':
-		    n_atoms += 1
+	if desc == 'C-Alpha':
+		n_atoms += 1
 
     if not go:
         if desc == 'N0' or desc == 'N':
@@ -189,15 +190,40 @@ for l in inp:
 
     if not go:
         if desc == 'C-Beta' or desc == 'H-Beta' or desc == 'C-Alpha' or desc == 'O':
+#            n_atoms += 1
             atoms.append( Atom(n_atoms, chain_no, n_res, atom_type, 0.0, float(l[3]), float(l[4]), float(l[5])) )
             groups[group_id - 1].append(str(n_atoms))
     else:
         if desc == 'C-Alpha':
-            atom_type = 1
-            n_res += 1
-            atoms.append(Atom(n_atoms,chain_no,n_res,atom_type,0.0,float(l[3]),float(l[4]),float(l[5])))
+	    atom_type = 1
+	    n_res += 1
+            atoms.append( Atom(n_atoms, chain_no, n_res, atom_type, 0.0, float(l[3]), float(l[4]), float(l[5])) )
             groups[group_id - 1].append(str(n_atoms))
 inp.close()
+
+# Adjust box boundaries
+
+xmin = ymin = zmin = -200.0
+xmax = ymax = zmax = 200.0
+if len(atoms)>0:
+  xmin = xmax = atoms[0].x
+  ymin = ymax = atoms[0].y
+  zmin = zmax = atoms[0].z
+
+for ia in atoms:
+  if ia.x<xmin: xmin = ia.x
+  elif ia.x>xmax: xmax = ia.x
+  if ia.y<ymin: ymin = ia.y
+  elif ia.y>ymax: ymax = ia.y
+  if ia.z<zmin: zmin = ia.z
+  elif ia.z>zmax: zmax = ia.z
+
+xlo = xmin - edge
+ylo = ymin - edge
+zlo = zmin - edge
+xhi = xmax + edge
+yhi = ymax + edge
+zhi = zmax + edge
 
 if go:
 	n_atoms = len(atoms)
@@ -208,7 +234,7 @@ if go:
 
 space11 = "           "
 out = open(out_file,'w')
-out.write("LAMMPS protain data file\n\n")
+out.write("LAMMPS protein data file\n\n")
 
 out.write( (space11+str(n_atoms))[-12:] + "  atoms\n" )
 out.write( (space11+str(n_bonds))[-12:] + "  bonds\n" )
@@ -280,7 +306,7 @@ replace_rules = [ ["``read_data_file",  "read_data " +  out_file],
 		  ["``pair_interactions", pair_string],
 		  ["``pair_coeff", pair_coeff_string] ]
 myhome = os.environ.get("HOME")
-inp = open(sys.argv[1] + "/AWSEMFiles/AWSEMTools/inFilePattern.data")
+inp = open(myhome + "/opt/script/inFilePattern.data")
 inFile = inp.read()
 inp.close()
 
