@@ -184,9 +184,12 @@ calculate_frustration <- function(PdbFile=NULL, PdbID=NULL, Chain=NULL, Electros
 
   if(Pdb$mode == "configurational" | Pdb$mode == "mutational")
   {
+    print("-----------------------------5Adens-----------------------------")
     system(paste("perl ", Pdb$scriptsDir, "/5Adens.pl ", Pdb$PdbBase, ".pdb ", gsub(".$", "", Pdb$JobDir), " ", Pdb$mode, sep=""))
   }
+  print("-----------------------------RenumFiles-----------------------------")
   system(paste("perl ", Pdb$scriptsDir, "/RenumFiles.pl ", Pdb$PdbBase, " ", Pdb$JobDir, " ", Pdb$mode, sep="" ))
+  print("-----------------------------GenerateVisualizations-----------------------------")
   system(paste("perl ", Pdb$scriptsDir, "/GenerateVisualizations.pl ", Pdb$PdbBase, "_", Pdb$mode, ".pdb_auxiliar ", Pdb$PdbBase, " ", gsub(".$", "", Pdb$JobDir), " ", Pdb$mode, sep=""))
  
 
