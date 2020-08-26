@@ -5,7 +5,7 @@ my $jobDir=$ARGV[1];
 my $mode=$ARGV[2];
 my $FrstFile="tertiary_frustration.dat";
 
-my @CA_coords=qx(awk -F "" '{if(\$0~/ CA / && \$0~/ATOM/) print \$31\$32\$33\$34\$35\$36\$37\$38, \$39\$40\$41\$42\$43\$44\$45\$46, \$47\$48\$49\$50\$51\$52\$53\$54 }' $jobDir/$jobID);
+my @CA_coords=qx(awk -FS "" '{if(\$0~/ CA / && \$0~/ATOM/) print \$31\$32\$33\$34\$35\$36\$37\$38, \$39\$40\$41\$42\$43\$44\$45\$46, \$47\$48\$49\$50\$51\$52\$53\$54 }' $jobDir/$jobID);
 my @Conts_coords=qx(awk '{print \$1, \$2, \$5, \$6, \$7, \$8, \$9, \$10, \$19}' $jobDir/$FrstFile);
 my @Positions=qx(awk '{print \$3 }' $jobDir/$jobID\_equivalences.txt);
 my @ResChain=qx(awk '{print \$1 }' $jobDir/$jobID\_equivalences.txt);
