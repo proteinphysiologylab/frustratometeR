@@ -188,7 +188,7 @@ calculate_frustration <- function(PdbFile=NULL, PdbID=NULL, Chain=NULL, Electros
   }
   system(paste("perl ", Pdb$scriptsDir, "/RenumFiles.pl ", Pdb$PdbBase, " ", Pdb$JobDir, " ", Pdb$mode, sep="" ))
   system(paste("perl ", Pdb$scriptsDir, "/GenerateVisualizations.pl ", Pdb$PdbBase, "_", Pdb$mode, ".pdb_auxiliar ", Pdb$PdbBase, " ", gsub(".$", "", Pdb$JobDir), " ", Pdb$mode, sep=""))
-
+ 
 
   #Directory reorganization and results
   print("-----------------------------Reorganization-----------------------------")
