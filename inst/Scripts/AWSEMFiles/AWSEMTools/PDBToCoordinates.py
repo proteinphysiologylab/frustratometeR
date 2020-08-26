@@ -19,9 +19,7 @@ ap = 0.4436538
 bp = 0.2352006
 cp = 0.3211455
 
-aH = -0.946747
-bH = 2.50352
-cH = -0.620388
+rh = 1.54
 
 atom_type = {'1' : 'C', '2' : 'N', '3' : 'O', '4' : 'C', '5' : 'H', '6' : 'C'}
 atom_desc = {'1' : 'C-Alpha', '2' : 'N', '3' : 'O', '4' : 'C-Beta', '5' : 'H-Beta', '6' : 'C-Prime'}
@@ -44,7 +42,7 @@ class Atom:
         self.ch = ch
 
     def print_(self):
-        print(self.No, self.ch, self.ty , self.x, ',', self.y, ',', self.z, self.desc)
+        print self.No, self.ch, self.ty , self.x, ',', self.y, ',', self.z, self.desc
 
     def write_(self, f):
         f.write(str(self.No))
@@ -65,7 +63,7 @@ class Atom:
 
 def print_array(a):
     for ia in a:
-        print(ia)
+        print ia
 
 class PDB_Atom:
 	no = 0
@@ -126,9 +124,8 @@ def three2one(prot):
     return newprot
 
 if len(sys.argv)==1:
-    print("\nReadingPDBFile.py PDB_Id Output_file [-s]\n")
-    print("-s\tSplit into files for each chain")
-#    sys.argv.append("1BG8")
+    print "\nReadingPDBFile.py PDB_Id Output_file [-s]\n"
+    print "-s\tSplit into files for each chain"
     exit()
 
 from Bio.PDB.PDBParser import PDBParser
@@ -136,7 +133,11 @@ from Bio.PDB.PDBParser import PDBParser
 p = PDBParser(PERMISSIVE=1)
 
 struct_id = sys.argv[1]
-filename = struct_id + ".pdb"
+if struct_id.lower().endswith(".pdb"):
+  filename = struct_id
+  struct_id = struct_id[:-4]
+else:
+  filename = struct_id + ".pdb"
 
 splite = False
 for av in sys.argv:
@@ -163,16 +164,17 @@ for ch in chains:
     iatom = 0
     ichain = ichain + 1
     if output_fn!="":
-	    pass
+	pass
 #        if not splite:
 #            out.write("Chain: ")
 #            out.write(ch.get_id())
 #            out.write('\n')
     else:
-        print("Chain:", ch.get_id())
+        print "Chain:", ch.get_id()
     for res in ch:
         is_regular_res = res.has_id('N') and res.has_id('CA') and res.has_id('C')
-        res_id = res.get_id()[0]
+
+	res_id = res.get_id()[0]
         if (res_id==' ' or res_id=='H_MSE' or res_id=='H_M3L' or res_id=='H_CAS') and is_regular_res:
             ires = ires + 1
             resname = res.get_resname() 
@@ -181,18 +183,30 @@ for ch in chains:
             xyz_N = res['N'].get_coord()
             xyz_CA = res['CA'].get_coord()
             xyz_C = res['C'].get_coord()
-            xyz_O = res['O'].get_coord()
+#            xyz_O = res['O'].get_coord()
+            # Get coordinates of O, including for labeled terminal residues 
+            if(res.has_id('O')):
+                xyz_O = res['O'].get_coord()
+            elif(res.has_id('OT')):
+               xyz_O = res['OT'].get_coord()
+            else:
+               xyz_O = res['OT1'].get_coord()
             if resname != 'GLY':
               if not res.has_id('CB'):
-                print(ires, resname, "missing CB atom!")
-                print("Abort!")
+                print ires, resname, "missing CB atom!"
+                print "Abort!"
                 exit()
               xyz_CB = res['CB'].get_coord()
             else:
                 xyz_H = [0.0, 0.0, 0.0]
-                xyz_H[0] = aH*xyz_N[0] + bH*xyz_CA[0] + cH*xyz_C[0]
-                xyz_H[1] = aH*xyz_N[1] + bH*xyz_CA[1] + cH*xyz_C[1]
-                xyz_H[2] = aH*xyz_N[2] + bH*xyz_CA[2] + cH*xyz_C[2]
+                v1 = vector(xyz_N, xyz_CA)
+                v2 = vector(xyz_CA, xyz_C)
+                v3 = vcross_product(v1, v2)
+                vm = vabs(v3)
+                vh = vproduct(v3, rh/vm)
+                xyz_H[0] = xyz_CA[0] + vh[0]
+                xyz_H[1] = xyz_CA[1] + vh[1]
+                xyz_H[2] = xyz_CA[2] + vh[2]
             
             iatom = iatom + 1
             atom = Atom(iatom, ichain, 'N', xyz_N[0], xyz_N[1], xyz_N[2], 'N')
@@ -216,7 +230,7 @@ for ch in chains:
                 atoms.append(atom)
             else:            
                 iatom = iatom + 1
-                atom = Atom(iatom, ichain, 'H', xyz_N[0], xyz_H[1], xyz_H[2], 'H-Beta')
+                atom = Atom(iatom, ichain, 'H', xyz_H[0], xyz_H[1], xyz_H[2], 'H-Beta')
                 atoms.append(atom)
             
     if output_fn!="":
@@ -238,7 +252,7 @@ for ch in chains:
             out.close()
             se_out.close()
     else:
-        print(three2one(sequance))
+        print three2one(sequance)
         for iAtm in atoms:
             iAtm.print_()
 
