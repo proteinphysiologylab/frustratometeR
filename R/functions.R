@@ -168,12 +168,12 @@ calculate_frustration <- function(PdbFile=NULL, PdbID=NULL, Chain=NULL, Electros
 
   print("-----------------------------Setting options-----------------------------")
 
-  system(paste("cd ", Pdb$JobDir, "; sed -i  's/run		10000/run		0/g' ", Pdb$PdbBase, ".in; sed -i 's/mutational/", Pdb$mode, "/g' fix_backbone_coeff.data",  sep=""))
+  system(paste("cd ", Pdb$JobDir, "; sed -i ''  's/run		10000/run		0/g' ", Pdb$PdbBase, ".in; sed -i '' 's/mutational/", Pdb$mode, "/g' fix_backbone_coeff.data",  sep=""))
 
   if(!is.null(Electrostatics_K))
   {
     print("Setting electrostatics...")
-    system(paste("cd ", Pdb$JobDir, "; sed -i 's/\\[DebyeHuckel\\]-/\\[DebyeHuckel\\]/g' fix_backbone_coeff.data; sed -i 's/4.15 4.15 4.15/", Electrostatics_K, " ", Electrostatics_K, " ", Electrostatics_K, "/g' fix_backbone_coeff.data;", sep=""))
+    system(paste("cd ", Pdb$JobDir, "; sed -i '' 's/\\[DebyeHuckel\\]-/\\[DebyeHuckel\\]/g' fix_backbone_coeff.data; sed -i '' 's/4.15 4.15 4.15/", Electrostatics_K, " ", Electrostatics_K, " ", Electrostatics_K, "/g' fix_backbone_coeff.data;", sep=""))
     print("Setting electrostatics...")
     system(paste("cd ", Pdb$JobDir, "; python3 ", Pdb$scriptsDir, "/Pdb2Gro.py ", Pdb$PdbBase, ".pdb ", Pdb$PdbBase, ".pdb.gro; perl ", Pdb$scriptsDir, "/GenerateChargeFile.pl ", Pdb$PdbBase, ".pdb.gro > ", JobDir, "charge_on_residues.dat", sep=""))
   }
