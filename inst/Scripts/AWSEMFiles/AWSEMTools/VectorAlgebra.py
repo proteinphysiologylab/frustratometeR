@@ -95,4 +95,3 @@ def R(phi, theta, psi):
     R33 = cos(theta)
     
     return [[R11,R12,R13],[R21,R22,R23],[R31,R32,R33]]
-
