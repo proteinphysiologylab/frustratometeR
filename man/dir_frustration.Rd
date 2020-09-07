@@ -11,6 +11,7 @@ dir_frustration(
   seqdist = 12,
   Modes = "configurational",
   Graphics = TRUE,
+  Visualization = TRUE,
   ResultsDir = NULL
 )
 }
@@ -26,6 +27,8 @@ dir_frustration(
 \item{Modes}{Local frustration index to be calculated (configurational, mutational, singleresidue). Default: configurational}
 
 \item{Graphics}{The corresponding graphics are made (TRUE or FALSE). Default: TRUE}
+
+\item{Visualization}{Make visualizations, including pymol. Default: TRUE}
 
 \item{ResultsDir}{Path to the folder where results will be stored.}
 }

@@ -4,27 +4,14 @@
 \alias{plot_mutate_res}
 \title{Frustration of mutated residue}
 \usage{
-plot_mutate_res(
-  PdbPath = NULL,
-  DataFile = NULL,
-  ResultDir = NULL,
-  Chain = NULL,
-  Modes = "configurational",
-  Resno = NULL
-)
+plot_mutate_res(Pdb = NULL, Mutation = NULL, Show = TRUE)
 }
 \arguments{
-\item{PdbPath}{Full path of the Pdb to analyze}
+\item{Pdb}{Pdb object resulting from calculate_frustration}
 
-\item{DataFile}{Full path of the table resulting from the execution of mutate_res to parse}
+\item{Mutation}{Mutation attribute specific to the Pdb object}
 
-\item{ResultDir}{Full path of the directory where the resulting graphic will be stored}
-
-\item{Chain}{Chain of residue to analyze. Default: NULL}
-
-\item{Modes}{Local frustration index to be calculated (configurational, mutational). Default: configurational}
-
-\item{Resno}{Resno of residue to analyze.}
+\item{Show}{Print plot on screen. Default: TRUE}
 }
 \description{
 Generate a graph of the configurational or mutational frustration difference for the mutation of the n mutated residues by using mutate_res

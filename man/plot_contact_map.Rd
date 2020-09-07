@@ -4,12 +4,14 @@
 \alias{plot_contact_map}
 \title{Plot frustration contact map}
 \usage{
-plot_contact_map(Pdb, Chain = NULL)
+plot_contact_map(Pdb, Chain = NULL, Show = TRUE)
 }
 \arguments{
 \item{Pdb}{Frustration object}
 
 \item{Chain}{Chain of residue to analyze. Default: NULL}
+
+\item{Show}{Print plot on screen. Default: TRUE}
 }
 \description{
 Generates contact map plot to visualize the frustration values assigned to each contact

@@ -4,12 +4,14 @@
 \alias{plot_5Andens}
 \title{Plot 5Adens}
 \usage{
-plot_5Andens(Pdb, Chain = NULL)
+plot_5Andens(Pdb, Chain = NULL, Show = TRUE)
 }
 \arguments{
 \item{Pdb}{Frustration object}
 
 \item{Chain}{Chain of residue to analyze. Default: NULL}
+
+\item{Show}{Print plot on screen. Default: TRUE}
 }
 \description{
 Generates plot to analyze the density of contacts around a sphere of 5 Armstrongs, centered in the C-alfa atom from the residue. The different classes of contacts based on the mutational frustration index are counted in absolute terms.

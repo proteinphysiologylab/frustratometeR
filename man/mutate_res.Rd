@@ -5,8 +5,7 @@
 \title{Frustration of mutated residue}
 \usage{
 mutate_res(
-  PdbPath = NULL,
-  JobDir = NULL,
+  Pdb = NULL,
   Modes = "configurational",
   Chain = NULL,
   Resno = NULL,
@@ -15,9 +14,7 @@ mutate_res(
 )
 }
 \arguments{
-\item{PdbPath}{Pdb file path}
-
-\item{JobDir}{Full directory path where the results will be stored}
+\item{Pdb}{Pdb object}
 
 \item{Modes}{Local frustration index to be calculated (configurational, mutational, singleresidue). Default: configurational}
 
@@ -30,7 +27,7 @@ mutate_res(
 \item{Method}{Method indicates the method to use to perform the mutation (Threading or Modeller). Default: Threading}
 }
 \value{
-Table of frustration results in file
+Returns Pdb object with corresponding Mutation attribute
 }
 \description{
 Calculates local energetic frustration for residue mutation

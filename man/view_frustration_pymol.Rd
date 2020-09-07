@@ -4,7 +4,7 @@
 \alias{view_frustration_pymol}
 \title{View Frustration Pymol}
 \usage{
-view_frustration_pymol(pdb)
+view_frustration_pymol(Pdb)
 }
 \arguments{
 \item{Pdb}{Frustration object}
