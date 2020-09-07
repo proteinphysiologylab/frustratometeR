@@ -27,7 +27,7 @@ open(FRUSTRENUM, ">$jobDir/$jobID\_$mode\_renumbered");
 
 if($mode eq "configurational" || $mode eq "mutational")
 {
-print FRUST "#Res1 Res2 ChainRes1 ChainRes2 DensityRes1 DensityRes2 AA1 AA2 NativeEnergy DecoyEnergy SDEnergy FrstIndex Welltype FrstState\n";
+print FRUST "Res1 Res2 ChainRes1 ChainRes2 DensityRes1 DensityRes2 AA1 AA2 NativeEnergy DecoyEnergy SDEnergy FrstIndex Welltype FrstState\n";
 
 
 	for(my $i=2; $i<@tertiary_frustration; $i++)
@@ -90,7 +90,7 @@ print FRUST "#Res1 Res2 ChainRes1 ChainRes2 DensityRes1 DensityRes2 AA1 AA2 Nati
 
 elsif($mode eq "singleresidue")
 {
-print FRUST "#Res ChainRes DensityRes AA NativeEnergy DecoyEnergy SDEnergy FrstIndex\n";
+print FRUST "Res ChainRes DensityRes AA NativeEnergy DecoyEnergy SDEnergy FrstIndex\n";
 
 	for(my $i=2; $i<@tertiary_frustration; $i++)
 	{
