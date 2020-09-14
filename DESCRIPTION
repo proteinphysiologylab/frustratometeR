@@ -9,10 +9,9 @@ License: GPL
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.0
-Imports:
-    bio3d,
-    ggplot2,
-    magick,
-    reshape2
+Depends:
+	bio3d,
+	ggplot2,
+	reshape2
 Suggests:
-    magick
+	magick

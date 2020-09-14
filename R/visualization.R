@@ -22,7 +22,6 @@ plot_5Andens <- function(Pdb, Chain=NULL, Show=TRUE)
   AdensTable=read.table(file=paste(Dir,"FrustrationData/", JobID,".pdb_", Pdb$mode, "_5adens", sep=""),stringsAsFactors = FALSE)
   AdensTable <- as.data.frame(AdensTable)
   colnames(AdensTable) <- c("Positions","Chains","Total","MaximallyFrst","NeutrallyFrst","MinimallyFrst")
-
   PositionsTotal=seq(from=1, to=length( AdensTable$Positions ), by=1)
   AdensTable <- cbind( AdensTable , PositionsTotal )
 
@@ -38,8 +37,8 @@ plot_5Andens <- function(Pdb, Chain=NULL, Show=TRUE)
     Graphic <- Graphic + scale_color_manual(name = "",labels = c( "Highly frustrated" , "Neutral" , "Minimally frustrated" , "Total" ) , values = c("red", "gray", "green", "black"))
     Graphic <- Graphic + scale_y_continuous( breaks = seq(0,Maximum,5) ) + scale_x_continuous( breaks = seq( 1 , length(AdensTable$Positions), trunc((length(AdensTable$Positions)-1)/10)) )
     Graphic <- Graphic + theme_classic()
-
-    ggsave( filename=paste(Dir, "Images/", JobID, "_", mode, ".png_5Adens", ".png", sep=""), plot=Graphic,width=10, height= 6)
+    if(Show)  Graphic
+    else ggsave( filename=paste(Dir, "Images/", JobID, "_", mode, ".png_5Adens", ".png", sep=""), plot=Graphic,width=10, height= 6)
   }else{
     AdensTable<-AdensTable[AdensTable$Chains==Chain,]
 
@@ -53,10 +52,10 @@ plot_5Andens <- function(Pdb, Chain=NULL, Show=TRUE)
     Graphic <- Graphic + scale_color_manual(name = "", labels = c( "Highly frustrated" , "Neutral" , "Minimally frustrated" , "Total" ) , values = c("red", "gray", "green", "black"))
     Graphic <- Graphic + scale_y_continuous( breaks = seq(0,Maximum,5) ) + scale_x_continuous( breaks = seq( 1 , length(AdensTable$Positions), trunc((length(AdensTable$Positions)-1)/10) ))
     Graphic <- Graphic + theme_classic()
-
-    ggsave( filename=paste(Dir, "Images/", JobID, "_", mode, "_5Adens__chain", Chain, ".png", sep=""), plot=Graphic,width=10, height= 6)
+    
+    if(Show)  Graphic
+    else  ggsave( filename=paste(Dir, "Images/", JobID, "_", mode, "_5Adens__chain", Chain, ".png", sep=""), plot=Graphic,width=10, height= 6)
   }
-  if(Show)  Graphic
 }
 
 #' Plot 5Adens proportions
@@ -65,10 +64,12 @@ plot_5Andens <- function(Pdb, Chain=NULL, Show=TRUE)
 #'
 #' @param Pdb Frustration object
 #' @param Chain Chain of residue to analyze. Default: NULL
+#' @param Show Print plot on screen. Default: TRUE
 #' @export
 #'
-plot_5Adens_proportions <- function(Pdb, Chain=NULL)
+plot_5Adens_proportions <- function(Pdb, Chain=NULL, Show=TRUE)
 {
+  
   if(!is.null(Chain)){
     if(!(Chain %in% unique(Pdb$atom$chain))) stop("Chain not exist!")
   }
@@ -78,48 +79,34 @@ plot_5Adens_proportions <- function(Pdb, Chain=NULL)
   Dir=Pdb$JobDir;
   if (!dir.exists(paste(Dir,"/Images",sep="")))  dir.create(paste(Dir,"/Images",sep=""))
   mode=Pdb$mode;
-
+  
   AdensTable=read.table(file=paste(Dir,"FrustrationData/", JobID,".pdb_", Pdb$mode, "_5adens", sep=""),fill=T)
-  Positions=as.numeric(AdensTable[,1])
-  Chains=AdensTable[,2]
-  MaximallyFrst= as.numeric(AdensTable[,4])
-  NeutrallyFrst=as.numeric(AdensTable[,5])
-  MinimallyFrst=as.numeric(AdensTable[,6])
-  Total=as.numeric(AdensTable[,3])
-
-  PositionsTotal=seq(from=1, to=length(Positions), by=1)
+  AdensTable <- as.data.frame(AdensTable)
+  colnames(AdensTable) <- c("Positions","Chains","Total","MaximallyFrst","NeutrallyFrst","MinimallyFrst")
+  
+  if(!is.null(Chain)) AdensTable<-AdensTable[AdensTable$Chains==Chain,]
+  
   MinimallyFrst=as.numeric(AdensTable[,9])
   NeutrallyFrst=as.numeric(AdensTable[,8])
   MaximallyFrst=as.numeric(AdensTable[,7])
-
-  if(is.null(Chain))
-  {
-    png(filename = paste(Dir, "Images/", JobID, "_", mode, "_5Adens_around.png", sep=""), width = 540, height = 420)
-    par(mar=c(5,5,3,2), xpd=TRUE)
-    par(mgp=c(2,0.5,0))
-    barplot(rbind(MinimallyFrst, NeutrallyFrst, MaximallyFrst), col=c("green", "gray", "red"), axis.lty=1, xlab="Position", ylab="Density arround 5A sphere (%)", cex.lab=1.5, border = NA, space = c(0), xaxt = "n")
-    AuxAxis=seq(from=0, to=length(PositionsTotal))
-    axis(side = 1, at = AuxAxis , labels = (AuxAxis+min(PositionsTotal)),  tick = FALSE)
-    box(lwd=2)
-    legend(x="top",inset=c(-0.5,-0.12), legend=c("minimally frustrated", "neutral", "highly frustrated"), pch=c(15, 15, 15), col=c("green", "gray", "red"), horiz = T, bty = "n")
-    par(mar=c(5,1,5,5))
-    mtext(text = Pdb$PdbBase,line=4,side=4,cex=1.5)
-
-    dev.off()
-  }
-  else{
-    png(filename = paste(Dir, "Images/", JobID, "_", mode, "_5Adens_around_chain", Chain, ".png", sep=""), width = 540, height = 420)
-    par(mar=c(5,5,3,2), xpd=TRUE)
-    par(mgp=c(2,0.5,0))
-    barplot(rbind(MinimallyFrst[which(Chains==Chain)], NeutrallyFrst[which(Chains==Chain)], MaximallyFrst[which(Chains==Chain)]), col=c("green", "gray", "red"), axis.lty=1, xlab="Position", ylab="Density arround 5A sphere (%)", cex.lab=1.5, border = NA, space = c(0), xaxt = "n")
-    AuxAxis=seq(from=0, to=length(Positions[which(Chains==Chain)]))
-    axis(side = 1, at = AuxAxis , labels = (AuxAxis+min(Positions[which(Chains==Chain)])),  tick = FALSE)
-    legend(x="top",inset=c(-0.5,-0.12), legend=c("minimally frustrated", "neutral", "highly frustrated"), pch=c(15, 15, 15), col=c("green", "gray", "red"), horiz = T, bty = "n")
-    box(lwd=2)
-    par(mar=c(5,1,5,5))
-    mtext(text = Pdb$PdbBase,line=4,side=4,cex=1.5)
-    dev.off()
-  }
+  
+  FrustrationData <- as.data.frame(rbind(MaximallyFrst, NeutrallyFrst, MinimallyFrst))
+  FrustrationData$row <- seq_len(nrow(FrustrationData))
+  FrustrationData <- melt(FrustrationData, id.vars = "row")
+  FrustrationData$variable <- apply(as.matrix(FrustrationData$variable), c(1,2), function(x){return(as.numeric(substr(start = 2, stop = nchar(x),x = x)))})
+  FrustrationData$row <- as.factor(FrustrationData$row)
+  
+  Graphic <- ggplot(FrustrationData, aes(x = variable, y = value, fill = row ), color = row) + geom_bar(stat = "identity",width = 1) 
+  Graphic <- Graphic + scale_x_continuous( breaks = seq( 1 , length(AdensTable[,1]), by = trunc((length(AdensTable[,1])-1)/10) ))
+  Graphic <- Graphic + xlab("Positions") + ylab("Density arround 5A sphere (%)")
+  Graphic <- Graphic + ggtitle(paste("Density arround 5A sphere (%) in", Pdb$PdbBase))
+  Graphic <- Graphic + scale_fill_manual(name="",labels=c("Highly frustrated", "Neutral", "Minimally frustrated"),values=c("red", "gray", "green"))
+  Graphic <- Graphic + scale_color_manual(name="",values=c("red", "gray", "green"))
+  Graphic <- Graphic + theme(plot.title=element_text(size=11,hjust=0.5), panel.background = element_blank())
+  
+  if(Show)  Graphic
+  else if(is.null(Chain))  ggsave( filename=paste(Dir, "Images/", JobID, "_", mode, "_5Adens_around.png", sep=""), plot=Graphic,width=10, height= 6)
+else ggsave( filename=paste(Dir, "Images/", JobID, "_", mode, "_5Adens_around_chain", Chain,".png", sep=""), plot=Graphic,width=10, height= 6)
 }
 
 #' Plot frustration contact map
@@ -235,9 +222,10 @@ plot_contact_map <-function(Pdb, Chain=NULL, Show=TRUE )
     annotate("text", x = total.positions+20, y = round(apply(posNEW[,1:2],1,mean)), label = unique(chains),parse = TRUE,color="gray")+
     scale_x_continuous(breaks=breaks,labels=labels) + scale_y_continuous(breaks=breaks,labels=labels)
   }
-
-  ggsave(paste(Dir, "Images/", JobID, "_", mode, "_map.png", sep=""),plot=Graphic)
+  
   if(Show)  Graphic
+  else  ggsave(paste(Dir, "Images/", JobID, "_", mode, "_map.png", sep=""),plot=Graphic)
+  
 }
 
 #' View Frustration Pymol
@@ -525,22 +513,30 @@ plot_delta_frus<-function(PdbPath=NULL,DataDir=NULL,ResultDir=NULL,Chain=NULL){
 #' Generate a graph of the configurational or mutational frustration difference for the mutation of the n mutated residues by using mutate_res
 #'
 #' @param Pdb Pdb object resulting from calculate_frustration
-#' @param Mutation Mutation attribute specific to the Pdb object
+#' @param Chain ***********************
+#' @param Resno *************************
+#' @param Method **************************
 #' @param Show Print plot on screen. Default: TRUE
 #'
 #' @export
 #'
 
-plot_mutate_res<-function(Pdb = NULL, Mutation = NULL, Show = TRUE){
-
+plot_mutate_res<-function(Pdb = NULL, Chain = NULL, Resno = NULL, Method = "Threading", Show = TRUE){
+  
   if(is.null(Pdb)) stop("Pdb not specified")
-  if(is.null(Mutation)) stop("Mutation not specified")
+  if(!is.null(Pdb$Mutations[[Method]])){
+    if(is.null(Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain, sep = "")]]))
+      stop(paste("Not mutated to ", Resno, " residue from ", Chain, " chain", sep = ""))
+  }
+  else  stop(paste("It was not mutated with the ", Method, " method", sep = ""))
+    
+  Mutation <- Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain, sep = "")]]
   
   DataFrus = read.table(Mutation$File, header=F, stringsAsFactors = F)
   DataFrus <- as.data.frame(DataFrus)
   DataFrus <- cbind(DataFrus,seq(1,length(DataFrus[,1])))
   
-  if( Mutation$Mode == "configurational" | Mutation$Mode == "mutational"){
+  if( Pdb$mode == "configurational" | Pdb$mode == "mutational"){
   
     colnames(DataFrus) <- c("Res1","Res2","Chain1","Chain2","AA1","AA2","FrstIndex","FrstState","Color")
     DataFrus$FrstState <- as.factor(DataFrus$FrstState)
@@ -550,7 +546,7 @@ plot_mutate_res<-function(Pdb = NULL, Mutation = NULL, Show = TRUE){
     DataFrus$Chain1[DataFrus$Chain1!=Mutation$Chain] <- Mutation$Chain
     DataFrus$Res1[DataFrus$Res1!=Mutation$Res] <- Mutation$Res
   }
-  else if( Mutation$Mode == "singleresidue"){
+  else if( Pdb$mode == "singleresidue"){
     DataFrus <- cbind(DataFrus,seq(1,length(DataFrus[,1])))
     colnames(DataFrus) <- c("Resno","Chain","AA1","FrstIndex","FrstState","Color")
     DataFrus[DataFrus$FrstIndex>=0.78,5]<-"minimally"
@@ -570,7 +566,7 @@ plot_mutate_res<-function(Pdb = NULL, Mutation = NULL, Show = TRUE){
   #DataFrus$Color[DataFrus$AA1=='G']<-"orange"
   DataFrus$Color<-as.factor(DataFrus$Color)
 
-  if( Mutation$Mode == "configurational" | Mutation$Mode == "mutational"){
+  if( Pdb$mode == "configurational" | Pdb$mode == "mutational"){
     
     Contacts <- unique(DataFrus[,c("Res2","Chain2")])
     Contacts <- Contacts[order(Contacts[,1]),]
@@ -592,25 +588,24 @@ plot_mutate_res<-function(Pdb = NULL, Mutation = NULL, Show = TRUE){
     Graphic <- Graphic+ xlab("Contact residue") + ylab("Frustration Index")
     Graphic <- Graphic+ scale_x_continuous(breaks=Contacts$Index,labels=paste(Resid,Contacts$Res,Contacts$Chain))+ scale_y_continuous(breaks=seq(y1,y2,0.5),labels=as.character(seq(y1,y2,0.5)),limits = c(y1,y2))
     Graphic <- Graphic+ geom_hline(yintercept=c(0.78,-1),color="gray",linetype="longdash")
-    Graphic <- Graphic+ ggtitle(paste("Contact Frustration ",Mutation$Mode," of residue ",aa123(Native),"_",DataFrus$Res1[1],sep=""))+ theme(plot.title = element_text(hjust = 0.5),axis.text.x = element_text(angle = 90))
+    Graphic <- Graphic+ ggtitle(paste("Contact Frustration ",Pdb$mode," of residue ",aa123(Native),"_",DataFrus$Res1[1],sep=""))+ theme(plot.title = element_text(hjust = 0.5),axis.text.x = element_text(angle = 90), panel.background = element_blank())
     Graphic <- Graphic+ scale_color_manual("",breaks=c("green","gray","red","blue"),labels=c("Minimally frustrated","Neutral","Highly frustrated","Native"),values=c("green","gray","red","blue"))
+    
   }
-  else if( Mutation$Mode == "singleresidue"){
+  else if( Pdb$mode == "singleresidue"){
     y1 <- (-4)
     y2 <- 4
     Graphic <- ggplot(DataFrus, aes(x=aa123(AA1), y=FrstIndex, color = Color)) + geom_point()
     Graphic <- Graphic+ xlab("Residue") + ylab("Frustration Index")
     Graphic <- Graphic+ scale_y_continuous(breaks=seq(y1,y2,0.5),labels=as.character(seq(y1,y2,0.5)),limits = c(y1,y2))
     Graphic <- Graphic+ geom_hline(yintercept=c(0.58,-1),color="gray",linetype="longdash")
-    Graphic <- Graphic+ ggtitle(paste("Frustration of the 20 variants in position ",Mutation$Res," of the structure ",sep=""))+ theme(plot.title = element_text(hjust = 0.5),axis.text.x = element_text(angle = 90))
+    Graphic <- Graphic+ ggtitle(paste("Frustration of the 20 variants in position ",Mutation$Res," of the structure ",sep=""))+ theme(plot.title = element_text(hjust = 0.5),axis.text.x = element_text(angle = 90), panel.background = element_blank())
     Graphic <- Graphic+ scale_color_manual("",breaks=c("green","gray","red","blue"),labels=c("Minimally frustrated","Neutral","Highly frustrated","Native"),values=c("green","gray","red","blue"))
-    
+
   }
   
   if(!dir.exists(paste(Pdb$JobDir,"MutationsData/Images",sep="")))  dir.create(paste(Pdb$JobDir,"MutationsData/Images",sep=""))
-  ggsave(plot=Graphic,paste(Pdb$JobDir,"MutationsData/Images/",Mutation$Mode,"_",DataFrus$Res1[1],"_",Mutation$Method,"_",Mutation$Chain,".png",sep=""),width=10, height= 6)
-
-  if(Show){
-    Graphic
-  }
+  
+  if(Show)  Graphic
+  else  ggsave(plot=Graphic,paste(Pdb$JobDir,"MutationsData/Images/",Pdb$mode,"_",DataFrus$Res1[1],"_",Mutation$Method,"_",Mutation$Chain,".png",sep=""),width=10, height= 6)
 }
