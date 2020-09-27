@@ -42,7 +42,10 @@ plot_5Andens <- function(Pdb, Chain = NULL, Show = TRUE){
     Graphic <- Graphic + theme(plot.title = element_text(size = 11, hjust = 0.5), panel.background = element_blank())
     
     if(Show)  Graphic
-    else ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, ".png_5Adens", ".png", sep = ""), plot = Graphic, width = 10, height = 6)
+    else{
+      ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, ".png_5Adens", ".png", sep = ""), plot = Graphic, width = 10, height = 6)
+      cat(paste("5Adens plot is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, ".png_5Adens", ".png\n", sep = ""))
+    }
     
   }else{
     AdensTable <- AdensTable[AdensTable$Chains == Chain, ]
@@ -62,7 +65,10 @@ plot_5Andens <- function(Pdb, Chain = NULL, Show = TRUE){
     Graphic <- Graphic + theme(plot.title = element_text(size = 11, hjust = 0.5), panel.background = element_blank())
     
     if(Show)  Graphic
-    else  ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens__chain", Chain, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
+    else{
+      ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens__chain", Chain, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
+      cat(paste("5Adens plot is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens__chain", Chain, ".png\n", sep = ""))
+      }
   }
   
   return(Graphic)
@@ -118,9 +124,14 @@ plot_5Adens_proportions <- function(Pdb, Chain = NULL, Show = TRUE){
   Graphic <- Graphic + theme(plot.title = element_text(size = 11, hjust = 0.5), panel.background = element_blank())
   
   if(Show)  Graphic
-  else if(is.null(Chain))  ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around.png", sep = ""), plot = Graphic, width = 10, height = 6)
-  else ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around_chain", Chain, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
-
+  else if(is.null(Chain)){
+    ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around.png", sep = ""), plot = Graphic, width = 10, height = 6)
+    cat(paste("5Adens proportion plot is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around.png\n", sep = ""))
+  }else{
+    ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around_chain", Chain, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
+    cat(paste("5Adens proportion plot is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around_chain", Chain, ".png\n", sep = ""))
+  }
+  
   return(Graphic)
 }
 #plot_contact_map----
@@ -223,8 +234,10 @@ plot_contact_map <- function(Pdb, Chain = NULL, Show = TRUE){
   }
   
   if(Show)  Graphic
-  else  ggsave(paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_map.png", sep = ""), plot = Graphic, width = 7, height = 6)
-  
+  else{
+    ggsave(paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_map.png", sep = ""), plot = Graphic, width = 7, height = 6)
+    cat(paste("Contact map is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_map.png\n", sep = ""))
+  }
   return(Graphic)
 }
 #view_frustration_pymol----
@@ -291,9 +304,11 @@ plot_dynamic_res_5Adens_proportion <- function(Dynamic, Resno, Chain, Show = TRU
     Graphic <- Graphic + theme(plot.title = element_text(size = 11, hjust = 0.5), panel.background = element_blank())
     
     if(Show)  Graphic
-    else  ggsave(filename = paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamicHist5adens_", Dynamic$Mode, "_Res_", Resno, "_", Chain, ".png", sep = ""),
+    else{
+      ggsave(filename = paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamicHist5adens_", Dynamic$Mode, "_Res_", Resno, "_", Chain, ".png", sep = ""),
                  plot = Graphic, width = 10, height = 6)
-    
+      cat(paste("Dynamic_res 5Adens proportion plot is stored in ", Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamicHist5adens_", Dynamic$Mode, "_Res_", Resno, "_", Chain, ".png\n", sep = ""))
+    }
   }
   
   return(Graphic)
@@ -341,7 +356,10 @@ plot_dynamic_res <- function(Dynamic, Resno, Chain, Show = TRUE){
     Graphic <- Graphic + theme_classic() + theme(plot.title = element_text(size = 11, hjust = 0.5), axis.text.x = element_text(angle = 90))
     
     if(Show)  Graphic
-    else  ggsave(plot = Graphic, paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic5adens_", Dynamic$Mode, "_Res", Resno, ".png", sep = ""), width = 10, height = 6)
+    else{
+      ggsave(plot = Graphic, paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic5adens_", Dynamic$Mode, "_Res", Resno, ".png", sep = ""), width = 10, height = 6)
+      cat(paste("Dynamic_res 5Adens plot is stored in ", Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic5adens_", Dynamic$Mode, "_Res", Resno, ".png\n", sep = ""))
+    }
   }
   else{
     FrustrationResults <- cbind(seq(1, dim(FrustrationResults)[1]),FrustrationResults[, 8])
@@ -359,7 +377,10 @@ plot_dynamic_res <- function(Dynamic, Resno, Chain, Show = TRUE){
     Graphic <- Graphic + theme_classic() + theme(plot.title = element_text(size = 11, hjust = 0.5), axis.text.x = element_text(angle = 90))
     
     if(Show)  Graphic
-    else  ggsave(paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic_IndexFrustration_", Dynamic$Mode, "_Res", Resno, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
+    else{
+      ggsave(paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic_IndexFrustration_", Dynamic$Mode, "_Res", Resno, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
+      cat(paste("Dynamic_res plot is stored in ", Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic_IndexFrustration_", Dynamic$Mode, "_Res", Resno, ".png\n", sep = ""))
+    }
   }
   
   return(Graphic)
@@ -381,19 +402,25 @@ gif_contact_map <- function(Dynamic, Show = FALSE){
   }
   else library(magick)
   
+  cat("----------------------------Getting paths-----------------------------\n")
   paths <- c()
   for(i in seq(1, length(Dynamic$OrderList))){
     paths[i] <- paste(Dynamic$ResultsDir, basename.pdb(Dynamic$OrderList[i]), ".done/Images/", basename.pdb(Dynamic$OrderList[i]), "_", Dynamic$Mode, "_map.png", sep = "")
   }
+  cat("----------------------------Loading images-----------------------------\n")
   images <- list()
   for(i in seq(1, length(Dynamic$OrderList))){
     images[[i]] <- image_read(paths[i])
   }
+  cat("----------------------------Concatenating images-----------------------------\n")
   images <- image_join(images)
   animation <- image_animate(images, fps = 2, optimize = TRUE)
   
   if(Show) print(animation)
-  else image_write(animation, paste(Dynamic$ResultsDir, "contactMap_", Dynamic$Mode, ".gif", sep = ""))
+  else{
+    image_write(animation, paste(Dynamic$ResultsDir, "contactMap_", Dynamic$Mode, ".gif", sep = ""))
+    cat(paste("Contact map gif in ", Dynamic$ResultsDir, "contactMap_", Dynamic$Mode, ".gif\n", sep = ""))
+  }
 }
 #gif_5adens_proportions----
 #' @title 5Adens proportions gif.
@@ -426,7 +453,10 @@ gif_5adens_proportions <- function(Dynamic, Show = FALSE){
   animation <- image_animate(images, fps = 2, optimize = TRUE)
   
   if(Show) print(animation)
-  else  image_write(image = animation, path = paste(Dynamic$ResultsDir, "5Adens_proportions_", Dynamic$Mode, ".gif", sep = ""))
+  else{
+    image_write(image = animation, path = paste(Dynamic$ResultsDir, "5Adens_proportions_", Dynamic$Mode, ".gif", sep = ""))
+    cat(paste("5Adens proportion gif in ", Dynamic$ResultsDir, "5Adens_proportions_", Dynamic$Mode, ".gif\n", sep = ""))
+  }
 }
 #frustra_movie----
 #' @title Frustration movie in Pymol.
@@ -467,6 +497,10 @@ frustra_movie <- function(Dynamic){
   write("show cgo,all", file = fileMovie, append = TRUE)
   write("show dashes,all", file = fileMovie, append = TRUE)
   write("show cartoon,all", file = fileMovie, append = TRUE)
+  
+  cat(paste("Script that loads visualizations is stored in ", ResultDir, "/representations_", Dynamic$Mode, ".pml\n", sep = ""))
+  cat(paste("Script that generates movie is stored in ", ResultDir, "/GenerateMovie_", Dynamic$Mode, ".pml\n", sep = ""))
+  
 }
 #plot_delta_frus----
 #' @title Delta frustration of mutated residue
@@ -539,6 +573,7 @@ plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Show = TRUE
     if(!dir.exists(paste(Pdb$JobDir, "MutationsData/Images", sep = "")))  
       dir.create(paste(Pdb$JobDir, "MutationsData/Images", sep = ""))
     ggsave(plot = Graphic, paste(Pdb$JobDir, "MutationsData/Images/Delta_frus_", Resno, "_", Chain, ".png", sep = ""), width = 10, height = 6)
+    cat(paste("Delta frus plot is stored in ", Pdb$JobDir, "MutationsData/Images/Delta_frus_", Resno, "_", Chain, ".png\n", sep = ""))
   }
     
   return(Graphic)
@@ -654,6 +689,7 @@ plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", DeltaFrus =
     if(!dir.exists(paste(Pdb$JobDir, "MutationsData/Images", sep = "")))  
       dir.create(paste(Pdb$JobDir, "MutationsData/Images", sep = ""))
     ggsave(plot = Graphic, paste(Pdb$JobDir, "MutationsData/Images/", Pdb$Mode, "_", DataFrus$Res1[1], "_", Mutation$Method, "_", Mutation$Chain, ".png", sep = ""), width = 10, height = 6)
+    cat(paste("Mutate res plot is stored in ", Pdb$JobDir, "MutationsData/Images/", Pdb$Mode, "_", DataFrus$Res1[1], "_", Mutation$Method, "_", Mutation$Chain, ".png\n", sep = ""))
   }
   return(Graphic)  
 }

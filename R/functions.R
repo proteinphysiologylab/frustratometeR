@@ -231,7 +231,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   
   if(is.null(PdbFile)){
     #Get URL and download
-    print("-----------------------------Download files-----------------------------")
+    cat("-----------------------------Download files-----------------------------\n")
     pdbURL <- get.pdb(id = PdbID, split = boolsplit, URLonly = TRUE)
     system(paste("wget --no-check-certificate -P ", tempfolder, pdbURL, " -q --progress=bar:force:noscroll --show-progress", sep = ' '))
     
@@ -266,7 +266,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   
   PdbFile <- paste(JobDir, PdbBase, ".pdb", sep = "")
 
-  #**************FILTERS**************
+  cat("-----------------------------Filtering-----------------------------\n")
   # Here we filter out DNA chains
   system(paste("awk '{if($0!~/DT/ && $0!~/DG/ && $0!~/DA/ && $0!~/DC/ && $4!=",'"',"T",'"'," && $4!=",'"',"G",'"'," && $4!=",'"',"A",'"'," && $4!=",'"',"C",'"',") print }' ", PdbFile , " > ", JobDir, "/aux", sep=""))
   system(paste("mv ", JobDir, "/aux ", PdbFile, sep = ""))
@@ -306,17 +306,17 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   	Pdb[["equivalences"]] <- equivalences
   }
 
-  print("-----------------------------Preparing files-----------------------------")
+  cat("-----------------------------Preparing files-----------------------------\n")
   system(paste("sh ", Pdb$scriptsDir, "/AWSEMFiles/AWSEMTools/PdbCoords2Lammps.sh ", Pdb$PdbBase, " ", Pdb$PdbBase, " ", Pdb$scriptsDir, sep = ""))
   system(paste("cp ", Pdb$scriptsDir, "/AWSEMFiles/*.dat* ", Pdb$JobDir, sep = ""))
 
-  print("-----------------------------Setting options-----------------------------")
+  cat("-----------------------------Setting options-----------------------------\n")
   replace_Expr("run\t\t10000", "run\t\t0", paste(Pdb$JobDir, Pdb$PdbBase, ".in", sep = ""))
   replace_Expr("mutational", Pdb$Mode, paste(Pdb$JobDir, "fix_backbone_coeff.data", sep = ""))
   
   if(!is.null(Electrostatics_K))
   {
-    print("-----------------------------Setting electrostatics-----------------------------")
+    cat("-----------------------------Setting electrostatics-----------------------------\n")
     replace_Expr("\\[DebyeHuckel\\]-", "\\[DebyeHuckel\\]", paste(Pdb$JobDir, "fix_backbone_coeff.data", sep = ""))
     replace_Expr("4.15 4.15 4.15", paste(Electrostatics_K, Electrostatics_K, Electrostatics_K, sep = " "),
                  paste(Pdb$JobDir, "fix_backbone_coeff.data", sep = ""))
@@ -325,19 +325,17 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
                  Pdb$scriptsDir, "/GenerateChargeFile.pl ", Pdb$PdbBase, ".pdb.gro > ", JobDir, "charge_on_residues.dat", sep = ""))
   }
 
-  print("-----------------------------Calculating-----------------------------")
+  cat("-----------------------------Calculating-----------------------------\n")
   system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, " ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
                "; ./lmp_serial_", SeqDist, " < ", Pdb$PdbBase, ".in", sep = ""))
 
-  print("-----------------------------RenumFiles-----------------------------")
   system(paste("perl ", Pdb$scriptsDir, "/RenumFiles.pl ", Pdb$PdbBase, " ", Pdb$JobDir, " ", Pdb$Mode, sep = "" ))
   
   if(Pdb$Mode == "configurational" | Pdb$Mode == "mutational"){
-    print("-----------------------------5Adens-----------------------------")
     XAdens(Pdb)
   }
   
-  print("-----------------------------Reorganization-----------------------------")
+  cat("-----------------------------Reorganization-----------------------------\n")
   Frustration <- paste(Pdb$JobDir, "FrustrationData", sep = "")
   if (!dir.exists(Frustration))  dir.create(Frustration)
   system(paste("mv *.pdb_", Pdb$Mode, " ", Frustration, sep = ""))
@@ -347,7 +345,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   system(paste("mv *.pdb ", Frustration, sep = ""))
   
   if(Graphics & Mode != "singleresidue"){
-    print("-----------------------------Images-----------------------------")
+    cat("-----------------------------Images-----------------------------\n")
     Images <- paste(Pdb$JobDir, "Images", sep = "")
     if (!dir.exists(Images))  dir.create(Images)
     plot_5Andens(Pdb, Chain = Chain, Show = F)
@@ -356,7 +354,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   }
   
   if(Visualization & Mode != "singleresidue"){
-    print("-----------------------------Visualizations-----------------------------")
+    cat("-----------------------------Visualizations-----------------------------\n")
     system(paste("perl ", Pdb$scriptsDir, "/GenerateVisualizations.pl ", Pdb$PdbBase, "_", Pdb$Mode,
                  ".pdb_auxiliar ", Pdb$PdbBase, " ", gsub(".$", "", Pdb$JobDir), " ", Pdb$Mode, sep = ""))
     VisualizationDir <- paste(Pdb$JobDir, "VisualizationScrips", sep = "")
@@ -368,8 +366,14 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
     system(paste("cp ", Pdb$scriptsDir, "/draw_links.py ", VisualizationDir, sep = ""))
   }
   
+  cat("\n\n****Storage information****\n")
+  cat(paste("The frustration data was stored in ", Frustration, "\n", sep = ""))
+  if(Graphics & Mode != "singleresidue")
+    cat(paste("Graphics are stored in ", Images, "\n", sep = ""))
+  if(Visualization & Mode != "singleresidue")
+    cat(paste("Visualizations are stored in ", VisualizationDir, "\n", sep = ""))
+  
   #Unnecessary files are removed
-  print("-----------------------------Remove unnecessary files-----------------------------")
   system(paste("ls -F1 > output;", sep = ""))
   files <- read.table(paste(JobDir, "output", sep = ""), header = F)
   files[,1] <- as.character(files[, 1])
@@ -410,55 +414,58 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
 #' @export
 dir_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electrostatics_K = NULL, SeqDist = 12,
                             Mode = "configurational", Graphics = TRUE, Visualization = TRUE, ResultsDir){
-	
+  
   setwd(PdbsDir)
   
-	CalculationEnabled = TRUE
-
-	if(file.exists(paste(ResultsDir, "Modes.log", sep = ""))){
-		Modes <- read.table(paste(ResultsDir, "Modes.log", sep = ""), header = FALSE)
-		for(i in seq(1, length(Modes[, 1]))){
-			if(Modes[i, 1] == Mode)
-				CalculationEnabled = FALSE
-		}
-	}
-
-	if(CalculationEnabled){
-		if(is.null(OrderList)){
-
-		  OrderList <- as.vector(list.files(path = PdbsDir))
-			listPdb <- data.frame(OrderList)
-
-			for(index in seq(1, dim(listPdb)[1])){
-
-    			if(Mode == "configurational"){
-    		  		Pdb = calculate_frustration(PdbFile = paste(PdbsDir, listPdb[index, 1], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist,
-    		  		                            Mode = "configurational", Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
-    			}else if(Mode == "mutational"){
-    		  		Pdb = calculate_frustration(PdbFile = paste(PdbsDir, listPdb[index, 1], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist,
-    		  		                            Mode = "mutational", Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
-    			}else if(Mode == "singleresidue"){
-    		  		Pdb = calculate_frustration(PdbFile = paste(PdbsDir, listPdb[index, 1], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist,
-    		  		                            Mode = "singleresidue" , Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
-    			}
-    		}
-		}else{
-
-  			for(index in seq(1, length(OrderList))){
-    			if(Mode == "configurational"){
-    		  		Pdb = calculate_frustration(PdbFile = paste(PdbsDir, OrderList[index], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist,
-    		  		                            Mode = "configurational", Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
-    			}else if(Mode == "mutational"){
-    		  		Pdb = calculate_frustration(PdbFile = paste(PdbsDir, OrderList[index], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist, 
-    		  		                            Mode = "mutational", Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
-    			}else if(Mode == "singleresidue"){
-    		  		Pdb = calculate_frustration(PdbFile = paste(PdbsDir, OrderList[index], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist,
-    		  		                            Mode = "singleresidue", Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
-    			}
-    		}
-		}
-  		write(Mode, file = paste(ResultsDir, "Modes.log", sep = ""), append = TRUE)
-	}
+  CalculationEnabled = TRUE
+  
+  if(file.exists(paste(ResultsDir, "Modes.log", sep = ""))){
+    Modes <- read.table(paste(ResultsDir, "Modes.log", sep = ""), header = FALSE)
+    for(i in seq(1, length(Modes[, 1]))){
+      if(Modes[i, 1] == Mode)
+        CalculationEnabled = FALSE
+    }
+  }
+  
+  if(CalculationEnabled){
+    if(is.null(OrderList)){
+      
+      OrderList <- as.vector(list.files(path = PdbsDir))
+      listPdb <- data.frame(OrderList)
+      
+      for(index in seq(1, dim(listPdb)[1])){
+        
+        if(Mode == "configurational"){
+          Pdb = calculate_frustration(PdbFile = paste(PdbsDir, listPdb[index, 1], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist,
+                                      Mode = "configurational", Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
+        }else if(Mode == "mutational"){
+          Pdb = calculate_frustration(PdbFile = paste(PdbsDir, listPdb[index, 1], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist,
+                                      Mode = "mutational", Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
+        }else if(Mode == "singleresidue"){
+          Pdb = calculate_frustration(PdbFile = paste(PdbsDir, listPdb[index, 1], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist,
+                                      Mode = "singleresidue" , Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
+        }
+      }
+    }else{
+      
+      for(index in seq(1, length(OrderList))){
+        if(Mode == "configurational"){
+          Pdb = calculate_frustration(PdbFile = paste(PdbsDir, OrderList[index], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist,
+                                      Mode = "configurational", Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
+        }else if(Mode == "mutational"){
+          Pdb = calculate_frustration(PdbFile = paste(PdbsDir, OrderList[index], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist, 
+                                      Mode = "mutational", Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
+        }else if(Mode == "singleresidue"){
+          Pdb = calculate_frustration(PdbFile = paste(PdbsDir, OrderList[index], sep = ""), Chain = Chain, Electrostatics_K = Electrostatics_K, SeqDist = SeqDist,
+                                      Mode = "singleresidue", Graphics = Graphics, Visualization = Visualization, ResultsDir = ResultsDir)
+        }
+      }
+    }
+    write(Mode, file = paste(ResultsDir, "Modes.log", sep = ""), append = TRUE)
+    
+    cat("\n\n****Storage information****\n")
+    cat(paste("Frustration data for all Pdb's directory ", PdbsDir, " are stored in ", ResultsDir, "\n", sep = ""))
+  }
 }
 #dynamic_frustration----
 #' @title Dynamic Frustration.
@@ -479,7 +486,7 @@ dir_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electrostat
 #' @export
 dynamic_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electrostatics_K = NULL, SeqDist = 12, Mode = "configurational", GIFs = FALSE, ResultsDir){
   
-  #Object Dynamic
+  cat("-----------------------------Object Dynamic Frustration-----------------------------\n")
   if(is.null(OrderList)) 
     OrderList <- as.vector(list.files(path = PdbsDir))
   Dynamic <- c()
@@ -492,8 +499,12 @@ dynamic_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electro
   Dynamic$SeqDist <- SeqDist
   
   #Pdbs indicated in OrderList found in PdbsDir are frustrated
+  cat("-----------------------------Calculating Dynamic Frustration-----------------------------\n")
   dir_frustration(PdbsDir = PdbsDir, OrderList = OrderList, Chain = Chain, Electrostatics_K = Electrostatics_K,
                   SeqDist = SeqDist, Mode = Mode, ResultsDir = ResultsDir)
+  
+  cat("\n\n****Storage information****\n")
+  cat(paste("The frustration of the full dynamic is stored in ", ResultsDir, "\n", sep = ""))
   
   #Gifs
   if(GIFs){
@@ -528,6 +539,7 @@ dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
   if(!dir.exists(PlotsDir)) dir.create(PlotsDir)
   if(file.exists(ResultFile)) file.remove(ResultFile)
   
+  cat("-----------------------------Getting frustrated data-----------------------------\n")
   if(Dynamic$Mode == "configurational" | Dynamic$Mode == "mutational"){
     write("Res ChainRes Total nHighlyFrst nNeutrallyFrst nMinimallyFrst relHighlyFrustrated relNeutralFrustrated relMinimallyFrustrated",
           file = ResultFile)
@@ -549,6 +561,8 @@ dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
   }
   Dynamic$ResiduesDynamic[[Chain]][[paste("Res_", Resno, sep = "")]] <- ResultFile
   
+  cat("\n\n****Storage information****\n")
+  cat(paste("The frustration of the residue is stored in ", ResultFile, "\n", sep = ""))
   #Graphics
   if(Graphics){
     plot_dynamic_res(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Show = F)
@@ -571,7 +585,7 @@ dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
 #' 
 #' @return Returns Pdb frustration object with corresponding Mutation attribute
 #' 
-#' @exports
+#' @export
 mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
   
   options(stringsAsFactors = FALSE)
@@ -616,6 +630,9 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
     
     #It is mutated by 20 AA
     for(AA in AAvector){
+      
+      cat("\n-----------------------------Getting variant ", AA, "-----------------------------\n")
+      
       PdbMut <- Pdb
       #If AA is equal to the residue it is not necessary to mutate and neither is it glycine
       if(AA != Pdb$atom$resid[indexTotales$atom[1]] & !Glycine){
@@ -642,12 +659,13 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
       if(Split == TRUE) write.pdb(PdbMut, paste(Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, ".pdb", sep = ""))
       else  write.pdb(PdbMut, paste(Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb", sep = ""))
       
-      #Gets frustrated
+      cat("----------------------------Calculating frustration-----------------------------\n")
       if(Split == TRUE) calculate_frustration( PdbFile = paste(Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, ".pdb", sep = ""),
                                                Mode = Pdb$Mode, ResultsDir = Pdb$JobDir, Graphics = F, Visualization = F, Chain = Chain)
       else  calculate_frustration(PdbFile = paste(Pdb$JobDir, "/", Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb", sep = ""), 
                                   Mode = Pdb$Mode, ResultsDir = Pdb$JobDir, Graphics = FALSE, Visualization = F)
       
+      cat("----------------------------Storing-----------------------------\n")
       if(Pdb$Mode == "singleresidue"){
         system(paste("mv ", Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".done/FrustrationData/", Pdb$PdbBase, "_", 
                      Resno, "_", AA, "_", Chain, ".pdb_singleresidue ", Pdb$JobDir, "MutationsData/", sep = ""))
@@ -684,6 +702,7 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
     
     AAvector <- c('L', 'D', 'I', 'N', 'T', 'V', 'A', 'G', 'E', 'R', 'K', 'H', 'Q', 'S', 'P', 'F', 'Y', 'M', 'W', 'C');
     
+    cat("-----------------------------Getting sequence-----------------------------\n")
     sequence <- get.seq(ids = c(Pdb$PdbBase), db = "PDB", outfile = paste(Pdb$JobDir, "seqs.fasta", sep = ""))
     fasta <- read.fasta(paste(Pdb$JobDir, "seqs.fasta", sep = ""))
     
@@ -695,7 +714,7 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
     }
     
     rownames(Seq) <- toupper(rowname)
-    
+    cat("-----------------------------Equivalences-----------------------------\n")
     SeqPdb <- as.data.frame(pdbseq(Pdb, atom.select(Pdb, chain = Chain, elety = "CA")))
     SeqPdb <- cbind(SeqPdb, as.numeric(row.names(SeqPdb)), 1:length(SeqPdb[, 1]))
     colnames(SeqPdb) <- c("AA", "resno", "index")
@@ -717,10 +736,11 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
     
     system(paste("cp ", Pdb$scriptsDir, "/align2d.py ", Pdb$JobDir, sep = ""))
     system(paste("cp ", Pdb$scriptsDir, "/make_ali.py ", Pdb$JobDir, sep = ""))
-    system(paste("cp ", Pdb$scriptsDir, "/Model-single.py ", Pdb$JobDir, sep = ""))
+    system(paste("cp ", Pdb$scriptsDir, "/model-single.py ", Pdb$JobDir, sep = ""))
     system(paste("cp ", Pdb$PdbPath," ", Pdb$JobDir, sep = ""))
 
     for (AA in AAvector){
+      cat("\n-----------------------------Getting variant ", AA, "-----------------------------\n")
       if(Split){
         write(">Modelo", file = paste(Pdb$JobDir, "Modelo.fa", sep = ""))
         SeqMut = Seq[Chain, 1:table(Seq[Chain,] == "-")[1]]
@@ -728,16 +748,20 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
         write(paste(as.vector(SeqMut), collapse = ""), file = paste(Pdb$JobDir, "Modelo.fa", sep = ""), append = TRUE)
       }
       
+      cat("-----------------------------Aligning-----------------------------\n")
       system(paste("cd ", Pdb$JobDir, " ;python3 make_ali.py Modelo", sep = ""))
       if(Split) system(paste("cd ", Pdb$JobDir, " ;python3 align2d.py ", Pdb$PdbBase, " Modelo ", Chain, sep = ""))
   
-      system(paste("cd ", Pdb$JobDir, " ;python3 Model-single.py ", Pdb$PdbBase, " Modelo", sep = ""))
+      cat("-----------------------------Modeling-----------------------------\n")
+      system(paste("cd ", Pdb$JobDir, " ;python3 model-single.py ", Pdb$PdbBase, " Modelo", sep = ""))
       system(paste("cd ", Pdb$JobDir, " ;mv Modelo.B99990001.pdb ", Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb", sep = ""))
       system(paste("cd ", Pdb$JobDir, " ;rm *D00000001 *ini *rsr *sch *V99990001 *ali *pap *fa"))
       
+      cat("----------------------------Calculating frustration-----------------------------\n")
       calculate_frustration(PdbFile = paste(Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb", sep = ""),
                             Mode = Pdb$Mode, ResultsDir = Pdb$JobDir, Graphics = F, Visualization = F)
       
+      cat("----------------------------Storing-----------------------------\n")
       if(Pdb$Mode == "singleresidue"){
         system(paste("mv ", Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".done/FrustrationData/", Pdb$PdbBase,
                      "_", Resno, "_", AA, "_", Chain, ".pdb_singleresidue ", Pdb$JobDir, "MutationsData/", sep = ""))
@@ -764,7 +788,7 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
     }
     system(paste("cd ", Pdb$JobDir, " ; rm *pdb seqs.fasta *py", sep = ""))
     
-    #Renumber residues
+    cat("----------------------------Renumbering-----------------------------\n")
     if(Pdb$Mode == "singleresidue"){
       data <- read.table(paste(Pdb$JobDir, "MutationsData/singleresidue_Res", Resno, "_", Method,"_",Chain, ".txt", sep = ""), header = T)
       data[, 2] <- Chain
@@ -794,5 +818,8 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
   Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain, sep = "")]] <- data.frame(Method = Method ,Res = Resno, 
                                                                                                Chain = Chain, File = paste(Pdb$JobDir, "MutationsData/", Pdb$Mode, "_Res", Resno, "_", Method,"_",Chain, ".txt", sep = ""))
 
+  cat("\n\n****Storage information****\n")
+  cat(paste("The frustration of the residue is stored in ", Pdb$JobDir, "MutationsData/mutational_Res", Resno, "_", Method, "_", Chain , ".txt\n", sep = ""))
+  
   return(Pdb)
 }
