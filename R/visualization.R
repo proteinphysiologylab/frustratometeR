@@ -6,12 +6,12 @@
 #'
 #' @param Pdb Pdb Frustration object.
 #' @param Chain Chain of residue. Type: character. Default: NULL.
-#' @param Show Print graphic on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: TRUE.
+#' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
 #' 
 #' @export
-plot_5Andens <- function(Pdb, Chain = NULL, Show = TRUE){
+plot_5Andens <- function(Pdb, Chain = NULL, Save = FALSE){
   
   if(!is.null(Chain)){
     if(!(Chain %in% unique(Pdb$atom$chain))) stop("Chain not exist!")
@@ -41,8 +41,7 @@ plot_5Andens <- function(Pdb, Chain = NULL, Show = TRUE){
     Graphic <- Graphic + scale_y_continuous(breaks = seq(0, Maximum, 5)) + scale_x_continuous(breaks = seq(1 , length(AdensTable$Positions), trunc((length(AdensTable$Positions) - 1) / 10)))
     Graphic <- Graphic + theme(plot.title = element_text(size = 11, hjust = 0.5), panel.background = element_blank())
     
-    if(Show)  Graphic
-    else{
+    if(Save){
       ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, ".png_5Adens", ".png", sep = ""), plot = Graphic, width = 10, height = 6)
       cat(paste("5Adens plot is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, ".png_5Adens", ".png\n", sep = ""))
     }
@@ -64,11 +63,10 @@ plot_5Andens <- function(Pdb, Chain = NULL, Show = TRUE){
     Graphic <- Graphic + scale_y_continuous(breaks = seq(0, Maximum, 5)) + scale_x_continuous(breaks = seq(1, length(AdensTable$Positions), trunc((length(AdensTable$Positions) - 1) / 10)))
     Graphic <- Graphic + theme(plot.title = element_text(size = 11, hjust = 0.5), panel.background = element_blank())
     
-    if(Show)  Graphic
-    else{
+    if(Save){
       ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens__chain", Chain, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
       cat(paste("5Adens plot is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens__chain", Chain, ".png\n", sep = ""))
-      }
+    }
   }
   
   return(Graphic)
@@ -82,12 +80,12 @@ plot_5Andens <- function(Pdb, Chain = NULL, Show = TRUE){
 #'
 #' @param Pdb Pdb Frustration object.
 #' @param Chain Chain of residue. Type: character. Default: NULL.
-#' @param Show  Print graphic on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: TRUE.
+#' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
 #' 
 #' @export
-plot_5Adens_proportions <- function(Pdb, Chain = NULL, Show = TRUE){
+plot_5Adens_proportions <- function(Pdb, Chain = NULL, Save = FALSE){
   
   if(!is.null(Chain)){
     if(!(Chain %in% unique(Pdb$atom$chain))) stop("Chain not exist!")
@@ -123,14 +121,14 @@ plot_5Adens_proportions <- function(Pdb, Chain = NULL, Show = TRUE){
   Graphic <- Graphic + scale_color_manual(name = "",values = c("red", "gray", "green"))
   Graphic <- Graphic + theme(plot.title = element_text(size = 11, hjust = 0.5), panel.background = element_blank())
   
-  if(Show)  Graphic
-  else if(is.null(Chain)){
-    ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around.png", sep = ""), plot = Graphic, width = 10, height = 6)
-    cat(paste("5Adens proportion plot is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around.png\n", sep = ""))
-  }else{
-    ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around_chain", Chain, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
-    cat(paste("5Adens proportion plot is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around_chain", Chain, ".png\n", sep = ""))
-  }
+  if(Save)
+    if(is.null(Chain)){
+      ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around.png", sep = ""), plot = Graphic, width = 10, height = 6)
+      cat(paste("5Adens proportion plot is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around.png\n", sep = ""))
+    }else{
+      ggsave(filename = paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around_chain", Chain, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
+      cat(paste("5Adens proportion plot is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_5Adens_around_chain", Chain, ".png\n", sep = ""))
+    }
   
   return(Graphic)
 }
@@ -141,12 +139,12 @@ plot_5Adens_proportions <- function(Pdb, Chain = NULL, Show = TRUE){
 #'
 #' @param Pdb Pdb Frustration object.
 #' @param Chain Chain of residue. Type: character. Default: NULL.
-#' @param Show Print graphic on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: TRUE.
+#' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
 #'  
 #' @export
-plot_contact_map <- function(Pdb, Chain = NULL, Show = TRUE){
+plot_contact_map <- function(Pdb, Chain = NULL, Save = FALSE){
   
   if(!is.null(Chain)){
     if(!(Chain %in% unique(Pdb$atom$chain))) stop("Chain not exist!")
@@ -233,8 +231,7 @@ plot_contact_map <- function(Pdb, Chain = NULL, Show = TRUE){
                          scale_x_continuous(breaks = breaks, labels = labels) + scale_y_continuous(breaks = breaks, labels = labels)
   }
   
-  if(Show)  Graphic
-  else{
+  if(Save){
     ggsave(paste(Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_map.png", sep = ""), plot = Graphic, width = 7, height = 6)
     cat(paste("Contact map is stored in ", Pdb$JobDir, "Images/", Pdb$PdbBase, "_", Pdb$Mode, "_map.png\n", sep = ""))
   }
@@ -262,12 +259,12 @@ view_frustration_pymol <- function(Pdb){
 #' @param Dynamic Dynamic frustration object.
 #' @param Resno Specific residue. Type: numeric.
 #' @param Chain Specific chain. Type: character.
-#' @param Show Print graphic on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: TRUE.
+#' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
 #'  
 #' @export
-plot_dynamic_res_5Adens_proportion <- function(Dynamic, Resno, Chain, Show = TRUE){
+plot_dynamic_res_5Adens_proportion <- function(Dynamic, Resno, Chain, Save = FALSE){
   
   if(!is.null(Dynamic$ResiduesDynamic[[Chain]])){
     if(is.null(Dynamic$ResiduesDynamic[[Chain]][[paste("Res_", Resno, sep = "")]]))
@@ -303,8 +300,7 @@ plot_dynamic_res_5Adens_proportion <- function(Dynamic, Resno, Chain, Show = TRU
     Graphic <- Graphic + scale_color_manual(name = "", values = c("red", "gray", "green"))
     Graphic <- Graphic + theme(plot.title = element_text(size = 11, hjust = 0.5), panel.background = element_blank())
     
-    if(Show)  Graphic
-    else{
+    if(Save){
       ggsave(filename = paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamicHist5adens_", Dynamic$Mode, "_Res_", Resno, "_", Chain, ".png", sep = ""),
                  plot = Graphic, width = 10, height = 6)
       cat(paste("Dynamic_res 5Adens proportion plot is stored in ", Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamicHist5adens_", Dynamic$Mode, "_Res_", Resno, "_", Chain, ".png\n", sep = ""))
@@ -321,13 +317,13 @@ plot_dynamic_res_5Adens_proportion <- function(Dynamic, Resno, Chain, Show = TRU
 #' @param Dynamic Dynamic frustration object.
 #' @param Resno Specific residue. Type: numeric.
 #' @param Chain Specific chain. Type: character.
-#' @param Show Print graphic on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: TRUE.
+#' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
 #' 
 #' @export
 #'
-plot_dynamic_res <- function(Dynamic, Resno, Chain, Show = TRUE){
+plot_dynamic_res <- function(Dynamic, Resno, Chain, Save = FALSE){
   
   if(!is.null(Dynamic$ResiduesDynamic[[Chain]])){
     if(is.null(Dynamic$ResiduesDynamic[[Chain]][[paste("Res_", Resno, sep = "")]]))
@@ -355,8 +351,7 @@ plot_dynamic_res <- function(Dynamic, Resno, Chain, Show = TRUE){
     Graphic <- Graphic + scale_x_continuous(breaks = seq(1, length(FrustrationResults$Frame), ceiling(length(FrustrationResults$Frame) * 0.05)))
     Graphic <- Graphic + theme_classic() + theme(plot.title = element_text(size = 11, hjust = 0.5), axis.text.x = element_text(angle = 90))
     
-    if(Show)  Graphic
-    else{
+    if(Save){
       ggsave(plot = Graphic, paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic5adens_", Dynamic$Mode, "_Res", Resno, ".png", sep = ""), width = 10, height = 6)
       cat(paste("Dynamic_res 5Adens plot is stored in ", Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic5adens_", Dynamic$Mode, "_Res", Resno, ".png\n", sep = ""))
     }
@@ -376,8 +371,7 @@ plot_dynamic_res <- function(Dynamic, Resno, Chain, Show = TRUE){
     Graphic <- Graphic + scale_x_continuous(breaks = seq(1, length(FrustrationResults$Frame), ceiling(length(FrustrationResults$Frame) * 0.05)))
     Graphic <- Graphic + theme_classic() + theme(plot.title = element_text(size = 11, hjust = 0.5), axis.text.x = element_text(angle = 90))
     
-    if(Show)  Graphic
-    else{
+    if(Save){
       ggsave(paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic_IndexFrustration_", Dynamic$Mode, "_Res", Resno, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
       cat(paste("Dynamic_res plot is stored in ", Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic_IndexFrustration_", Dynamic$Mode, "_Res", Resno, ".png\n", sep = ""))
     }
@@ -511,12 +505,12 @@ frustra_movie <- function(Dynamic){
 #' @param Resno Specific residue. Type: numeric.
 #' @param Chain Specific chain. Type: character.
 #' @param Method Method indicates the method to use to perform the mutation (Threading or Modeller). Default: Threading
-#' @param Show Print Gif on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: FALSE.
+#' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
 #'
 #' @export
-plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Show = TRUE){
+plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALSE){
 
   if(!is.null(Pdb$Mutations[[Method]])){
     if(is.null(Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain, sep = "")]]))
@@ -568,8 +562,7 @@ plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Show = TRUE
                                        labels = c("Native state", "Neutral", "Minimally frustrated", "Highly frustrated"), values = c("blue", "gray", "green", "red"))
   Graphic <- Graphic + theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(angle = 90))
   
-  if(Show)  Graphic
-  else{
+  if(Save){
     if(!dir.exists(paste(Pdb$JobDir, "MutationsData/Images", sep = "")))  
       dir.create(paste(Pdb$JobDir, "MutationsData/Images", sep = ""))
     ggsave(plot = Graphic, paste(Pdb$JobDir, "MutationsData/Images/Delta_frus_", Resno, "_", Chain, ".png", sep = ""), width = 10, height = 6)
@@ -588,12 +581,12 @@ plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Show = TRUE
 #' @param Resno Specific residue. Type: numeric.
 #' @param Chain Specific chain. Type: character.
 #' @param Method Method indicates the method to use to perform the mutation (Threading or Modeller). Default: Threading
-#' @param Show Print Gif on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: FALSE.
+#' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
 #'
 #' @export
-plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", DeltaFrus = FALSE, Show = TRUE){
+plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", DeltaFrus = FALSE, Save = FALSE){
   
   if(!is.null(Pdb$Mutations[[Method]])){
     if(is.null(Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain, sep = "")]]))
@@ -684,8 +677,7 @@ plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", DeltaFrus =
     
   }
   
-  if(Show)  Graphic
-  else{
+  if(Save){
     if(!dir.exists(paste(Pdb$JobDir, "MutationsData/Images", sep = "")))  
       dir.create(paste(Pdb$JobDir, "MutationsData/Images", sep = ""))
     ggsave(plot = Graphic, paste(Pdb$JobDir, "MutationsData/Images/", Pdb$Mode, "_", DataFrus$Res1[1], "_", Mutation$Method, "_", Mutation$Chain, ".png", sep = ""), width = 10, height = 6)

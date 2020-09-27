@@ -4,14 +4,14 @@
 \alias{plot_contact_map}
 \title{Plot frustration contact map.}
 \usage{
-plot_contact_map(Pdb, Chain = NULL, Show = TRUE)
+plot_contact_map(Pdb, Chain = NULL, Save = FALSE)
 }
 \arguments{
 \item{Pdb}{Pdb Frustration object.}
 
 \item{Chain}{Chain of residue. Type: character. Default: NULL.}
 
-\item{Show}{Print graphic on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: TRUE.}
+\item{Save}{If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.}
 }
 \value{
 ggplot2 object.

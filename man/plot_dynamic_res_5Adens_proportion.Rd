@@ -4,7 +4,7 @@
 \alias{plot_dynamic_res_5Adens_proportion}
 \title{Plot 5Adens proportion for specific residue.}
 \usage{
-plot_dynamic_res_5Adens_proportion(Dynamic, Resno, Chain, Show = TRUE)
+plot_dynamic_res_5Adens_proportion(Dynamic, Resno, Chain, Save = FALSE)
 }
 \arguments{
 \item{Dynamic}{Dynamic frustration object.}
@@ -13,7 +13,7 @@ plot_dynamic_res_5Adens_proportion(Dynamic, Resno, Chain, Show = TRUE)
 
 \item{Chain}{Specific chain. Type: character.}
 
-\item{Show}{Print graphic on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: TRUE.}
+\item{Save}{If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.}
 }
 \value{
 ggplot2 object.

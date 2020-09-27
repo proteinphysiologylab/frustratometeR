@@ -10,7 +10,7 @@ plot_mutate_res(
   Chain,
   Method = "Threading",
   DeltaFrus = FALSE,
-  Show = TRUE
+  Save = FALSE
 )
 }
 \arguments{
@@ -22,7 +22,7 @@ plot_mutate_res(
 
 \item{Method}{Method indicates the method to use to perform the mutation (Threading or Modeller). Default: Threading}
 
-\item{Show}{Print Gif on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: FALSE.}
+\item{Save}{If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.}
 }
 \value{
 ggplot2 object.

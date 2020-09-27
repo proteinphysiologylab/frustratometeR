@@ -348,9 +348,9 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
     cat("-----------------------------Images-----------------------------\n")
     Images <- paste(Pdb$JobDir, "Images", sep = "")
     if (!dir.exists(Images))  dir.create(Images)
-    plot_5Andens(Pdb, Chain = Chain, Show = F)
-    plot_5Adens_proportions(Pdb, Chain = Chain, Show = F)
-    plot_contact_map(Pdb, Chain = Chain, Show = F)
+    plot_5Andens(Pdb, Chain = Chain, Save = T)
+    plot_5Adens_proportions(Pdb, Chain = Chain, Save = T)
+    plot_contact_map(Pdb, Chain = Chain, Save = T)
   }
   
   if(Visualization & Mode != "singleresidue"){
@@ -565,8 +565,8 @@ dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
   cat(paste("The frustration of the residue is stored in ", ResultFile, "\n", sep = ""))
   #Graphics
   if(Graphics){
-    plot_dynamic_res(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Show = F)
-    plot_dynamic_res_5Adens_proportion(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Show = F)
+    plot_dynamic_res(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Save = T)
+    plot_dynamic_res_5Adens_proportion(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Save = T)
   }
   
   return(Dynamic)

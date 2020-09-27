@@ -4,7 +4,7 @@
 \alias{plot_delta_frus}
 \title{Delta frustration of mutated residue}
 \usage{
-plot_delta_frus(Pdb, Resno, Chain, Method = "Threading", Show = TRUE)
+plot_delta_frus(Pdb, Resno, Chain, Method = "Threading", Save = FALSE)
 }
 \arguments{
 \item{Pdb}{Pdb frustration object}
@@ -15,7 +15,7 @@ plot_delta_frus(Pdb, Resno, Chain, Method = "Threading", Show = TRUE)
 
 \item{Method}{Method indicates the method to use to perform the mutation (Threading or Modeller). Default: Threading}
 
-\item{Show}{Print Gif on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: FALSE.}
+\item{Save}{If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.}
 }
 \value{
 ggplot2 object.
