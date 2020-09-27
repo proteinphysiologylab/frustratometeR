@@ -4,15 +4,29 @@
 \alias{plot_mutate_res}
 \title{Frustration of mutated residue}
 \usage{
-plot_mutate_res(Pdb = NULL, Mutation = NULL, Show = TRUE)
+plot_mutate_res(
+  Pdb,
+  Resno,
+  Chain,
+  Method = "Threading",
+  DeltaFrus = FALSE,
+  Show = TRUE
+)
 }
 \arguments{
-\item{Pdb}{Pdb object resulting from calculate_frustration}
+\item{Pdb}{Pdb frustration object}
 
-\item{Mutation}{Mutation attribute specific to the Pdb object}
+\item{Resno}{Specific residue. Type: numeric.}
 
-\item{Show}{Print plot on screen. Default: TRUE}
+\item{Chain}{Specific chain. Type: character.}
+
+\item{Method}{Method indicates the method to use to perform the mutation (Threading or Modeller). Default: Threading}
+
+\item{Show}{Print Gif on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: FALSE.}
+}
+\value{
+ggplot2 object.
 }
 \description{
-Generate a graph of the configurational or mutational frustration difference for the mutation of the n mutated residues by using mutate_res
+Plot the frustration for each of the 20 residue variants at a given position in the structure.
 }

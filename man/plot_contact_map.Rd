@@ -2,17 +2,20 @@
 % Please edit documentation in R/visualization.R
 \name{plot_contact_map}
 \alias{plot_contact_map}
-\title{Plot frustration contact map}
+\title{Plot frustration contact map.}
 \usage{
 plot_contact_map(Pdb, Chain = NULL, Show = TRUE)
 }
 \arguments{
-\item{Pdb}{Frustration object}
+\item{Pdb}{Pdb Frustration object.}
 
-\item{Chain}{Chain of residue to analyze. Default: NULL}
+\item{Chain}{Chain of residue. Type: character. Default: NULL.}
 
-\item{Show}{Print plot on screen. Default: TRUE}
+\item{Show}{Print graphic on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: TRUE.}
+}
+\value{
+ggplot2 object.
 }
 \description{
-Generates contact map plot to visualize the frustration values assigned to each contact
+Generates contact map plot to visualize the frustration values assigned to each contact.
 }

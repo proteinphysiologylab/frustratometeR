@@ -4,31 +4,23 @@
 \alias{mutate_res}
 \title{Frustration of mutated residue}
 \usage{
-mutate_res(
-  Pdb = NULL,
-  Modes = "configurational",
-  Chain = NULL,
-  Resno = NULL,
-  Split = TRUE,
-  Method = "Threading"
-)
+mutate_res(Pdb, Resno, Chain, Split = TRUE, Method = "Threading")
 }
 \arguments{
-\item{Pdb}{Pdb object}
+\item{Pdb}{Pdb frustration object.}
 
-\item{Modes}{Local frustration index to be calculated (configurational, mutational, singleresidue). Default: configurational}
+\item{Resno}{Resno of the residue to be mutated. Type: numeric. Default: NULL.}
 
-\item{Chain}{Chain of residue to analyze. Default: NULL}
+\item{Chain}{Chain of the residue to be mutated. Type: character. Default: NULL.}
 
-\item{Resno}{Resno of residue to analyze. If it is NULL, not analyze. Default: NULL}
-
-\item{Split}{Split that you are going to calculate frustration. If it is TRUE specific string, if it is FALSE full complex. Default: TRUE}
+\item{Split}{Split that you are going to calculate frustration. If it is TRUE specific string, if it is FALSE full complex. Default: TRUE.}
 
 \item{Method}{Method indicates the method to use to perform the mutation (Threading or Modeller). Default: Threading}
 }
 \value{
-Returns Pdb object with corresponding Mutation attribute
+Returns Pdb frustration object with corresponding Mutation attribute
 }
 \description{
-Calculates local energetic frustration for residue mutation
+Calculate the local energy frustration for each of the 20 residual variants in the Resno position and Chain chain.
+Use the frustration index indicated in the Pdb object.
 }

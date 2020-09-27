@@ -2,16 +2,21 @@
 % Please edit documentation in R/functions.R
 \name{get_frustration}
 \alias{get_frustration}
-\title{Get frustration data}
+\title{Get frustration data.}
 \usage{
-get_frustration(Pdb = NULL)
+get_frustration(Pdb, Resno = NULL, Chain = NULL)
 }
 \arguments{
-\item{Pdb}{}
+\item{Pdb}{Pdb frustration object obtained by calculate_frustration().}
+
+\item{Resno}{Specific residue in Pdb. Type: numeric. Default: NULL.}
+
+\item{Chain}{Specific chain in Pdb. Type: character. Default: NULL.}
 }
 \value{
-Frustration table
+Frustration table. Type: data frame.
 }
 \description{
-Returns a data frame corresponding to the frustration data previously calculated by calculate_frustration
+Returns the frustration of all Pdb residues, of a specific Chain or residue (Resno)
+By default the complete Pdb frustration table is obtained and returned.
 }

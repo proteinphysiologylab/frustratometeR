@@ -2,17 +2,16 @@
 % Please edit documentation in R/visualization.R
 \name{frustra_movie}
 \alias{frustra_movie}
-\title{Frustration movie in Pymol}
+\title{Frustration movie in Pymol.}
 \usage{
-frustra_movie(PdbDir = NULL, OrderList = NULL, Modes = "configurational")
+frustra_movie(Dynamic)
 }
 \arguments{
-\item{PdbDir}{File containing all proteins structures. The full path to the file is needed}
-
-\item{OrderList}{Orderer list of PDB files to calculate frustration.}
-
-\item{Modes}{Local frustration index to be calculated (configurational, mutational, singleresidue). Default: configurational}
+\item{Dynamic}{Dynamic frustration object.}
+}
+\value{
+Stores pymol scripts representations_(Mode).pml and GenerateMovie_(Mode).pml
 }
 \description{
-It generates visualization in pymol of the frames of the indicated dynamics and script for its execution in pymol of generation of the film
+It generates visualization in pymol of the frames of the indicated dynamics and script for its execution in pymol of generation of the film.
 }

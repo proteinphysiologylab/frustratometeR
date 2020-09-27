@@ -2,42 +2,42 @@
 % Please edit documentation in R/functions.R
 \name{calculate_frustration}
 \alias{calculate_frustration}
-\title{Calculate Frustration}
+\title{Calculate Frustration.}
 \usage{
 calculate_frustration(
   PdbFile = NULL,
   PdbID = NULL,
   Chain = NULL,
   Electrostatics_K = NULL,
-  seqdist = 12,
-  Modes = "configurational",
+  SeqDist = 12,
+  Mode = "configurational",
   Graphics = TRUE,
   Visualization = TRUE,
-  ResultsDir = NULL
+  ResultsDir
 )
 }
 \arguments{
-\item{PdbFile}{File containing the protein structure. The full path to the file is needed}
+\item{PdbFile}{Full path of the file containing the protein structure. Default: NULL.}
 
-\item{PdbID}{PdbID of the protein structure.}
+\item{PdbID}{PdbID of the protein structure. Default: NULL.}
 
-\item{Chain}{Chain of the protein structure.}
+\item{Chain}{Chain of the protein structure. Type: character. Default: NULL.}
 
-\item{Electrostatics_K}{K constant to use in the electrostatics mode. Default: NULL (no electrostatics is considered).}
+\item{Electrostatics_K}{K constant to use in the electrostatics Mode. Type: numeric. Default: NULL (no electrostatics is considered).}
 
-\item{seqdist}{Sequence at which contacts are considered to interact (3 or 12). Default: 12}
+\item{SeqDist}{Sequence at which contacts are considered to interact (3 or 12). Type: numeric. Default: 12.}
 
-\item{Modes}{Local frustration index to be calculated (configurational, mutational, singleresidue). Default=configurational}
+\item{Mode}{Local frustration index to be calculated (configurational, mutational, singleresidue). Type: string. Default: configurational.}
 
-\item{Graphics}{The corresponding graphics are made (TRUE or FALSE). Default: TRUE}
+\item{Graphics}{The corresponding graphics are made (TRUE or FALSE). Type: bool. Default: TRUE.}
 
-\item{Visualization}{Make visualizations, including pymol. Default: TRUE}
+\item{Visualization}{Make visualizations, including pymol. Type: bool. Default: TRUE.}
 
 \item{ResultsDir}{Path to the folder where results will be stored.}
 }
 \value{
-Pdb Frustration object
+Pdb frustration object.
 }
 \description{
-Calculates local energetic frustration for a protein structure
+Calculates local energetic frustration for a protein structure.
 }

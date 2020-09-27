@@ -2,39 +2,39 @@
 % Please edit documentation in R/functions.R
 \name{dynamic_frustration}
 \alias{dynamic_frustration}
-\title{Dynamic Frustration}
+\title{Dynamic Frustration.}
 \usage{
 dynamic_frustration(
-  PdbDir = NULL,
+  PdbsDir,
   OrderList = NULL,
-  Electrostatics_K = NULL,
-  seqdist = 12,
-  Modes = "configurational",
-  Resno = NULL,
   Chain = NULL,
+  Electrostatics_K = NULL,
+  SeqDist = 12,
+  Mode = "configurational",
   GIFs = FALSE,
-  ResultsDir = NULL
+  ResultsDir
 )
 }
 \arguments{
-\item{PdbDir}{File containing all proteins structures. The full path to the file is needed}
+\item{PdbsDir}{Directory containing all protein structures. The full path to the file is needed.}
 
-\item{OrderList}{Orderer list of PDB files to calculate frustration. If it is NULL, frustration is calculated for all PDBs. Default: NULL}
+\item{OrderList}{Orderer list of PDB files to calculate frustration. If it is NULL, frustration is calculated for all PDBs. Type: vector. Default: NULL.}
 
-\item{Electrostatics_K}{K constant to use in the electrostatics mode. Default: NULL (no electrostatics is considered).}
+\item{Chain}{Chain of the protein structure. Type: character. Default: NULL.}
 
-\item{seqdist}{Sequence at which contacts are considered to interact (3 or 12). Default: 12}
+\item{Electrostatics_K}{K constant to use in the electrostatics Mode. Type: numeric. Default: NULL (no electrostatics is considered).}
 
-\item{Modes}{Local frustration index to be calculated (configurational, mutational, singleresidue). Default: configurational}
+\item{SeqDist}{Sequence at which contacts are considered to interact (3 or 12). Type: numeric. Default: 12.}
 
-\item{Resno}{Resno of residue to analyze. If it is NULL, not analyze. Default: NULL}
+\item{Mode}{Local frustration index to be calculated (configurational, mutational, singleresidue). Default: configurational.}
 
-\item{Chain}{Chain of residue to analyze}
-
-\item{GIFs}{if it is TRUE, gifs of contact maps and proportion 5 adens are made for all the frames. Default: FALSE}
+\item{GIFs}{If it is TRUE, the contact map gifs and 5 adens proportion of all the frames of the dynamic will be stored, otherwise they will not be stored. Type: bool. Default: FALSE}
 
 \item{ResultsDir}{Path to the folder where results will be stored.}
 }
+\value{
+Dynamic frustration object
+}
 \description{
-Calculates local energetic frustration for a dynamic
+Calculates local energetic frustration for a dynamic.
 }

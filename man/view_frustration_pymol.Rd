@@ -2,13 +2,13 @@
 % Please edit documentation in R/visualization.R
 \name{view_frustration_pymol}
 \alias{view_frustration_pymol}
-\title{View Frustration Pymol}
+\title{View Frustration Pymol.}
 \usage{
 view_frustration_pymol(Pdb)
 }
 \arguments{
-\item{Pdb}{Frustration object}
+\item{Pdb}{Pdb Frustration object.}
 }
 \description{
-Generates a pymol session to observe the frustration patterns on top of the pdb protein structure
+Generates a pymol session to observe the frustration patterns on top of the pdb protein structure.
 }

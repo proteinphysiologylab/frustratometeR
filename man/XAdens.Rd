@@ -2,18 +2,19 @@
 % Please edit documentation in R/functions.R
 \name{XAdens}
 \alias{XAdens}
-\title{Replace expression}
+\title{X Adens.}
 \usage{
-XAdens(Pdb = NULL, ratio = 5)
+XAdens(Pdb, ratio = 5)
 }
 \arguments{
-\item{Pdb}{Pdb object}
+\item{Pdb}{Pdb frustration object.}
 
-\item{ratio}{Radius of the sphere for calculating proportions}
+\item{ratio}{Sphere radius. Type: numeric.}
 }
 \value{
-
+File (Mode)_5adens.
 }
 \description{
-Calculate the proportion by type of contact in a sphere of radius X
+Calculate the proportion of each type of contact (neutral, highly minimally frustrated) of each residue Pdb within a sphere of radius ratio
+Is performed by obtaining information from the "tertiary_frustration.dat" file (intermediate processing).
 }

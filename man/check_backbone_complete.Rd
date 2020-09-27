@@ -2,16 +2,16 @@
 % Please edit documentation in R/functions.R
 \name{check_backbone_complete}
 \alias{check_backbone_complete}
-\title{Check Backbone Complete}
+\title{Check Backbone Complete.}
 \usage{
 check_backbone_complete(Pdb)
 }
 \arguments{
-\item{Pdb}{Frustration object}
+\item{Pdb}{Pdb frustration object.}
 }
 \value{
-Flag indicating if the backbone should be completed
+Flag indicating if the backbone should be completed.
 }
 \description{
-Checks the backbone of a given protein structure to be processed by the frustratometer pipeline
+Checks the backbone of a given protein structure to be processed by the frustratometeR pipeline.
 }

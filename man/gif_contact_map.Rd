@@ -2,17 +2,15 @@
 % Please edit documentation in R/visualization.R
 \name{gif_contact_map}
 \alias{gif_contact_map}
-\title{Contact map gif}
+\title{Contact map gif.}
 \usage{
-gif_contact_map(PdbDir = NULL, OrderList = NULL, Modes = "configurational")
+gif_contact_map(Dynamic, Show = FALSE)
 }
 \arguments{
-\item{PdbDir}{File containing all proteins structures. The full path to the file is needed}
+\item{Dynamic}{Dynamic frustration object.}
 
-\item{OrderList}{Orderer list of PDB files to calculate frustration.}
-
-\item{Modes}{Local frustration index to be calculated (configurational, mutational, singleresidue). Default: configurational}
+\item{Show}{Print Gif on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: FALSE.}
 }
 \description{
-Generate Gif of contact map of the structure under study along the dynamics
+Generate Gif of contact map of the structure under study along the dynamics.
 }

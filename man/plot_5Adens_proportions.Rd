@@ -2,15 +2,21 @@
 % Please edit documentation in R/visualization.R
 \name{plot_5Adens_proportions}
 \alias{plot_5Adens_proportions}
-\title{Plot 5Adens proportions}
+\title{Plot 5Adens proportions.}
 \usage{
-plot_5Adens_proportions(Pdb, Chain = NULL)
+plot_5Adens_proportions(Pdb, Chain = NULL, Show = TRUE)
 }
 \arguments{
-\item{Pdb}{Frustration object}
+\item{Pdb}{Pdb Frustration object.}
 
-\item{Chain}{Chain of residue to analyze. Default: NULL}
+\item{Chain}{Chain of residue. Type: character. Default: NULL.}
+
+\item{Show}{Print graphic on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: TRUE.}
+}
+\value{
+ggplot2 object.
 }
 \description{
-Generates plot to analyze the density of contacts around a sphere of 5 Armstrongs, centered in the C-alfa atom from the residue. The different classes of contacts based on the mutational frustration index are counted in relative terms.
+Generates plot to analyze the density of contacts around a sphere of 5 Armstrongs, centered in the C-alfa atom from the residue. 
+The different classes of contacts based on the mutational frustration index are counted in relative terms.
 }

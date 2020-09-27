@@ -2,16 +2,16 @@
 % Please edit documentation in R/functions.R
 \name{pdb_equivalences}
 \alias{pdb_equivalences}
-\title{Pdb Equivalences}
+\title{Pdb Equivalences.}
 \usage{
 pdb_equivalences(Pdb)
 }
 \arguments{
-\item{Pdb}{Frustration object}
+\item{Pdb}{Pdb frustration object.}
 }
 \value{
-Pdb equivalences
+Pdb equivalences in matrix and file "pdb_equivalences.txt".
 }
 \description{
-Internal function that produces auxiliar files to run the frustratometer pipeline.
+Internal function that produces auxiliary files in the execution of the script, numerical equivalences between the Pdb and its sequence.
 }

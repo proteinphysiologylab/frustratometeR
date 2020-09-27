@@ -2,21 +2,15 @@
 % Please edit documentation in R/visualization.R
 \name{gif_5adens_proportions}
 \alias{gif_5adens_proportions}
-\title{5Adens proportions gif}
+\title{5Adens proportions gif.}
 \usage{
-gif_5adens_proportions(
-  PdbDir = NULL,
-  OrderList = NULL,
-  Modes = "configurational"
-)
+gif_5adens_proportions(Dynamic, Show = FALSE)
 }
 \arguments{
-\item{PdbDir}{File containing all proteins structures. The full path to the file is needed}
+\item{Dynamic}{Dynamic frustration object.}
 
-\item{OrderList}{Orderer list of PDB files to calculate frustration.}
-
-\item{Modes}{Local frustration index to be calculated (configurational, mutational, singleresidue). Default: configurational}
+\item{Show}{Print Gif on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: FALSE.}
 }
 \description{
-Generate Gif of 5Adens proportions plot of the structure under study along the dynamics
+Generate Gif of 5Adens proportions plot of the structure under study along the dynamics.
 }

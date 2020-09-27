@@ -2,20 +2,20 @@
 % Please edit documentation in R/functions.R
 \name{replace_Expr}
 \alias{replace_Expr}
-\title{Replace expression}
+\title{Expression replacement in a file}
 \usage{
-replace_Expr(pattern = NULL, replacement = NULL, file = NULL)
+replace_Expr(pattern, replacement, file)
 }
 \arguments{
-\item{pattern}{Pattern string to replace}
+\item{pattern}{Pattern string to replace.}
 
-\item{replacement}{Character string to be replaced}
+\item{replacement}{The character string to be replaced.}
 
-\item{file}{Full path of the file where it will be replaced}
+\item{file}{Full path of the file where the pattern will be replaced.}
 }
 \value{
-
+File with pattern replaced by replacement.
 }
 \description{
-Searches for a string in a file and replaces
+Search and replace pattern by replacement in the file lines.
 }

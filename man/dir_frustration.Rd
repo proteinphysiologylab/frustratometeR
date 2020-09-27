@@ -2,36 +2,42 @@
 % Please edit documentation in R/functions.R
 \name{dir_frustration}
 \alias{dir_frustration}
-\title{Calculate Directory Frustration}
+\title{Calculate Directory Frustration.}
 \usage{
 dir_frustration(
-  PdbDir = NULL,
+  PdbsDir,
   OrderList = NULL,
+  Chain = NULL,
   Electrostatics_K = NULL,
-  seqdist = 12,
-  Modes = "configurational",
+  SeqDist = 12,
+  Mode = "configurational",
   Graphics = TRUE,
   Visualization = TRUE,
-  ResultsDir = NULL
+  ResultsDir
 )
 }
 \arguments{
-\item{PdbDir}{File containing all proteins structures. The full path to the file is needed}
+\item{PdbsDir}{Directory containing all protein structures. The full path to the file is needed.}
 
-\item{OrderList}{Orderer list of PDB files to calculate frustration. If it is NULL, frustration is calculated for all PDBs. Default: NULL}
+\item{OrderList}{Orderer list of PDB files to calculate frustration. If it is NULL, frustration is calculated for all PDBs. Type: vector. Default: NULL.}
 
-\item{Electrostatics_K}{K constant to use in the electrostatics mode. Default: NULL (no electrostatics is considered).}
+\item{Chain}{Chain of the protein structure. Type: character. Default: NULL.}
 
-\item{seqdist}{Sequence at which contacts are considered to interact (3 or 12). Default: 12}
+\item{Electrostatics_K}{K constant to use in the electrostatics Mode. Type: numeric. Default: NULL (no electrostatics is considered).}
 
-\item{Modes}{Local frustration index to be calculated (configurational, mutational, singleresidue). Default: configurational}
+\item{SeqDist}{Sequence at which contacts are considered to interact (3 or 12). Type: numeric. Default: 12.}
 
-\item{Graphics}{The corresponding graphics are made (TRUE or FALSE). Default: TRUE}
+\item{Mode}{Local frustration index to be calculated (configurational, mutational, singleresidue). Default: configurational.}
 
-\item{Visualization}{Make visualizations, including pymol. Default: TRUE}
+\item{Graphics}{The corresponding graphics are made (TRUE or FALSE). Type: bool. Default: TRUE.}
+
+\item{Visualization}{Make visualizations, including pymol. Type: bool. Default: TRUE.}
 
 \item{ResultsDir}{Path to the folder where results will be stored.}
 }
+\value{
+Files resulting from the frustration of each structure in ResultsDir.
+}
 \description{
-Calculate local energy frustration for all protein structures in one directory
+Calculate local energy frustration for all protein structures in one directory.
 }
