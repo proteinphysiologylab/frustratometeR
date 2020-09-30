@@ -357,13 +357,18 @@ plot_dynamic_res <- function(Dynamic, Resno, Chain, Save = FALSE){
     }
   }
   else{
-    FrustrationResults <- cbind(seq(1, dim(FrustrationResults)[1]),FrustrationResults[, 8])
+    FrustrationResults <- cbind(seq(1, dim(FrustrationResults)[1]), FrustrationResults[, 8], seq(1, dim(FrustrationResults)[1]))
+    FrustrationResults <- as.data.frame(FrustrationResults)
+    FrustrationResults[,2] <- as.numeric(FrustrationResults[,2])
+    FrustrationResults[,1] <- as.numeric(FrustrationResults[,1])
     FrustrationResults[which(FrustrationResults[, 2] >= 0.58), 3] <- "Minimally frustrated"
-    FrustrationResults[which((FrustrationResults[, 2] < 0.58) & (FrustrationResults[, 2] > -1.0) ), 3] <- "Neutral"
+    FrustrationResults[which((FrustrationResults[, 2] < 0.58) & (FrustrationResults[, 2] > (-1.0)) ), 3] <- "Neutral"
     FrustrationResults[which(FrustrationResults[, 2] <= (-1.0)), 3] <- "Highly frustrated"
+    
     colnames(FrustrationResults) <- c("Frame", "IndexFrst", "Type")
     FrustrationResults$Type <- factor(x = FrustrationResults$Type, levels = c("Minimally frustrated", "Neutral", "Highly frustrated"))
     
+   
     Graphic <- ggplot(data = FrustrationResults,aes(x = Frame, y = IndexFrst, colour = Type)) + geom_point()
     Graphic <- Graphic + ylab("Index Frustration") + xlab("Frame") + ggtitle(paste("Index Frustration of resid", Resno, "Single residue"))
     cols <- c("Minimally frustrated" = "green", "Neutral" = "gray", "Highly frustrated" = "red")
@@ -684,4 +689,39 @@ plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", DeltaFrus =
     cat(paste("Mutate res plot is stored in ", Pdb$JobDir, "MutationsData/Images/", Pdb$Mode, "_", DataFrus$Res1[1], "_", Mutation$Method, "_", Mutation$Chain, ".png\n", sep = ""))
   }
   return(Graphic)  
+}
+#plot_dynamic_clusters_graph----
+#' @title Plot Graph Dynamic Clusters
+#'
+#' @description 
+#'
+#' @param Dynamic Dynamic Frustration Object
+#' 
+#'
+#' @export
+plot_dynamic_clusters_graph <- function(Dynamic = Dynamic){
+  
+  if(is.null(Dynamic$Clusters[["Graph"]])){
+    stop("Cluster detection failed, run detect_dynamic_clusters()")
+  }
+  #colorPalette <- colorRampPalette(brewer.pal(12, "Paired"))(length(unique(Dynamic$Cluster$LeidenClusters[, 1])))
+  colorPalette <- brewer.pal(n = length(unique(Dynamic$Cluster$LeidenClusters[, 1])), name = "Paired")
+  Dynamic$Clusters$Graph <- set_vertex_attr(Dynamic$Clusters$Graph, index = V(Dynamic$Clusters$Graph) ,
+                                            name = "color", value = colorPalette[Dynamic$Clusters$LeidenClusters$cluster])
+  Dynamic$Clusters$Graph <- set_vertex_attr(Dynamic$Clusters$Graph, index = V(Dynamic$Clusters$Graph), 
+                         name = "color", value = colorPalette[Dynamic$Clusters$LeidenClusters$cluster])
+  
+  library(svglite)
+  par(mar=c(1,1,1,1))
+  svglite("/home/hacha/Documentos/grafo.svg",width = 20,height = 20)
+
+  plot.igraph(Dynamic$Clusters$Graph, layout = layout_with_kk(Dynamic$Clusters$Graph, dim = 2), vertex.label.dist = 2, edge.width = 1,
+                         vertex.color = V(Dynamic$Clusters$Graph)$color, vertex.size = 10, edge.color = "black", vertex.label.cex = 3)
+  dev.off()
+  # if(Save){
+  #   if(!dir.exists(paste(Dynamic$ResultsDir, "DynamicClusters/", sep = "")))  
+  #     dir.create(paste(Dynamic$ResultsDir, "DynamicClusters/", sep = ""))
+  #   ggsave(plot = Graphic, paste(Dynamic$ResultsDir, "DynamicClusters/GraphClusters.png", sep = ""), width = 10, height = 6)
+  #   cat(paste("Plot graph dynamic clusters is stored in ", Dynamic$ResultsDir, "DynamicClusters/GraphClusters.png\n", sep = ""))
+  # }  
 }

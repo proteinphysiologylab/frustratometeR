@@ -566,7 +566,8 @@ dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
   #Graphics
   if(Graphics){
     plot_dynamic_res(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Save = T)
-    plot_dynamic_res_5Adens_proportion(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Save = T)
+    if(Dynamic$Mode != "singleresidue")
+      plot_dynamic_res_5Adens_proportion(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Save = T)
   }
   
   return(Dynamic)
@@ -612,7 +613,6 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
     
     AAvector <- c('LEU', 'ASP', 'ILE', 'ASN', 'THR', 'VAL', 'ALA', 'GLY', 'GLU', 'ARG',
                   'LYS', 'HIS', 'GLN', 'SER', 'PRO', 'PHE', 'TYR', 'MET', 'TRP', 'CYS')
-    
     Glycine <- FALSE
     
     #Indices of all the atoms of the residue to mutate
@@ -628,6 +628,7 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
     if(Glycine) indexBackbone <- atom.select(Pdb, chain = Chain, resno = Resno, elety = c("N", "CA", "C", "O"))
     else indexBackbone <- atom.select(Pdb, chain = Chain, resno = Resno, elety = c("N", "CA", "C", "O", "CB"))
     
+    rename <-c()
     #It is mutated by 20 AA
     for(AA in AAvector){
       
@@ -647,13 +648,22 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
           diffxyz <- setdiff(indexTotales$xyz, indexBackboneGly$xyz)
         }
         #If the previous subtraction is not empty, the corresponding atoms and coordinates are removed
-        if(length(diffAtom))  PdbMut$atom <- PdbMut$atom[-diffAtom, ]
-        if(length(diffxyz)) PdbMut$xyz <- PdbMut$xyz[-diffxyz]
+        if(length(diffAtom) > 0)  PdbMut$atom <- PdbMut$atom[-diffAtom, ]
+        if(length(diffxyz) > 0) PdbMut$xyz <- PdbMut$xyz[-diffxyz]
       }
       
       #Residues are renamed
-      if(AA == "GLY") PdbMut$atom$resid[indexBackboneGly$atom] <- AA
-      else PdbMut$atom$resid[indexBackbone$atom] <- AA
+      # if(AA == 'GLY'){
+      #   raname <- atom.select(PdbMut, chain = Chain, resno = Resno, elety = c("N", "CA", "C", "O"))
+      #   PdbMut$atom$resid[rename$atom] <- AA
+      # }
+      # else{
+      #   if(Glycine) rename <- atom.select(PdbMut, chain = Chain, resno = Resno, elety = c("N", "CA", "C", "O"))
+      #   else rename <- atom.select(PdbMut, chain = Chain, resno = Resno, elety = c("N", "CA", "C", "O", "CB"))
+      #   PdbMut$atom$resid[rename$atom] <- AA
+      # }
+      rename <- atom.select(PdbMut, chain = Chain, resno = Resno)
+      PdbMut$atom$resid[rename$atom] <- AA
       
       #Muted PDB is saved
       if(Split == TRUE) write.pdb(PdbMut, paste(Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, ".pdb", sep = ""))
@@ -822,4 +832,100 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
   cat(paste("The frustration of the residue is stored in ", Pdb$JobDir, "MutationsData/mutational_Res", Resno, "_", Method, "_", Chain , ".txt\n", sep = ""))
   
   return(Pdb)
+}
+#detect_dynamic_clusters----
+#' @title Detect Dynamic clusters
+#'
+#' @description 
+#'
+#' @param Dynamic
+#' @param LoessSpan
+#' @param FiltDifProb
+#' @param FiltMean
+#' @param Ncp
+#' @param CorThreshold
+#' @param LeidenResol
+#' 
+#' @return Dynamic Frustration Object
+#' 
+#' @export
+detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, FiltDifprob = 0.7, FiltMean = 0.5, Ncp = 10, CorThreshold = 0.8, LeidenResol = 2){
+  
+  libraries <- c("leiden", "dplyr", "igraph", "FactoMineR", "bio3d", "Hmisc", "RColorBrewer")
+
+  for(library in libraries){
+    if(library == "leiden"){
+      cat("To import 'leiden' is the next module must first be installed with: 'python3 -m pip install leidenalg'")  
+    }
+    if(!requireNamespace(library, quietly = TRUE)){
+      install.packages(library)
+      library(library, character.only = T)
+    }
+    else library(library, character.only = T)
+  }
+  
+  #Loading residues and resno
+  ini <- read.table(paste(Dynamic$ResultsDir, basename.pdb(Dynamic$OrderList[1]),".done/FrustrationData/",
+                          basename.pdb(Dynamic$OrderList[1]), ".pdb_singleresidue", sep = ""), header = T)
+  residues <- ini$AA
+  resnos <- ini$Res
+  rm(ini)
+  
+  #Loading data
+  frustraData <- c()
+  read <- c()
+  for(i in 1:length(Dynamic$OrderList)){
+    read <- read.table(paste(Dynamic$ResultsDir, basename.pdb(Dynamic$OrderList[i]), ".done/FrustrationData/",
+                             basename.pdb(Dynamic$OrderList[i]), ".pdb_singleresidue", sep = ""), header = T)
+    frustraData <- cbind(frustraData, read$FrstIndex)
+  }
+  frustraData <- as.data.frame(frustraData)
+  colnames(frustraData) <- paste("frame_", 1:length(Dynamic$OrderList), sep = "")
+  rownames(frustraData) <- paste(aa123(residues), "_", resnos, sep = "")
+  
+  #Model fitting and filter by difference and mean
+  diferences <- c()
+  means <- c()
+  fitted <- c()
+  res <- c()
+  for (i in 1:length(residues)){
+    res <- as.data.frame(cbind(t(frustraData[i, ]), 1:ncol(frustraData)))
+    colnames(res) <- c("Frustration","Frames")
+    modelo <- loess(Frustration ~ Frames, data = res, span = LoessSpan, degree = 1, family="gaussian")
+    fitted <- as.data.frame(cbind(fitted, modelo$fitted))
+    diferences <- c(diferences, max(modelo$fitted) - min(modelo$fitted))
+    means <- c(means, mean(modelo$fitted))
+  }
+  
+  estadistics <- data.frame(Diferences = diferences, Means = means)
+  frustraData <- frustraData[(estadistics$Diferences > quantile(estadistics$Diferences, probs = FiltDifprob)) &
+                      (estadistics$Means < -FiltMean | estadistics$Means > FiltMean) , ]
+  
+  #Principal component analysis
+  pca <- PCA(frustraData, ncp = Ncp, graph = F)
+  
+  Cor <- as.matrix(rcorr(t(pca$ind$coord[,])))
+  Cor[[1]][lower.tri(Cor[[1]], diag = T)] <- 0
+  
+  Cor[[1]][!(Cor[[1]] < (-CorThreshold)) & !(Cor[[1]] > (CorThreshold)) | Cor[[3]] > 0.05] <- 0
+  net <- graph_from_adjacency_matrix(adjmatrix = Cor[[1]], diag = F, mode = "undirected", weighted = T)
+  
+  #Leiden Clustering
+  cluster <- data.frame(cluster = leiden(net, resolution_parameter = LeidenResol))
+  cluster <- as.data.frame(cluster[-as.vector(V(net)[igraph::degree(net) == 0]), ])
+  net <- delete_vertices(net, V(net)[igraph::degree(net) == 0])
+  
+  Dynamic$Clusters[["Graph"]] <- net
+  Dynamic$Clusters[["LeidenClusters"]] <- cluster
+  Dynamic$Clusters[["LoessSpan"]] <- LoessSpan
+  Dynamic$Clusters[["FiltDifprob"]] <- FiltDifprob
+  Dynamic$Clusters[["FiltMean"]] <- FiltMean
+  Dynamic$Clusters[["Ncp"]] <- Ncp
+  Dynamic$Clusters[["CorThreshold"]] <- CorThreshold
+  Dynamic$Clusters[["LeidenResol"]] <- LeidenResol
+  Dynamic$Clusters[["Fitted"]] <- fitted
+  
+  
+  
+  return(Dynamic)
 }
