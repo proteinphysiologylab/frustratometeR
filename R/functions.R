@@ -1,3 +1,26 @@
+#get_os----
+#' @title Get OS
+#'
+#' @description Gets the operating system on which FrustratometeR is running
+#'
+#' @return Character string indicating the operating system
+#' 
+#' @export
+get_os <- function(){
+  sysinf <- Sys.info()
+  if (!is.null(sysinf)){
+    os <- sysinf['sysname']
+    if (os == 'Darwin')
+      os <- "osx"
+  } else { ## mystery machine
+    os <- .Platform$OS.type
+    if (grepl("^darwin", R.version$os))
+      os <- "osx"
+    if (grepl("linux-gnu", R.version$os))
+      os <- "linux"
+  }
+  tolower(os)
+}
 #replace_Expr----
 #' @title Expression replacement in a file
 #'
@@ -326,9 +349,16 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   }
 
   cat("-----------------------------Calculating-----------------------------\n")
-  system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, " ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
-               "; ./lmp_serial_", SeqDist, " < ", Pdb$PdbBase, ".in", sep = ""))
-
+  OperativeSystem <- get_os()
+  if(OperativeSystem == "linux"){
+     system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, "_Linux ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
+                 "_Linux ; ./lmp_serial_", SeqDist, "_Linux < ", Pdb$PdbBase, ".in", sep = ""))
+  }
+  else if(OperativeSystem == "osx"){
+    system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, "_MacOS ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
+                 "_MacOS ; ./lmp_serial_", SeqDist, "_MacOS < ", Pdb$PdbBase, ".in", sep = ""))
+  }
+ 
   system(paste("perl ", Pdb$scriptsDir, "/RenumFiles.pl ", Pdb$PdbBase, " ", Pdb$JobDir, " ", Pdb$Mode, sep = "" ))
   
   if(Pdb$Mode == "configurational" | Pdb$Mode == "mutational"){
@@ -653,15 +683,6 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
       }
       
       #Residues are renamed
-      # if(AA == 'GLY'){
-      #   raname <- atom.select(PdbMut, chain = Chain, resno = Resno, elety = c("N", "CA", "C", "O"))
-      #   PdbMut$atom$resid[rename$atom] <- AA
-      # }
-      # else{
-      #   if(Glycine) rename <- atom.select(PdbMut, chain = Chain, resno = Resno, elety = c("N", "CA", "C", "O"))
-      #   else rename <- atom.select(PdbMut, chain = Chain, resno = Resno, elety = c("N", "CA", "C", "O", "CB"))
-      #   PdbMut$atom$resid[rename$atom] <- AA
-      # }
       rename <- atom.select(PdbMut, chain = Chain, resno = Resno)
       PdbMut$atom$resid[rename$atom] <- AA
       
