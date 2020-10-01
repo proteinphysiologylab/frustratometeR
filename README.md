@@ -5,7 +5,7 @@ An R package for calculating energetic local frustration in protein structures. 
 
 `invisible(lapply(c("bio3d", "usethis", "devtools", "ggplot2", "reshape2", "magick"), library, character.only = TRUE))`
 
-`install_github("proteinphysiologylab/frustratometeR")`
+`devtools::install_github("proteinphysiologylab/frustratometeR")`
 
 # dependencies
 
