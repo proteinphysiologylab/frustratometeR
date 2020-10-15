@@ -7,19 +7,36 @@
 detect_dynamic_clusters(
   Dynamic = Dynamic,
   LoessSpan = 0.05,
-  FiltDifprob = 0.7,
+  FiltDifprob = 0.8,
   FiltMean = 0.5,
   Ncp = 10,
   CorThreshold = 0.8,
-  LeidenResol = 2
+  LeidenResol = 1.5
 )
 }
 \arguments{
-\item{LeidenResol}{}
+\item{Dynamic}{Dynamic Frustration Object.}
+
+\item{LoessSpan}{Parameter α > 0 that controls the degree of smoothing of the loess() function of model fit. Type: numeric. Default: 0.05.}
+
+\item{FiltMean}{Frustration Mean Filter Threshold. FiltMean >= 0. Type: numeric. Default: 0.5.}
+
+\item{Ncp}{Number of principal components to be used in PCA(). Ncp >= 1. Type: numeric. Default: 10.}
+
+\item{CorThreshold}{Correlation filter threshold. 0 <= CorThreshold <= 1. Type: numeric. Default: 0.8.}
+
+\item{LeidenResol}{Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.5.}
+
+\item{FiltDifProb}{Frustration dynamic range filter threshold. 0 <= FiltDifProb <= 1. Type: numeric. Default: 0.8.}
 }
 \value{
-Dynamic Frustration Object
+Dynamic Frustration Object and its Clusters attribute.
 }
 \description{
-
+Detects residue modules with similar single-residue frustration dynamics.
+It filters out the residuals with variable dynamics, for this, it adjusts a loess 
+model with span = LoessSpan and calculates the dynamic range of frustration and the mean of single-residue frustration.
+It is left with the residuals with a dynamic frustration range greater than the quantile defined by FiltDifProb and with a mean Mean <(-FiltMean) or Mean> FiltMean.
+Performs an analysis of main components and keeps Ncp components, to compute the correlation between them and keep the residues that have greater correlation CorThreshold and p-value> 0.05.
+An undirected graph is generated and Leiden clustering is applied with LeidenResol resolution.
 }

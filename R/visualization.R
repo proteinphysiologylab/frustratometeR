@@ -19,7 +19,10 @@ plot_5Andens <- function(Pdb, Chain = NULL, Save = FALSE){
   if(!dir.exists(paste(Pdb$JobDir, "/Images", sep = "")))  
     dir.create(paste(Pdb$JobDir, "/Images", sep = ""))
   
-  AdensTable <- read.table(file = paste(Pdb$JobDir,"FrustrationData/", Pdb$PdbBase, ".pdb_", Pdb$Mode, "_5adens", sep = ""), stringsAsFactors = FALSE, header = T)
+  colClasses = c("integer", "character", "integer", 
+                 "integer", "integer", "integer",
+                 "numeric", "numeric", "numeric")
+  AdensTable <- read.table(file = paste(Pdb$JobDir,"FrustrationData/", Pdb$PdbBase, ".pdb_", Pdb$Mode, "_5adens", sep = ""), header = T, colClasses = colClasses)
   AdensTable <- as.data.frame(AdensTable)
   colnames(AdensTable) <- c("Positions", "Chains", "Total", "MaximallyFrst", "NeutrallyFrst", "MinimallyFrst")
   PositionsTotal <- seq(from = 1, to = length(AdensTable$Positions), by = 1)
@@ -93,7 +96,11 @@ plot_5Adens_proportions <- function(Pdb, Chain = NULL, Save = FALSE){
   if(!dir.exists(paste(Pdb$JobDir, "/Images", sep = "")))  
     dir.create(paste(Pdb$JobDir, "/Images", sep = ""))
   
-  AdensTable = read.table(file = paste(Pdb$JobDir, "FrustrationData/", Pdb$PdbBase, ".pdb_", Pdb$Mode, "_5adens", sep = ""), fill = T, header = T)
+  colClasses = c("integer", "character", "integer", 
+                 "integer", "integer", "integer",
+                 "numeric", "numeric", "numeric")
+  AdensTable = read.table(file = paste(Pdb$JobDir, "FrustrationData/", Pdb$PdbBase, ".pdb_", Pdb$Mode, "_5adens", sep = ""),
+                          fill = T, header = T, colClasses = colClasses)
   AdensTable <- as.data.frame(AdensTable)
   colnames(AdensTable) <- c("Positions", "Chains", "Total", "MaximallyFrst", "NeutrallyFrst", "MinimallyFrst")
   
@@ -152,21 +159,31 @@ plot_contact_map <- function(Pdb, Chain = NULL, Save = FALSE){
   if(!dir.exists(paste(Pdb$JobDir, "/Images", sep = ""))) 
     dir.create(paste(Pdb$JobDir, "/Images", sep = ""))
   
-  AdensTable <- read.table(file = paste(Pdb$JobDir, "FrustrationData/", Pdb$PdbBase, ".pdb_", Pdb$Mode, "_5adens", sep = ""), fill = T, header = T)
+  colClasses = c("integer", "character", "integer", 
+                 "integer", "integer", "integer",
+                 "numeric", "numeric", "numeric")
+  AdensTable <- read.table(file = paste(Pdb$JobDir, "FrustrationData/", Pdb$PdbBase, ".pdb_", Pdb$Mode, "_5adens", sep = ""),
+                           fill = T, header = T, colClasses = colClasses)
   
   if(!is.null(Chain)){
     AdensTable <- AdensTable[AdensTable[, 2] == Chain, ]
   }
   
-  Positions <- as.numeric(AdensTable[, 1])
+  Positions <- AdensTable[, 1]
   Chains <- AdensTable[, 2]
-  MaximallyFrst <- as.numeric(AdensTable[, 4])
-  NeutrallyFrst <- as.numeric(AdensTable[, 5])
-  MinimallyFrst <- as.numeric(AdensTable[, 6])
-  Total <- as.numeric(AdensTable[, 3])
+  MaximallyFrst <- AdensTable[, 4]
+  NeutrallyFrst <- AdensTable[, 5]
+  MinimallyFrst <- AdensTable[, 6]
+  Total <- AdensTable[, 3]
   PositionsTotal <- seq(from = 1, to = length(Positions), by = 1)
   
-  datos <- read.table(file = paste(Pdb$JobDir, "FrustrationData/", Pdb$PdbBase, ".pdb_", Pdb$Mode, sep = ""), stringsAsFactors = F, header = T)
+  colClasses = c("integer", "integer", "character", 
+                 "character", "numeric", "numeric",
+                 "character", "character", "numeric",
+                 "numeric", "numeric", "numeric",
+                 "character", "character")
+  datos <- read.table(file = paste(Pdb$JobDir, "FrustrationData/", Pdb$PdbBase, ".pdb_", Pdb$Mode, sep = ""),
+                      header = T, colClasses = colClasses)
   
   if(!is.null(Chain)){
     datos <- datos[datos$ChainRes1 == Chain, ]
@@ -369,7 +386,7 @@ plot_dynamic_res <- function(Dynamic, Resno, Chain, Save = FALSE){
     FrustrationResults$Type <- factor(x = FrustrationResults$Type, levels = c("Minimally frustrated", "Neutral", "Highly frustrated"))
     
    
-    Graphic <- ggplot(data = FrustrationResults,aes(x = Frame, y = IndexFrst, colour = Type)) + geom_point()
+    Graphic <- ggplot() + geom_point(data = FrustrationResults,aes(x = Frame, y = IndexFrst, colour = Type))
     Graphic <- Graphic + ylab("Index Frustration") + xlab("Frame") + ggtitle(paste("Index Frustration of resid", Resno, "Single residue"))
     cols <- c("Minimally frustrated" = "green", "Neutral" = "gray", "Highly frustrated" = "red")
     Graphic <- Graphic + scale_colour_manual(name = "", values = cols) + scale_y_reverse(limits = c(4, -4), breaks = seq(4.0, -4.0, -0.5), labels = as.character(seq(4.0, -4.0, -0.5)))
@@ -516,7 +533,9 @@ frustra_movie <- function(Dynamic){
 #'
 #' @export
 plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALSE){
-
+  
+  if(Pdb$Mode != "singleresidue")
+    stop("This graph is available for singleresidue index, run calculate_frustration() with Mode = 'singleresidue' and mutate_res()")
   if(!is.null(Pdb$Mutations[[Method]])){
     if(is.null(Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain, sep = "")]]))
       stop(paste("Not mutated to ", Resno, " residue from ", Chain, " chain", sep = ""))
@@ -525,7 +544,8 @@ plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALS
 
   Mutation <- Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain, sep = "")]]
 
-  DataFrus <- read.table(Mutation$File, header = T, stringsAsFactors = F)
+  colClasses <- c("integer", "character", "character", "numeric")
+  DataFrus <- read.table(Mutation$File, header = T, colClasses = colClasses)
   DataFrus <- as.data.frame(DataFrus)
   DataFrus <- cbind(DataFrus, seq(1, length(DataFrus[, 1])), seq(1, length(DataFrus[, 1])))
 
@@ -575,7 +595,6 @@ plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALS
   }
     
   return(Graphic)
-
 }
 #plot_mutate_res----
 #' @title Frustration of mutated residue
@@ -591,7 +610,7 @@ plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALS
 #' @return ggplot2 object.
 #'
 #' @export
-plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", DeltaFrus = FALSE, Save = FALSE){
+plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALSE){
   
   if(!is.null(Pdb$Mutations[[Method]])){
     if(is.null(Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain, sep = "")]]))
@@ -599,9 +618,16 @@ plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", DeltaFrus =
   }
   else  stop(paste("It was not mutated with the ", Method, " method", sep = ""))
   
+  colClasses <- c()
+  if(Pdb$Mode == "configurational" | Pdb$Mode == "mutational")
+    colClasses <- c("integer", "integer", "character", "character",
+                    "character", "character", "numeric", "character")
+  else if(Pdb$Mode == "singleresidue")
+    colClasses <- c("integer", "character", "character", "numeric")
+    
   Mutation <- Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain, sep = "")]]
   
-  DataFrus <- read.table(Mutation$File, header = T, stringsAsFactors = F)
+  DataFrus <- read.table(Mutation$File, header = T, colClasses = colClasses)
   DataFrus <- as.data.frame(DataFrus)
   DataFrus <- cbind(DataFrus,seq(1, length(DataFrus[, 1])))
   
@@ -693,35 +719,131 @@ plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", DeltaFrus =
 #plot_dynamic_clusters_graph----
 #' @title Plot Graph Dynamic Clusters
 #'
-#' @description 
+#' @description Plot the graph obtained through detect_dynamic_clusters(),
+#'  where each color represents a cluster
 #'
 #' @param Dynamic Dynamic Frustration Object
 #' 
-#'
 #' @export
 plot_dynamic_clusters_graph <- function(Dynamic = Dynamic){
   
-  if(is.null(Dynamic$Clusters[["Graph"]])){
+  if(is.null(Dynamic$Clusters[["Graph"]]))
     stop("Cluster detection failed, run detect_dynamic_clusters()")
-  }
-  #colorPalette <- colorRampPalette(brewer.pal(12, "Paired"))(length(unique(Dynamic$Cluster$LeidenClusters[, 1])))
-  colorPalette <- brewer.pal(n = length(unique(Dynamic$Cluster$LeidenClusters[, 1])), name = "Paired")
+  
+  colorPalette = c("forestgreen", "firebrick3", "dodgerblue3", "darkorchid", "darkorange3", "orange", "blue", "aquamarine", "magenta",
+                      "brown", "gray", "wheat1", "azure4", "lightsalmon4", "navy", "sienna1", "gold4", "red4", "violetred")
   Dynamic$Clusters$Graph <- set_vertex_attr(Dynamic$Clusters$Graph, index = V(Dynamic$Clusters$Graph) ,
                                             name = "color", value = colorPalette[Dynamic$Clusters$LeidenClusters$cluster])
   Dynamic$Clusters$Graph <- set_vertex_attr(Dynamic$Clusters$Graph, index = V(Dynamic$Clusters$Graph), 
                          name = "color", value = colorPalette[Dynamic$Clusters$LeidenClusters$cluster])
   
-  library(svglite)
-  par(mar=c(1,1,1,1))
-  svglite("/home/hacha/Documentos/grafo.svg",width = 20,height = 20)
+  #library(svglite)
+  #par(mar=c(1,1,1,1))
+  #svglite("/home/hacha/Documentos/grafo.svg",width = 20,height = 20)
 
   plot.igraph(Dynamic$Clusters$Graph, layout = layout_with_kk(Dynamic$Clusters$Graph, dim = 2), vertex.label.dist = 2, edge.width = 1,
-                         vertex.color = V(Dynamic$Clusters$Graph)$color, vertex.size = 10, edge.color = "black", vertex.label.cex = 3)
-  dev.off()
-  # if(Save){
-  #   if(!dir.exists(paste(Dynamic$ResultsDir, "DynamicClusters/", sep = "")))  
-  #     dir.create(paste(Dynamic$ResultsDir, "DynamicClusters/", sep = ""))
-  #   ggsave(plot = Graphic, paste(Dynamic$ResultsDir, "DynamicClusters/GraphClusters.png", sep = ""), width = 10, height = 6)
-  #   cat(paste("Plot graph dynamic clusters is stored in ", Dynamic$ResultsDir, "DynamicClusters/GraphClusters.png\n", sep = ""))
-  # }  
+              vertex.color = V(Dynamic$Clusters$Graph)$color, vertex.size = 10, edge.color = "black", vertex.label.cex = 1, label.color = "black")
+  #dev.off()
+}
+#plot_res_dynamics----
+#' @title Plot dynamics residues
+#'
+#' @description Plots the singleresidue frustration index for a residual of a specific chain along the dynamics and fitted model in the detect_dynamic_clusters() function.
+#'
+#' @param Dynamic Dynamic Frustration Object
+#' @param Resno Specific residue. Type: numeric.
+#' @param Chain Specific chain. Type: character.
+#' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
+#' 
+#' @return ggplot2 object.
+#'
+#' @export
+plot_res_dynamics <- function(Dynamic = Dynamic, Resno, Chain, Save = FALSE){
+  
+  Pdb <- read.pdb(paste(Dynamic$ResultsDir, basename.pdb(Dynamic$OrderList[1]), ".done/FrustrationData/", Dynamic$OrderList[1], sep = ''), 
+                  ATOM.only = T, rm.alt = T, rm.insert = T)
+  if(length(atom.select(Pdb, resno = Resno, chain = Chain, elety = "CA")$atom) == 0)
+    stop("Resno of chain not exist")
+  rm(Pdb)
+  if(is.null(Dynamic$Clusters[["Graph"]]))
+    stop("Cluster detection failed, run detect_dynamic_clusters()")
+  
+  DataFit <- cbind(seq(1, nrow(Dynamic$Clusters$Fitted)), Dynamic$Clusters$Fitted[,Resno])
+  Dynamic <- dynamic_res(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Graphics = F)
+  Graphic <- plot_dynamic_res(Dynamic = Dynamic, Resno = Resno, Chain = Chain)
+  Graphic <- Graphic + geom_line(aes(x = DataFit[,1], y = DataFit[,2]), color = "blue")
+  
+  if(Save){
+    if(!dir.exists(paste(Dynamic$ResultsDir, "DynamicClusters/", sep = "")))  
+      dir.create(paste(Dynamic$ResultsDir, "DynamicClusters/", sep = ""))
+    ggsave(plot = Graphic, paste(Dynamic$ResultsDir, "DynamicClusters/Dynamic_fit_",Resno,"_",Chain,".png", sep = ""), width = 10, height = 6)
+    cat(paste("Plot cluster detection fit model is stored in ", Dynamic$ResultsDir, "DynamicClusters/Dynamic_fit_",Resno,"_",Chain,".png\n", sep = ""))
+  }
+  return(Graphic)
+}
+#plot_variable_res_filter----
+#' @title Plot variables residues filter
+#'
+#' @description Plot the filter in frustration dynamic range and the mean of the singleresidue index for each residue along the dynamics.
+#'
+#' @param Dynamic Dynamic Frustration Object
+#' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
+#' 
+#' @return ggplot2 object.
+#'
+#' @export
+plot_variable_res_filter <- function(Dynamic = Dynamic, Save = FALSE){
+  
+  if(is.null(Dynamic$Clusters[["Graph"]]))
+    stop("Cluster detection failed, run detect_dynamic_clusters()")
+  
+  if(!requireNamespace("ggrepel", quietly = TRUE)){
+    install.packages("ggrepel")
+    library(ggrepel)
+  }
+  else library(ggrepel)
+  
+  ini <- read.table(paste(Dynamic$ResultsDir, basename.pdb(Dynamic$OrderList[1]),".done/FrustrationData/",
+                          basename.pdb(Dynamic$OrderList[1]), ".pdb_singleresidue", sep = ""), header = T)
+  residues <- ini$AA
+  rm(ini)
+  
+  estadistics <- cbind(Dynamic$Clusters$Diferences, Dynamic$Clusters$Means,
+                       1:length(Dynamic$Clusters$Means), 1:length(Dynamic$Clusters$Means))
+  estadistics <- as.data.frame(estadistics)
+  colnames(estadistics)<- c("Diferences", "Means", "Res", "Color")
+  for(i in 1:length(Dynamic$Clusters$Means)){
+    estadistics$Res[i] <- paste(residues[i], "_", i, sep = "")
+    if((estadistics$Diferences[i] > quantile(estadistics$Diferences, probs = Dynamic$Clusters$FiltDifprob)) &
+       (estadistics$Means[i] < -Dynamic$Clusters$FiltMean | estadistics$Means[i] > Dynamic$Clusters$FiltMean))
+      estadistics$Color[i] <- "red"
+    else estadistics$Color[i] <- "blue"
+  }
+  
+  Graphic <- ggplot() + geom_point(aes(x = estadistics[estadistics$Color == "red",2], y = estadistics[estadistics$Color == "red",1], color = "red" ), size = 3)
+  Graphic <- Graphic + geom_point(aes(x = estadistics[estadistics$Color == "blue",2], y = estadistics[estadistics$Color == "blue",1], color = "blue"), size = 3)
+  Graphic <- Graphic + geom_hline(yintercept = quantile(estadistics$Diferences, probs = Dynamic$Clusters$FiltDifprob), color = "red", linetype = "longdash")
+  Graphic <- Graphic + geom_vline(xintercept = c(-Dynamic$Clusters$FiltMean,Dynamic$Clusters$FiltMean), color = "red", linetype = "longdash")
+  Graphic <- Graphic + scale_color_manual("State", breaks = c("red", "blue"), labels = c("Variable", "Non variable"),
+                                values = c("red", "gray35"))
+  Graphic <- Graphic + xlab("Mean frustration") + ylab("Frustration dynamic range")
+  Graphic <- Graphic + geom_label_repel(aes(x = estadistics[estadistics$Color == "red",2], 
+                                            y = estadistics[estadistics$Color == "red",1],
+                                            label = estadistics[estadistics$Color == "red",3]),
+                                            box.padding   = 0.35,
+                                            point.padding = 0.5,
+                                            segment.color = 'grey50', size = 3)
+  Graphic <- Graphic + theme(axis.line.x = element_line(color = "black"),
+                             axis.line.y = element_line(color = "black"), 
+                             text = element_text(size = 11), 
+                             panel.background = element_blank())
+  
+  if(Save){
+    if(!dir.exists(paste(Dynamic$ResultsDir, "DynamicClusters/", sep = "")))  
+      dir.create(paste(Dynamic$ResultsDir, "DynamicClusters/", sep = ""))
+    ggsave(plot = Graphic, paste(Dynamic$ResultsDir, "DynamicClusters/Filters_plot.png", sep = ""), width = 10, height = 6)
+    cat(paste("Plot cluster detection filtering is stored in ", Dynamic$ResultsDir, "DynamicClusters/Filters_plot.png\n", sep = ""))
+  }
+  
+  return(Graphic)
 }

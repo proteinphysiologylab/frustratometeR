@@ -4,14 +4,7 @@
 \alias{plot_mutate_res}
 \title{Frustration of mutated residue}
 \usage{
-plot_mutate_res(
-  Pdb,
-  Resno,
-  Chain,
-  Method = "Threading",
-  DeltaFrus = FALSE,
-  Save = FALSE
-)
+plot_mutate_res(Pdb, Resno, Chain, Method = "Threading", Save = FALSE)
 }
 \arguments{
 \item{Pdb}{Pdb frustration object}

@@ -4,16 +4,12 @@
 \alias{plot_dynamic_clusters_graph}
 \title{Plot Graph Dynamic Clusters}
 \usage{
-plot_dynamic_clusters_graph(Dynamic = Dynamic, Save = FALSE)
+plot_dynamic_clusters_graph(Dynamic = Dynamic)
 }
 \arguments{
 \item{Dynamic}{Dynamic Frustration Object}
-
-\item{Save}{If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.}
-}
-\value{
-ggplot2 object.
 }
 \description{
-
+Plot the graph obtained through detect_dynamic_clusters(),
+ where each color represents a cluster
 }

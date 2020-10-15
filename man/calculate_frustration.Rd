@@ -13,7 +13,7 @@ calculate_frustration(
   Mode = "configurational",
   Graphics = TRUE,
   Visualization = TRUE,
-  ResultsDir
+  ResultsDir = NULL
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ calculate_frustration(
 
 \item{Visualization}{Make visualizations, including pymol. Type: bool. Default: TRUE.}
 
-\item{ResultsDir}{Path to the folder where results will be stored.}
+\item{ResultsDir}{Path to the folder where results will be stored. If not specified, it will be stored in the directory returned by tempdir(). Default: NULL.}
 }
 \value{
 Pdb frustration object.

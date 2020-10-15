@@ -12,7 +12,7 @@ dynamic_frustration(
   SeqDist = 12,
   Mode = "configurational",
   GIFs = FALSE,
-  ResultsDir
+  ResultsDir = NULL
 )
 }
 \arguments{
@@ -30,7 +30,7 @@ dynamic_frustration(
 
 \item{GIFs}{If it is TRUE, the contact map gifs and 5 adens proportion of all the frames of the dynamic will be stored, otherwise they will not be stored. Type: bool. Default: FALSE}
 
-\item{ResultsDir}{Path to the folder where results will be stored.}
+\item{ResultsDir}{Path to the folder where results will be stored. If not specified, it will be stored in the directory returned by tempdir(). Default: NULL.}
 }
 \value{
 Dynamic frustration object

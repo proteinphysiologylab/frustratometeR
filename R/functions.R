@@ -239,15 +239,18 @@ complete_backbone <- function(Pdb){
 #' @param SeqDist Sequence at which contacts are considered to interact (3 or 12). Type: numeric. Default: 12.
 #' @param Graphics The corresponding graphics are made (TRUE or FALSE). Type: bool. Default: TRUE.
 #' @param Visualization Make visualizations, including pymol. Type: bool. Default: TRUE.
-#' @param ResultsDir Path to the folder where results will be stored.
+#' @param ResultsDir Path to the folder where results will be stored. If not specified, it will be stored in the directory returned by tempdir(). Default: NULL.
 #' 
 #' @return Pdb frustration object.
 #'
 #' @export
 calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, Electrostatics_K = NULL, SeqDist = 12,
-                                  Mode = "configurational", Graphics = TRUE, Visualization = TRUE, ResultsDir){
+                                  Mode = "configurational", Graphics = TRUE, Visualization = TRUE, ResultsDir = NULL){
+  
+  if(is.null(ResultsDir)) 
+    ResultsDir <- paste(tempdir(), "/", sep = "")
   tempfolder <- tempdir()
-
+  
   #Chain
   if(is.null(Chain))  boolsplit = F
   else  boolsplit = T
@@ -509,14 +512,16 @@ dir_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electrostat
 #' @param SeqDist Sequence at which contacts are considered to interact (3 or 12). Type: numeric. Default: 12.
 #' @param Mode Local frustration index to be calculated (configurational, mutational, singleresidue). Default: configurational.
 #' @param GIFs If it is TRUE, the contact map gifs and 5 adens proportion of all the frames of the dynamic will be stored, otherwise they will not be stored. Type: bool. Default: FALSE
-#' @param ResultsDir Path to the folder where results will be stored.
+#' @param ResultsDir Path to the folder where results will be stored. If not specified, it will be stored in the directory returned by tempdir(). Default: NULL.
 #'
 #' @return Dynamic frustration object
 #'
 #' @export
-dynamic_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electrostatics_K = NULL, SeqDist = 12, Mode = "configurational", GIFs = FALSE, ResultsDir){
+dynamic_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electrostatics_K = NULL, SeqDist = 12, Mode = "configurational", GIFs = FALSE, ResultsDir = NULL){
   
   cat("-----------------------------Object Dynamic Frustration-----------------------------\n")
+  if(is.null(ResultsDir)) 
+    ResultsDir <- paste(tempdir(), "/", sep = "")
   if(is.null(OrderList)) 
     OrderList <- as.vector(list.files(path = PdbsDir))
   Dynamic <- c()
@@ -619,25 +624,35 @@ dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
 #' @export
 mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
   
-  options(stringsAsFactors = FALSE)
-  
   #Exceptions
   if(length(atom.select(Pdb, resno = Resno, chain = Chain, elety = "CA")$atom) == 0)
     stop("Resno of chain not exist")
-  else if(length(atom.select(Pdb, resno = Resno, elety = "CA")$atom) != 0 &
-          is.na(atom.select(Pdb, resno = Resno, elety = "CA", value = TRUE)$atom$chain))
+  else if(is.na(atom.select(Pdb, resno = Resno, elety = "CA", value = TRUE)$atom$chain[1]))
     Chain = "A"
   if(Split == FALSE & Method == "Modeller")  stop("Complex Modeling not available")
   
+  #Output file
   FrustraMutFile <- paste(Pdb$JobDir, "MutationsData/", Pdb$Mode, "_Res", Resno, "_", Method, "_", Chain, ".txt", sep = "")
   if(!dir.exists(paste(Pdb$JobDir, "MutationsData", sep = "")))  dir.create(paste(Pdb$JobDir, "MutationsData", sep = ""))
   setwd(paste(Pdb$JobDir, "MutationsData", sep = ""))
-  if(!file.exists(FrustraMutFile)) file.create(FrustraMutFile)
-  
+  if(file.exists(FrustraMutFile)){
+    file.remove(FrustraMutFile)
+    file.create(FrustraMutFile)
+  }
   if(Pdb$Mode == "configurational" | Pdb$Mode == "mutational")
     write("Res1 Res2 ChainRes1 ChainRes2 AA1 AA2 FrstIndex FrstState", file = FrustraMutFile, append = TRUE)
   else if(Pdb$Mode == "singleresidue")  write("Res ChainRes AA FrstIndex", file = FrustraMutFile, append = TRUE)  
   
+  #Data types, files
+  colClasses <- c()
+  if(Pdb$Mode == "singleresidue")
+    colClasses <- c("integer", "character","numeric","character",
+                    "numeric", "numeric", "numeric", "numeric")
+  else if(Pdb$Mode == "configurational" | Pdb$Mode == "mutational")
+    colClasses <- c("integer", "integer", "character", "character",
+                    "numeric", "numeric", "character", "character",
+                    "numeric", "numeric", "numeric", "numeric",
+                    "character", "character")
   
   if(Method == "Threading"){
     
@@ -700,13 +715,15 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
       if(Pdb$Mode == "singleresidue"){
         system(paste("mv ", Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".done/FrustrationData/", Pdb$PdbBase, "_", 
                      Resno, "_", AA, "_", Chain, ".pdb_singleresidue ", Pdb$JobDir, "MutationsData/", sep = ""))
-        frustraTable <- read.table(paste(Pdb$JobDir, "MutationsData/", Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb_singleresidue", sep = ""), header = T)
+        frustraTable <- read.table(paste(Pdb$JobDir, "MutationsData/", Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb_singleresidue", sep = ""),
+                                   header = T, colClasses = colClasses)
         frustraTable <- frustraTable[frustraTable$ChainRes == Chain & frustraTable$Res == Resno, c(1, 2, 4, 8)]
         write(paste(frustraTable[, 1], frustraTable[, 2], frustraTable[, 3], frustraTable[, 4]), file = FrustraMutFile, append = TRUE)
       }else if(Pdb$Mode == "configurational" | Pdb$Mode == "mutational"){
         system(paste("mv ", Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".done/FrustrationData/", Pdb$PdbBase, "_", 
                      Resno, "_", AA, "_", Chain, ".pdb_", Pdb$Mode, " ", Pdb$JobDir, "MutationsData/", sep = ""))
-        frustraTable <- read.table(paste(Pdb$JobDir, "MutationsData/", Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb_", Pdb$Mode, sep = ""), header = T)
+        frustraTable <- read.table(paste(Pdb$JobDir, "MutationsData/", Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb_", Pdb$Mode, sep = ""),
+                                   header = T, colClasses = colClasses)
         frustraTable <- frustraTable[frustraTable$ChainRes1 == Chain & frustraTable$Res1 == Resno |
                                      frustraTable$ChainRes2 == Chain & frustraTable$Res2 == Resno,
                                      c(1, 2, 3, 4, 7, 8, 12, 14)]
@@ -796,15 +813,17 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
       if(Pdb$Mode == "singleresidue"){
         system(paste("mv ", Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".done/FrustrationData/", Pdb$PdbBase,
                      "_", Resno, "_", AA, "_", Chain, ".pdb_singleresidue ", Pdb$JobDir, "MutationsData/", sep = ""))
-        frustraTable <- read.table(paste(Pdb$JobDir, "MutationsData/", Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb_singleresidue", sep = ""), header = T)
-        frustraTable <- frustraTable[frustraTable$ChainRes == Chain & frustraTable$Res == Resno, c(1, 2, 4, 8)]
+        frustraTable <- read.table(paste(Pdb$JobDir, "MutationsData/", Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb_singleresidue", sep = ""),
+                                   header = T, colClasses = colClasses)
+        frustraTable <- frustraTable[frustraTable$Res == pos, c(1, 2, 4, 8)]
         write(paste(frustraTable[, 1], frustraTable[, 2], frustraTable[, 3], frustraTable[, 4]), file = FrustraMutFile, append = TRUE)
       }else if(Pdb$Mode == "configurational" | Pdb$Mode == "mutational"){
         system(paste("mv ", Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".done/FrustrationData/", Pdb$PdbBase,
                      "_", Resno, "_", AA, "_", Chain, ".pdb_", Pdb$Mode, " ", Pdb$JobDir, "MutationsData/", sep = ""))
-        frustraTable <- read.table(paste(Pdb$JobDir, "MutationsData/", Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb_", Pdb$Mode, sep = ""), header = T)
-        frustraTable <- frustraTable[frustraTable$ChainRes1 == Chain & frustraTable$Res1 == Resno |
-                                       frustraTable$ChainRes2 == Chain & frustraTable$Res2 == Resno,
+        frustraTable <- read.table(paste(Pdb$JobDir, "MutationsData/", Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb_", Pdb$Mode, sep = ""),
+                                   header = T, colClasses = colClasses)
+        frustraTable <- frustraTable[frustraTable$Res1 == pos |
+                                     frustraTable$Res2 == pos,
                                      c(1, 2, 3, 4, 7, 8, 12, 14)]
         write(paste(frustraTable[, 1], frustraTable[, 2], frustraTable[, 3], frustraTable[, 4],
                     frustraTable[, 5], frustraTable[, 6], frustraTable[, 7], frustraTable[, 8]),
@@ -857,29 +876,38 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
 #detect_dynamic_clusters----
 #' @title Detect Dynamic clusters
 #'
-#' @description 
+#' @description Detects residue modules with similar single-residue frustration dynamics.
+#' It filters out the residuals with variable dynamics, for this, it adjusts a loess 
+#' model with span = LoessSpan and calculates the dynamic range of frustration and the mean of single-residue frustration.
+#' It is left with the residuals with a dynamic frustration range greater than the quantile defined by FiltDifProb and with a mean Mean <(-FiltMean) or Mean> FiltMean.
+#' Performs an analysis of main components and keeps Ncp components, to compute the correlation between them and keep the residues that have greater correlation CorThreshold and p-value> 0.05.
+#' An undirected graph is generated and Leiden clustering is applied with LeidenResol resolution.
 #'
-#' @param Dynamic
-#' @param LoessSpan
-#' @param FiltDifProb
-#' @param FiltMean
-#' @param Ncp
-#' @param CorThreshold
-#' @param LeidenResol
+#' @param Dynamic Dynamic Frustration Object.
+#' @param LoessSpan Parameter α > 0 that controls the degree of smoothing of the loess() function of model fit. Type: numeric. Default: 0.05.
+#' @param FiltDifProb Frustration dynamic range filter threshold. 0 <= FiltDifProb <= 1. Type: numeric. Default: 0.8.
+#' @param FiltMean Frustration Mean Filter Threshold. FiltMean >= 0. Type: numeric. Default: 0.5.
+#' @param Ncp Number of principal components to be used in PCA(). Ncp >= 1. Type: numeric. Default: 10.
+#' @param CorThreshold Correlation filter threshold. 0 <= CorThreshold <= 1. Type: numeric. Default: 0.8.
+#' @param LeidenResol Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.5.
 #' 
-#' @return Dynamic Frustration Object
+#' @return Dynamic Frustration Object and its Clusters attribute.
 #' 
 #' @export
-detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, FiltDifprob = 0.7, FiltMean = 0.5, Ncp = 10, CorThreshold = 0.8, LeidenResol = 2){
+detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, FiltDifprob = 0.8, FiltMean = 0.5, Ncp = 10, CorThreshold = 0.8, LeidenResol = 1.5){
+  
+  if(Dynamic$Mode != "singleresidue")
+    stop("This functionality is only available for the singleresidue index, run dynamic_frustration() with Mode = 'singleresidue'")
   
   libraries <- c("leiden", "dplyr", "igraph", "FactoMineR", "bio3d", "Hmisc", "RColorBrewer")
 
   for(library in libraries){
-    if(library == "leiden"){
-      cat("To import 'leiden' is the next module must first be installed with: 'python3 -m pip install leidenalg'")  
-    }
     if(!requireNamespace(library, quietly = TRUE)){
       install.packages(library)
+      if(library == "leiden")
+        if(!requireNamespace("leiden", quietly = TRUE))
+          cat("To import 'leiden' is the next module must first be installed with: 'python3 -m pip install leidenalg'")  
+      
       library(library, character.only = T)
     }
     else library(library, character.only = T)
@@ -945,8 +973,8 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, FiltDif
   Dynamic$Clusters[["CorThreshold"]] <- CorThreshold
   Dynamic$Clusters[["LeidenResol"]] <- LeidenResol
   Dynamic$Clusters[["Fitted"]] <- fitted
-  
-  
+  Dynamic$Clusters[["Means"]] <- means
+  Dynamic$Clusters[["Diferences"]] <- diferences
   
   return(Dynamic)
 }
