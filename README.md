@@ -3,7 +3,7 @@ An R package for calculating energetic local frustration in protein structures. 
 
 # installation 
 
-`invisible(lapply(c("bio3d", "usethis", "devtools", "ggplot2", "reshape2", "magick"), library, character.only = TRUE))`
+`invisible(lapply(c("usethis", "devtools"), library, character.only = TRUE))`
 
 `devtools::install_github("proteinphysiologylab/frustratometeR")`
 
@@ -11,7 +11,7 @@ An R package for calculating energetic local frustration in protein structures. 
 
 **R packages (R version >= 3.6.3 required. Compatible with R 4.0.X)**
 
-`install.packages(c("bio3d", "usethis", "devtools", "ggplot2", "reshape2", "magick"))`
+`install.packages(c("usethis", "devtools"))`
 
 **Python 3**
 
@@ -23,6 +23,9 @@ biopython
 
 `python3 -m pip install biopython`
 
+leiden(optional)
+
+`python3 -m pip install leidenalg`
 
 **others**
 
