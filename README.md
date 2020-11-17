@@ -15,30 +15,24 @@ An R package for calculating energetic local frustration in protein structures. 
 
 **Python 3**
 
-numpy 
-
+*numpy 
 `python3 -m pip install numpy`
 
-biopython
-
+*biopython
 `python3 -m pip install biopython`
 
-leiden(optional)
-
+*leiden(optional)
 `python3 -m pip install leidenalg`
 
 **others**
 
-pymol
-
+*pymol
 `sudo apt install pymol`
 
-magick
-
+*magick
 `sudo apt-get install -y libmagick++-dev`
 
-perl
-
+*perl
 `sudo apt-get install perl`
 
 modeller (you need to install a licenced version of modeller in order to use some of the frustratometeR functionalities, https://salilab.org/modeller/)
