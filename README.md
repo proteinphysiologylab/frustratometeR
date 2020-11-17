@@ -1,13 +1,13 @@
 # FrustratometeR
 An R package for calculating energetic local frustration in protein structures. Additionally to the functionalities present at the web server, frustratometeR offers the possibility to analyse frustration across molecular dynamics simulations and to assess the effect of aminoacid variants.
 
-# installation 
+# Installation 
 
 `invisible(lapply(c("usethis", "devtools"), library, character.only = TRUE))`
 
 `devtools::install_github("proteinphysiologylab/frustratometeR")`
 
-# dependencies
+# Dependencies
 
 **R packages (R version >= 3.6.3 required. Compatible with R 4.0.X)**
 
