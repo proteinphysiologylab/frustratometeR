@@ -117,7 +117,7 @@ def draw_links(selection1="(pk1)",selection2="(pk2)",color=None,color2=None,radi
 #        print(object_name, n[0:len(object_name)])
         count += 1
 
-    object_name = object_name + str(count)
+    object_name = object_name# + str(count)
 
   cmd.load_cgo(cyl_obj,object_name)
 
