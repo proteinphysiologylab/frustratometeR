@@ -37,11 +37,11 @@ An R package for calculating energetic local frustration in protein structures. 
 
 modeller (you need to install a licenced version of modeller in order to use some of the frustratometeR functionalities, https://salilab.org/modeller/)
 
-**You can find an example of how to use the package at:**
+## **You can find an example of how to use the package at:**
 
 https://github.com/proteinphysiologylab/frustratometeR/tree/master/Examples
 
-**You can also find useful examples in our wiki!!:**
+## **You can also find useful examples in our wiki!!:**
 
 https://github.com/proteinphysiologylab/frustratometeR/wiki
 
