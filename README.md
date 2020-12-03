@@ -37,6 +37,13 @@ An R package for calculating energetic local frustration in protein structures. 
 
 modeller (you need to install a licenced version of modeller in order to use some of the frustratometeR functionalities, https://salilab.org/modeller/)
 
+# Minimum lines to calculate frustration in a protein
+`library(frustratometeR)`
+
+`Pdb=calculate_frustration(PdbID = "1n0r",Chain = "A",  ResultsDir = "/Users/parra/Desktop/" )`
+
+`view_frustration_pymol(Pdb)`
+
 ## **You can find an example of how to use the package at:**
 
 https://github.com/proteinphysiologylab/frustratometeR/tree/master/Examples
