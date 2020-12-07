@@ -35,7 +35,9 @@ An R package for calculating energetic local frustration in protein structures. 
 * perl
 `sudo apt-get install perl`
 
-modeller (you need to install a licenced version of modeller in order to use some of the frustratometeR functionalities, https://salilab.org/modeller/)
+**modeller**
+(you need to install a licenced version of modeller in order to use some of the frustratometeR functionalities, https://salilab.org/modeller/)
+modeller needs to be available via python3. To check if this is working execute python3 and try to do "form modeller import * " after installing modeller. We suggest to install modeller using conda environments. 
 
 # Minimum code to calculate frustration in a protein
 `library(frustratometeR)`
