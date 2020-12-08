@@ -42,9 +42,9 @@ modeller needs to be available via python3. To check if this is working execute 
 # Minimum code to calculate frustration in a protein
 `library(frustratometeR)`
 
-`Pdb=calculate_frustration(PdbID = "1n0r",Chain = "A",  ResultsDir = "/Users/parra/Desktop/" )`
+`Pdb_conf <- calculate_frustration(PdbID = "1n0r",Chain = "A",  ResultsDir = "/Home/Desktop/")`
 
-`view_frustration_pymol(Pdb)`
+`view_frustration_pymol(Pdb_conf)`
 
 ## **You can find an example of how to use the package at:**
 
@@ -54,3 +54,6 @@ https://github.com/proteinphysiologylab/frustratometeR/tree/master/Examples
 
 https://github.com/proteinphysiologylab/frustratometeR/wiki
 
+## You can find the data used in the Wiki examples at:
+
+https://github.com/proteinphysiologylab/frustratometer-data.git
