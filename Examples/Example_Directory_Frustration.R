@@ -1,25 +1,15 @@
-library(devtools)
-library(bio3d)
-library(usethis)
-library(devtools)
-library(ggplot2)
-library(reshape2)
-library(magick)
-
-install_github("proteinphysiologylab/frustratometeR")
-
 library(frustratometeR)
 
-PdbDir="/home/atilio/FrustratometeR/inst/Dynamic_Pdbs/"
-
-ResultsDir="/home/atilio/Escritorio/Result/"
+PdbsDir <- "/your/path/here/"
+ResultsDir <- "/your/path/here/Results/"
 
 # Calculate frustration of Pdbs contained in PdbDir
-dir_frustration(PdbDir = PdbDir,Modes = "configurational",ResultsDir = ResultsDir)
+dir_frustration(PdbsDir = PdbsDir, Mode = "configurational", ResultsDir = ResultsDir)
 
 # Calculate frustration of the Pdbs contained in PdbDir. With electrostatics = -1 and seqdist = 3
-dir_frustration(PdbDir = PdbDir,Modes = "mutational",Electrostatics_K = -1, seqdist = 3, ResultsDir = ResultsDir)
+dir_frustration(PdbsDir = PdbsDir, Mode = "mutational", Electrostatics_K = -1, seqdist = 12, ResultsDir = ResultsDir)
 
 # Calculate frustration of the Pdbs contained in PdbDir and indicated in OrderList
-OrderList=c("pdb2.pdb","pdb14.pdb","pdb26.pdb")
-dir_frustration(PdbDir = PdbDir, OrderList = OrderList, Modes = "configurational", ResultsDir = ResultsDir)
+# The listed structures are found in: https://github.com/proteinphysiologylab/frustratometeR/tree/master/Examples/Dynamic_Pdbs
+OrderList <- c("pdb2.pdb", "pdb14.pdb", "pdb26.pdb")
+dir_frustration(PdbsDir = PdbsDir, OrderList = OrderList, Mode = "configurational", ResultsDir = ResultsDir)

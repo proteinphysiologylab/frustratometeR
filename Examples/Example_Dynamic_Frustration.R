@@ -1,28 +1,32 @@
-library(devtools)
-library(bio3d)
-library(usethis)
-library(devtools)
-library(ggplot2)
-library(reshape2)
-library(magick)
-
-install_github("proteinphysiologylab/frustratometeR")
+#Example adapted for use with the dynamics frames found in https://github.com/proteinphysiologylab/frustratometeR/tree/master/Examples/Dynamic_Pdbs
 
 library(frustratometeR)
 
-PdbDir="/home/atilio/FrustratometeR/inst/Dynamic_Pdbs/"
+PdbsDir <- "/your/path/here/"
+ResultsDir <- "/your/path/here/Results/"
 
-ResultsDir="/home/atilio/Escritorio/Result/"
+# With singleresidue mode ----
 
-# Calculate frustration of the frames along the dynamics in PdbDir. With Gifs. Without analyzing specific residue
-dynamic_frustration(PdbDir = PdbDir, Modes = "configurational", ResultsDir = ResultsDir, GIFs = TRUE)
+# Calculate frustration of the frames along the dynamics in PdbsDir. With Gifs. 
+Dynamic_sing <- dynamic_frustration(PdbsDir = PdbsDir, ResultsDir = ResultsDir, 
+                                    GIFs = TRUE, Mode = "singleresidue")
 
-# Calculate frustration of the frames along the dynamics in PdbDir. With Gifs. Analyzing residue Resno
-dynamic_frustration(PdbDir = PdbDir, Modes = "mutational", ResultsDir = ResultsDir,Resno=32, GIFs = FALSE)
+# Analyzing residue Resno
+Dynamic_sing <- dynamic_res(Dynamic = Dynamic_sing, Resno = 32, Chain = "A")
+
+# Visualization
+plot_dynamic_res(Dynamic = Dynamic_sing, Resno = 32, Chain = "A")
+
+# With configurational or mutational modes ----
 
 # Calculate frustration of frames throughout the dynamics in PdbDir, calculated for OrderList. No gifs. Analyzing residue Resno
-OrderList=c("pdb2.pdb","pdb14.pdb","pdb26.pdb")
-dynamic_frustration(PdbDir = PdbDir, OrderList=OrderList, Modes = "singleresidue", ResultsDir = ResultsDir,Resno=32, GIFs = FALSE)
+OrderList <- c("pdb2.pdb", "pdb14.pdb", "pdb26.pdb")
+Dynamic_conf <- dynamic_frustration(PdbsDir = PdbsDir, OrderList = OrderList, 
+                                    ResultsDir = ResultsDir, GIFs = FALSE)
 
+# Analyzing residue Resno
+Dynamic_conf <- dynamic_res(Dynamic = Dynamic_conf, Resno = 32, Chain = 'A', Graphics = TRUE)
 
-# In general cases, the Resno Chain must be specified since the algorithm checks that said residue exists.
+#Visualisations
+plot_dynamic_res(Dynamic = Dynamic_conf, Resno = 32, Chain = "A") 
+plot_dynamic_res_5Adens_proportion(Dynamic = Dynamic_conf, Resno = 32, Chain = "A")
