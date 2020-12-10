@@ -16,10 +16,10 @@ ResultsDir="/home/atilio/Escritorio/"
 Modes="configurational"
 
 # Calculate frustration for a givenfile
-Pdb=calculate_frustration(PdbFile=PdbFile, Modes = "configurational", ResultsDir = ResultsDir,Graphics = TRUE)
+Pdb=calculate_frustration(PdbFile=PdbFile, Mode = "configurational", ResultsDir = ResultsDir,Graphics = TRUE)
 
 # Calculate frustration for a structure to be downloaded from the PDB
-Pdb=calculate_frustration(PdbID="1vkx", Modes = "configurational", ResultsDir = ResultsDir,Graphics = FALSE)
+Pdb=calculate_frustration(PdbID="1vkx", Mode = "configurational", ResultsDir = ResultsDir,Graphics = FALSE)
 
 #Calculate frustration for a particular chain in a structure to be downloaded from the PDB
 Pdb=calculate_frustration(PdbID="1ikn", Chain="D", Mode = "configurational", ResultsDir = ResultsDir)
