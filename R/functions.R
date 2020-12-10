@@ -4,8 +4,6 @@
 #' @description Gets the operating system on which FrustratometeR is running
 #'
 #' @return Character string indicating the operating system
-#' 
-#' @export
 get_os <- function(){
   sysinf <- Sys.info()
   if (!is.null(sysinf)){
