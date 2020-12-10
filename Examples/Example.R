@@ -22,7 +22,7 @@ Pdb=calculate_frustration(PdbFile=PdbFile, Modes = "configurational", ResultsDir
 Pdb=calculate_frustration(PdbID="1vkx", Modes = "configurational", ResultsDir = ResultsDir,Graphics = FALSE)
 
 #Calculate frustration for a particular chain in a structure to be downloaded from the PDB
-Pdb=calculate_frustration(PdbID="1ikn", Chain="D", Modes = "configurational", ResultsDir = ResultsDir)
+Pdb=calculate_frustration(PdbID="1ikn", Chain="D", Mode = "configurational", ResultsDir = ResultsDir)
 
 
 plot_5Andens(Pdb, chain=NULL)
