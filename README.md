@@ -54,6 +54,6 @@ https://github.com/proteinphysiologylab/frustratometeR/tree/master/Examples
 
 https://github.com/proteinphysiologylab/frustratometeR/wiki
 
-## You can find the data used in the Wiki examples at:
+## **You can find the data used in the Wiki examples at:**
 
 https://github.com/proteinphysiologylab/frustratometer-data.git
