@@ -248,6 +248,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   if(is.null(ResultsDir)) 
     ResultsDir <- paste(tempdir(), "/", sep = "")
   tempfolder <- tempdir()
+  system(paste0("rm -r ", tempfolder, "/*"))
   
   #Chain
   if(is.null(Chain))  boolsplit = F
