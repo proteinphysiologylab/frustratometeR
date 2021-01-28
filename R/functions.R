@@ -163,6 +163,39 @@ get_frustration_dynamic <- function(Dynamic, Resno, Chain, Frames = NULL){
   
   return(frustraTable)
 }
+#get_clusters----
+#' @title Get clusters information
+#'
+#' @description Obtain information about the clusters obtained from detect_dynamic_clusters(), 
+#' the name and number of the residues belonging to each cluster indicated in Clusters.
+#' 
+#' @param Dynamic Dynamic Frustration Object.
+#' @param Clusters Indicates the clusters, for example, c(1, 2, 3), clusters 1, 2 and 3. Default: "all".
+#' 
+#' @return Data frame containing name, number and cluster of each residue belonging to Clusters
+#' 
+#' @export
+get_clusters <- function(Dynamic, Clusters = "all"){
+  
+  if(is.null(Dynamic$Clusters[["Graph"]]))
+    stop("Cluster detection failed, run detect_dynamic_clusters()")
+  
+  clusterData <- c()
+  clusterData <- cbind(substr(V(Dynamic$Clusters$Graph)$name, 0, 3),
+                       substr(V(Dynamic$Clusters$Graph)$name, 5, length(V(Dynamic$Clusters$Graph)$name)),
+                       Dynamic$Clusters$LeidenClusters$cluster)
+  clusterData <- as.data.frame(clusterData)
+  colnames(clusterData) <- c("AA", "Res", "Cluster")
+  clusterData$Res <- as.numeric(clusterData$Res)
+  clusterData$Cluster <- as.numeric(clusterData$Cluster)
+  
+  if(Clusters[1] != "all"){
+    clusterData <- clusterData[clusterData$Cluster %in% Clusters, ]
+  }
+  
+  return(clusterData)
+}
+
 #pdb_equivalences----
 #' @title Pdb Equivalences.
 #'

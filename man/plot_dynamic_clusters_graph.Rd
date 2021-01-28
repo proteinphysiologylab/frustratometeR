@@ -4,7 +4,7 @@
 \alias{plot_dynamic_clusters_graph}
 \title{Plot Graph Dynamic Clusters}
 \usage{
-plot_dynamic_clusters_graph(Dynamic = Dynamic)
+plot_dynamic_clusters_graph(Dynamic)
 }
 \arguments{
 \item{Dynamic}{Dynamic Frustration Object}

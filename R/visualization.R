@@ -725,7 +725,7 @@ plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALS
 #' @param Dynamic Dynamic Frustration Object
 #' 
 #' @export
-plot_dynamic_clusters_graph <- function(Dynamic = Dynamic){
+plot_dynamic_clusters_graph <- function(Dynamic){
   
   if(is.null(Dynamic$Clusters[["Graph"]]))
     stop("Cluster detection failed, run detect_dynamic_clusters()")
@@ -846,4 +846,52 @@ plot_variable_res_filter <- function(Dynamic = Dynamic, Save = FALSE){
   }
   
   return(Graphic)
+}
+#plot_clusters_pymol----
+#' @title Plot clusters in pymol
+#'
+#' @description Generates a pymol session to observe the residues belonging to the clusters indicate in Clusters.
+#' 
+#' @param Dynamic Dynamic Frustration Object.
+#' @param Clusters Indicates the clusters, for example, c(1, 2, 3), clusters 1, 2 and 3. Default: "all".
+#' 
+#' @export
+plot_clusters_pymol <- function(Dynamic, Clusters = "all"){
+  
+  if(is.null(Dynamic$Clusters[["Graph"]]))
+    stop("Cluster detection failed, run detect_dynamic_clusters()")
+  
+  clusterData <- c()
+  clusterData <- cbind(substr(V(Dynamic$Clusters$Graph)$name, 0, 3),
+                       substr(V(Dynamic$Clusters$Graph)$name, 5, length(V(Dynamic$Clusters$Graph)$name)),
+                       Dynamic$Clusters$LeidenClusters$cluster)
+  clusterData <- as.data.frame(clusterData)
+  colnames(clusterData) <- c("AA", "Res", "Cluster")
+  clusterData$Res <- as.numeric(clusterData$Res)
+  clusterData$Cluster <- as.numeric(clusterData$Cluster)
+  if(Clusters[1] != "all"){
+    clusterData <- clusterData[clusterData$Cluster %in% Clusters, ]
+  }
+  
+  colorPalette = c("aquamarine", "br7", "brightorange", "carbon", "dash",
+                   "deepsalmon", "forest", "lightblue", "oxygen", "violetpurple",
+                   "tv_red", "tv_orange", "tv_blue", "tv_green", "teal", 
+                   "ruby", "raspberry", "calcium", "cerium", "gold")
+  file <- paste(tempdir(), "/clustersPymol.pml", sep = "")
+  write(paste("load ", Dynamic$PdbsDir, Dynamic$OrderList[1], ", structure", sep = ""), file = file)
+  write("color grey, structure", file = file, append = T)
+  
+  clusters <- unique(clusterData$Cluster)
+  for (i in 1:length(clusters)) {
+    residues <- paste(clusterData$Res[clusterData$Cluster == clusters[i]], collapse="+")
+    write(paste("sele cluster", clusters[i], ",resi ", residues, sep = ""),
+          file = file, append = T)
+    write(paste("color ", colorPalette[i], ", cluster", clusters[i], sep = ""), file = file, append = T)
+    write(paste("show sticks, cluster", clusters[i], sep = ""), file = file, append = T)
+  }
+  write("deselect", file = file, append = T)
+  
+  system(paste("pymol ", file, sep = ""))
+  
+  file.remove(file)
 }
