@@ -773,10 +773,7 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
   else if(Method == "Modeller"){
     
     if(!requireNamespace("msa", quietly = TRUE)){
-      if (!requireNamespace("BiocManager", quietly = TRUE))
-        install.packages("BiocManager")
-      BiocManager::install("msa")
-      library(msa)
+      stop("Please install msa package from Bioconductor for continue")
     }
     else library(msa)
     
@@ -911,36 +908,35 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
 #' @description Detects residue modules with similar single-residue frustration dynamics.
 #' It filters out the residuals with variable dynamics, for this, it adjusts a loess 
 #' model with span = LoessSpan and calculates the dynamic range of frustration and the mean of single-residue frustration.
-#' It is left with the residuals with a dynamic frustration range greater than the quantile defined by FiltDifProb and with a mean Mean <(-FiltMean) or Mean> FiltMean.
-#' Performs an analysis of main components and keeps Ncp components, to compute the correlation between them and keep the residues that have greater correlation CorThreshold and p-value> 0.05.
+#' It is left with the residuals with a dynamic frustration range greater than the quantile defined by MinFrstRange and with a mean Mean <(-FiltMean) or Mean> FiltMean.
+#' Performs an analysis of main components and keeps Ncp components, to compute the correlation(CorrType) between them and keep the residues that have greater correlation MinCorr and p-value> 0.05.
 #' An undirected graph is generated and Leiden clustering is applied with LeidenResol resolution.
 #'
 #' @param Dynamic Dynamic Frustration Object.
 #' @param LoessSpan Parameter α > 0 that controls the degree of smoothing of the loess() function of model fit. Type: numeric. Default: 0.05.
-#' @param FiltDifProb Frustration dynamic range filter threshold. 0 <= FiltDifProb <= 1. Type: numeric. Default: 0.8.
+#' @param MinFrstRange Frustration dynamic range filter threshold. 0 <= MinFrstRange <= 1. Type: numeric. Default: 0.8.
 #' @param FiltMean Frustration Mean Filter Threshold. FiltMean >= 0. Type: numeric. Default: 0.5.
 #' @param Ncp Number of principal components to be used in PCA(). Ncp >= 1. Type: numeric. Default: 10.
-#' @param CorThreshold Correlation filter threshold. 0 <= CorThreshold <= 1. Type: numeric. Default: 0.8.
+#' @param MinCorr Correlation filter threshold. 0 <= MinCorr <= 1. Type: numeric. Default: 0.8.
 #' @param LeidenResol Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.5.
+#' @param CorrType Type of correlation index to compute. Values: "pearson" or "spearman". Type: character. Default: "pearson".
 #' 
 #' @return Dynamic Frustration Object and its Clusters attribute.
 #' 
 #' @export
-detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, FiltDifprob = 0.8, FiltMean = 0.5, Ncp = 10, CorThreshold = 0.8, LeidenResol = 1.5){
+detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrstRange = 0.8, FiltMean = 0.5, Ncp = 10, MinCorr = 0.8, LeidenResol = 1.5, CorrType = "pearson"){
   
   if(Dynamic$Mode != "singleresidue")
     stop("This functionality is only available for the singleresidue index, run dynamic_frustration() with Mode = 'singleresidue'")
+  if(!(CorrType %in% c("pearson", "spearman")))
+    stop("Correlation type(CorrType) indicated isn't available or no exist, indicate 'pearson' or 'spearman'")
   
   libraries <- c("leiden", "dplyr", "igraph", "FactoMineR", "bio3d", "Hmisc", "RColorBrewer")
-
   for(library in libraries){
     if(!requireNamespace(library, quietly = TRUE)){
-      install.packages(library)
+      cat(paste("Please install ", library," package to continue", sep = ""))
       if(library == "leiden")
-        if(!requireNamespace("leiden", quietly = TRUE))
-          cat("To import 'leiden' is the next module must first be installed with: 'python3 -m pip install leidenalg'")  
-      
-      library(library, character.only = T)
+          cat("To import 'leiden' is the next module must first be installed with: 'python3 -m pip install leidenalg'")
     }
     else library(library, character.only = T)
   }
@@ -979,16 +975,16 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, FiltDif
   }
   
   estadistics <- data.frame(Diferences = diferences, Means = means)
-  frustraData <- frustraData[(estadistics$Diferences > quantile(estadistics$Diferences, probs = FiltDifprob)) &
+  frustraData <- frustraData[(estadistics$Diferences > quantile(estadistics$Diferences, probs = MinFrstRange)) &
                       (estadistics$Means < -FiltMean | estadistics$Means > FiltMean) , ]
   
   #Principal component analysis
   pca <- PCA(frustraData, ncp = Ncp, graph = F)
   
-  Cor <- as.matrix(rcorr(t(pca$ind$coord[,])))
+  Cor <- as.matrix(rcorr(t(pca$ind$coord[,]), type = CorrType))
   Cor[[1]][lower.tri(Cor[[1]], diag = T)] <- 0
   
-  Cor[[1]][!(Cor[[1]] < (-CorThreshold)) & !(Cor[[1]] > (CorThreshold)) | Cor[[3]] > 0.05] <- 0
+  Cor[[1]][!(Cor[[1]] < (-MinCorr)) & !(Cor[[1]] > (MinCorr)) | Cor[[3]] > 0.05] <- 0
   net <- graph_from_adjacency_matrix(adjmatrix = Cor[[1]], diag = F, mode = "undirected", weighted = T)
   
   #Leiden Clustering
@@ -999,14 +995,15 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, FiltDif
   Dynamic$Clusters[["Graph"]] <- net
   Dynamic$Clusters[["LeidenClusters"]] <- cluster
   Dynamic$Clusters[["LoessSpan"]] <- LoessSpan
-  Dynamic$Clusters[["FiltDifprob"]] <- FiltDifprob
+  Dynamic$Clusters[["MinFrstRange"]] <- MinFrstRange
   Dynamic$Clusters[["FiltMean"]] <- FiltMean
   Dynamic$Clusters[["Ncp"]] <- Ncp
-  Dynamic$Clusters[["CorThreshold"]] <- CorThreshold
+  Dynamic$Clusters[["MinCorr"]] <- MinCorr
   Dynamic$Clusters[["LeidenResol"]] <- LeidenResol
   Dynamic$Clusters[["Fitted"]] <- fitted
   Dynamic$Clusters[["Means"]] <- means
   Dynamic$Clusters[["Diferences"]] <- diferences
+  Dynamic$Clusters[["CorrType"]] <- CorrType
   
   return(Dynamic)
 }
