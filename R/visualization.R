@@ -10,6 +10,8 @@
 #' 
 #' @return ggplot2 object.
 #' 
+#' @import ggplot2
+#' 
 #' @export
 plot_5Andens <- function(Pdb, Chain = NULL, Save = FALSE){
   
@@ -87,6 +89,8 @@ plot_5Andens <- function(Pdb, Chain = NULL, Save = FALSE){
 #' 
 #' @return ggplot2 object.
 #' 
+#' @import ggplot2
+#' 
 #' @export
 plot_5Adens_proportions <- function(Pdb, Chain = NULL, Save = FALSE){
   
@@ -149,7 +153,10 @@ plot_5Adens_proportions <- function(Pdb, Chain = NULL, Save = FALSE){
 #' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
-#'  
+#'
+#' @import ggplot2
+#' @importFrom reshape2 melt
+#'   
 #' @export
 plot_contact_map <- function(Pdb, Chain = NULL, Save = FALSE){
   
@@ -279,7 +286,9 @@ view_frustration_pymol <- function(Pdb){
 #' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
-#'  
+#' 
+#' @import ggplot2
+#'   
 #' @export
 plot_dynamic_res_5Adens_proportion <- function(Dynamic, Resno, Chain, Save = FALSE){
   
@@ -337,6 +346,8 @@ plot_dynamic_res_5Adens_proportion <- function(Dynamic, Resno, Chain, Save = FAL
 #' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
+#' 
+#' @import ggplot2
 #' 
 #' @export
 #'
@@ -409,6 +420,9 @@ plot_dynamic_res <- function(Dynamic, Resno, Chain, Save = FALSE){
 #' @param Dynamic Dynamic frustration object.
 #' @param Show Print Gif on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: FALSE.
 #' 
+#' @importFrom magick image_read image_join image_animate image_write
+#' @importFrom bio3d basename.pdb
+#' 
 #' @export
 gif_contact_map <- function(Dynamic, Show = FALSE){
   
@@ -444,6 +458,9 @@ gif_contact_map <- function(Dynamic, Show = FALSE){
 #'
 #' @param Dynamic Dynamic frustration object.
 #' @param Show Print Gif on screen(TRUE), but(FALSE) store in corresponding directory. Type: bool. Default: FALSE.
+#' 
+#' @importFrom magick image_read image_join image_animate image_write
+#' @importFrom bio3d basename.pdb
 #'
 #' @export
 gif_5adens_proportions <- function(Dynamic, Show = FALSE){
@@ -480,6 +497,8 @@ gif_5adens_proportions <- function(Dynamic, Show = FALSE){
 #' @param Dynamic Dynamic frustration object.
 #' 
 #' @return Stores pymol scripts representations_(Mode).pml and GenerateMovie_(Mode).pml
+#' 
+#' @importFrom bio3d basename.pdb
 #' 
 #' @export
 frustra_movie <- function(Dynamic){
@@ -528,6 +547,8 @@ frustra_movie <- function(Dynamic){
 #' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
+#' 
+#' @import ggplot2
 #'
 #' @export
 plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALSE){
@@ -606,6 +627,8 @@ plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALS
 #' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
+#' 
+#' @import ggplot2
 #'
 #' @export
 plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALSE){
@@ -722,6 +745,8 @@ plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALS
 #'
 #' @param Dynamic Dynamic Frustration Object
 #' 
+#' @importFrom igraph plot.igraph set_vertex_attr
+#' 
 #' @export
 plot_dynamic_clusters_graph <- function(Dynamic){
   
@@ -755,6 +780,9 @@ plot_dynamic_clusters_graph <- function(Dynamic){
 #' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
+#' 
+#' @import ggplot2
+#' @importFrom bio3d basename.pdb
 #'
 #' @export
 plot_res_dynamics <- function(Dynamic = Dynamic, Resno, Chain, Save = FALSE){
@@ -789,6 +817,10 @@ plot_res_dynamics <- function(Dynamic = Dynamic, Resno, Chain, Save = FALSE){
 #' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
 #' 
 #' @return ggplot2 object.
+#' 
+#' @import ggplot2
+#' @importFrom ggrepel geom_label_repel
+#' @importFrom bio3d basename.pdb
 #'
 #' @export
 plot_variable_res_filter <- function(Dynamic = Dynamic, Save = FALSE){
@@ -797,8 +829,7 @@ plot_variable_res_filter <- function(Dynamic = Dynamic, Save = FALSE){
     stop("Cluster detection failed, run detect_dynamic_clusters()")
   
   if(!requireNamespace("ggrepel", quietly = TRUE)){
-    install.packages("ggrepel")
-    library(ggrepel)
+    stop("Please install ggrepel package to continue")
   }
   else library(ggrepel)
   

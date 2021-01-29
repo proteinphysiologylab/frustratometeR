@@ -14,6 +14,7 @@ biocViews:
 Imports:
 	bio3d,
 	ggplot2,
+	ggrepel,
 	reshape2,
 	dplyr,
 	igraph,
