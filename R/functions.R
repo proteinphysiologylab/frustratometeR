@@ -654,8 +654,8 @@ dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
 #' 
 #' @return Returns Pdb frustration object with corresponding Mutation attribute
 #' 
-#' @importFrom msa seqbind seqaln
-#' @importFrom bio3d write.pdb atom.select get.seq read.fasta
+#' @import msa
+#' @importFrom bio3d write.pdb atom.select get.seq read.fasta seqbind seqaln
 #' 
 #' @export
 mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
