@@ -745,7 +745,7 @@ plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALS
 #'
 #' @param Dynamic Dynamic Frustration Object
 #' 
-#' @importFrom igraph plot.igraph set_vertex_attr
+#' @importFrom igraph plot.igraph set_vertex_attr V
 #' 
 #' @export
 plot_dynamic_clusters_graph <- function(Dynamic){

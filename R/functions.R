@@ -655,7 +655,7 @@ dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
 #' @return Returns Pdb frustration object with corresponding Mutation attribute
 #' 
 #' @import msa
-#' @importFrom bio3d write.pdb atom.select get.seq read.fasta seqbind seqaln
+#' @importFrom bio3d write.pdb atom.select get.seq read.fasta seqbind seqaln pdbseq
 #' 
 #' @export
 mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
@@ -930,7 +930,7 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
 #' @importFrom FactoMineR PCA
 #' @importFrom Hmisc rcorr
 #' @importFrom bio3d basename.pdb
-#' @importFrom igraph graph_from_adjacency_matrix delete_vertices
+#' @importFrom igraph graph_from_adjacency_matrix delete_vertices V degree
 #' @importFrom leiden leiden
 #' 
 #' @export
