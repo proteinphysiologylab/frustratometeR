@@ -9,9 +9,17 @@ License: GPL
 Encoding: UTF-8
 LazyData: TRUE
 RoxygenNote: 7.1.1
-Depends:
+biocViews:
+	msa
+Imports:
 	bio3d,
 	ggplot2,
-	reshape2
+	reshape2,
+	dplyr,
+	igraph,
+	FactoMineR,
+	RColorBrewer,
+	Hmisc	
 Suggests:
-	magick
+	magick,
+	leiden

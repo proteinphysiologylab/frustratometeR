@@ -413,8 +413,7 @@ plot_dynamic_res <- function(Dynamic, Resno, Chain, Save = FALSE){
 gif_contact_map <- function(Dynamic, Show = FALSE){
   
   if(!requireNamespace("magick", quietly = TRUE)){
-    install.packages("magick")
-    library(magick)
+    stop("Please install magick package to continue")
   }
   else library(magick)
   
@@ -450,8 +449,7 @@ gif_contact_map <- function(Dynamic, Show = FALSE){
 gif_5adens_proportions <- function(Dynamic, Show = FALSE){
   
   if(!requireNamespace("magick", quietly = TRUE)){
-    install.packages("magick")
-    library(magick)
+    stop("Please install magick package to continue")
   }
   else library(magick)
   
@@ -738,12 +736,13 @@ plot_dynamic_clusters_graph <- function(Dynamic){
                          name = "color", value = colorPalette[Dynamic$Clusters$LeidenClusters$cluster])
   
   #library(svglite)
-  #par(mar=c(1,1,1,1))
+  par(fig=c(0, 0.85, 0, 1))
   #svglite("/home/hacha/Documentos/grafo.svg",width = 20,height = 20)
-
   plot.igraph(Dynamic$Clusters$Graph, layout = layout_with_kk(Dynamic$Clusters$Graph, dim = 2), vertex.label.dist = 2, edge.width = 1,
               vertex.color = V(Dynamic$Clusters$Graph)$color, vertex.size = 10, edge.color = "black", vertex.label.cex = 1, label.color = "black")
-  #dev.off()
+  par(fig=c(0, 1, 0, 1), new=TRUE)
+  legend(x = 0.8, y = 0.5, bty = "n", legend = paste(unique(Dynamic$Clusters$LeidenClusters$cluster), sep = ""), 
+         fill = colorPalette[unique(Dynamic$Clusters$LeidenClusters$cluster)], title = "Clusters")
 }
 #plot_res_dynamics----
 #' @title Plot dynamics residues
@@ -814,7 +813,7 @@ plot_variable_res_filter <- function(Dynamic = Dynamic, Save = FALSE){
   colnames(estadistics)<- c("Diferences", "Means", "Res", "Color")
   for(i in 1:length(Dynamic$Clusters$Means)){
     estadistics$Res[i] <- paste(residues[i], "_", i, sep = "")
-    if((estadistics$Diferences[i] > quantile(estadistics$Diferences, probs = Dynamic$Clusters$FiltDifprob)) &
+    if((estadistics$Diferences[i] > quantile(estadistics$Diferences, probs = Dynamic$Clusters$MinFrstRange)) &
        (estadistics$Means[i] < -Dynamic$Clusters$FiltMean | estadistics$Means[i] > Dynamic$Clusters$FiltMean))
       estadistics$Color[i] <- "red"
     else estadistics$Color[i] <- "blue"
@@ -822,7 +821,7 @@ plot_variable_res_filter <- function(Dynamic = Dynamic, Save = FALSE){
   
   Graphic <- ggplot() + geom_point(aes(x = estadistics[estadistics$Color == "red",2], y = estadistics[estadistics$Color == "red",1], color = "red" ), size = 3)
   Graphic <- Graphic + geom_point(aes(x = estadistics[estadistics$Color == "blue",2], y = estadistics[estadistics$Color == "blue",1], color = "blue"), size = 3)
-  Graphic <- Graphic + geom_hline(yintercept = quantile(estadistics$Diferences, probs = Dynamic$Clusters$FiltDifprob), color = "red", linetype = "longdash")
+  Graphic <- Graphic + geom_hline(yintercept = quantile(estadistics$Diferences, probs = Dynamic$Clusters$MinFrstRange), color = "red", linetype = "longdash")
   Graphic <- Graphic + geom_vline(xintercept = c(-Dynamic$Clusters$FiltMean,Dynamic$Clusters$FiltMean), color = "red", linetype = "longdash")
   Graphic <- Graphic + scale_color_manual("State", breaks = c("red", "blue"), labels = c("Variable", "Non variable"),
                                 values = c("red", "gray35"))
@@ -878,6 +877,7 @@ plot_clusters_pymol <- function(Dynamic, Clusters = "all"){
                    "tv_red", "tv_orange", "tv_blue", "tv_green", "teal", 
                    "ruby", "raspberry", "calcium", "cerium", "gold")
   file <- paste(tempdir(), "/clustersPymol.pml", sep = "")
+  
   write(paste("load ", Dynamic$PdbsDir, Dynamic$OrderList[1], ", structure", sep = ""), file = file)
   write("color grey, structure", file = file, append = T)
   
