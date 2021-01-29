@@ -18,8 +18,8 @@ Imports:
 	dplyr,
 	igraph,
 	FactoMineR,
-	Hmisc	
+	Hmisc,
+	msa
 Suggests:
 	magick,
-	leiden,
-	msa
+	leiden
