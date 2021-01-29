@@ -274,7 +274,7 @@ complete_backbone <- function(Pdb){
 #' 
 #' @return Pdb frustration object.
 #'
-#' @importFrom bio3d pdbsplit basename.pdb read.pdb write.pdb
+#' @importFrom bio3d pdbsplit basename.pdb read.pdb write.pdb get.pdb
 #' @export
 calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, Electrostatics_K = NULL, SeqDist = 12,
                                   Mode = "configurational", Graphics = TRUE, Visualization = TRUE, ResultsDir = NULL){
@@ -654,6 +654,9 @@ dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
 #' 
 #' @return Returns Pdb frustration object with corresponding Mutation attribute
 #' 
+#' @importFrom msa seqbind seqaln
+#' @importFrom bio3d write.pdb atom.select get.seq read.fasta
+#' 
 #' @export
 mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
   
@@ -774,7 +777,7 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
   else if(Method == "Modeller"){
     
     if(!requireNamespace("msa", quietly = TRUE)){
-      stop("Please install msa package from Bioconductor for continue")
+      stop("Please install msa package from Bioconductor to continue")
     }
     else library(msa)
     
@@ -923,6 +926,12 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
 #' @param CorrType Type of correlation index to compute. Values: "pearson" or "spearman". Type: character. Default: "pearson".
 #' 
 #' @return Dynamic Frustration Object and its Clusters attribute.
+#' 
+#' @importFrom FactoMineR PCA
+#' @importFrom Hmisc rcorr
+#' @importFrom bio3d basename.pdb
+#' @importFrom igraph graph_from_adjacency_matrix delete_vertices
+#' @importFrom leiden leiden
 #' 
 #' @export
 detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrstRange = 0.8, FiltMean = 0.5, Ncp = 10, MinCorr = 0.8, LeidenResol = 1.5, CorrType = "pearson"){

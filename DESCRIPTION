@@ -10,16 +10,17 @@ Encoding: UTF-8
 LazyData: TRUE
 RoxygenNote: 7.1.1
 biocViews:
-	msa
 Imports:
 	bio3d,
 	ggplot2,
+	ggrepel,
 	reshape2,
 	dplyr,
 	igraph,
 	FactoMineR,
 	RColorBrewer,
-	Hmisc	
+	Hmisc,
+	msa	
 Suggests:
 	magick,
 	leiden
