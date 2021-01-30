@@ -922,26 +922,26 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
 #' @param FiltMean Frustration Mean Filter Threshold. FiltMean >= 0. Type: numeric. Default: 0.5.
 #' @param Ncp Number of principal components to be used in PCA(). Ncp >= 1. Type: numeric. Default: 10.
 #' @param MinCorr Correlation filter threshold. 0 <= MinCorr <= 1. Type: numeric. Default: 0.8.
-#' @param LeidenResol Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.5.
+#' @param LeidenResol Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.45.
 #' @param CorrType Type of correlation index to compute. Values: "pearson" or "spearman". Type: character. Default: "pearson".
 #' 
 #' @return Dynamic Frustration Object and its Clusters attribute.
 #' 
 #' @importFrom FactoMineR PCA
 #' @importFrom Hmisc rcorr
-#' @importFrom bio3d basename.pdb
+#' @importFrom bio3d basename.pdb aa123
 #' @importFrom igraph graph_from_adjacency_matrix delete_vertices V degree
 #' @importFrom leiden leiden
 #' 
 #' @export
-detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrstRange = 0.8, FiltMean = 0.5, Ncp = 10, MinCorr = 0.8, LeidenResol = 1.5, CorrType = "pearson"){
+detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrstRange = 0.8, FiltMean = 0.5, Ncp = 10, MinCorr = 0.8, LeidenResol = 1.45, CorrType = "pearson"){
   
   if(Dynamic$Mode != "singleresidue")
     stop("This functionality is only available for the singleresidue index, run dynamic_frustration() with Mode = 'singleresidue'")
   if(!(CorrType %in% c("pearson", "spearman")))
     stop("Correlation type(CorrType) indicated isn't available or no exist, indicate 'pearson' or 'spearman'")
   
-  libraries <- c("leiden", "dplyr", "igraph", "FactoMineR", "bio3d", "Hmisc", "RColorBrewer")
+  libraries <- c("leiden", "igraph", "FactoMineR", "bio3d", "Hmisc")
   for(library in libraries){
     if(!requireNamespace(library, quietly = TRUE)){
       cat(paste("Please install ", library," package to continue", sep = ""))

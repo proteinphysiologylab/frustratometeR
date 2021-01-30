@@ -549,6 +549,7 @@ frustra_movie <- function(Dynamic){
 #' @return ggplot2 object.
 #' 
 #' @import ggplot2
+#' @importFrom bio3d aa321
 #'
 #' @export
 plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALSE){
@@ -629,6 +630,7 @@ plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALS
 #' @return ggplot2 object.
 #' 
 #' @import ggplot2
+#' @importFrom bio3d aa321 aa123 atom.select
 #'
 #' @export
 plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALSE){
@@ -782,7 +784,7 @@ plot_dynamic_clusters_graph <- function(Dynamic){
 #' @return ggplot2 object.
 #' 
 #' @import ggplot2
-#' @importFrom bio3d basename.pdb
+#' @importFrom bio3d basename.pdb atom.select
 #'
 #' @export
 plot_res_dynamics <- function(Dynamic = Dynamic, Resno, Chain, Save = FALSE){

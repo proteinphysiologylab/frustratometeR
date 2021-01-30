@@ -11,7 +11,7 @@ detect_dynamic_clusters(
   FiltMean = 0.5,
   Ncp = 10,
   MinCorr = 0.8,
-  LeidenResol = 1.5,
+  LeidenResol = 1.45,
   CorrType = "pearson"
 )
 }
@@ -28,7 +28,7 @@ detect_dynamic_clusters(
 
 \item{MinCorr}{Correlation filter threshold. 0 <= MinCorr <= 1. Type: numeric. Default: 0.8.}
 
-\item{LeidenResol}{Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.5.}
+\item{LeidenResol}{Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.45.}
 
 \item{CorrType}{Type of correlation index to compute. Values: "pearson" or "spearman". Type: character. Default: "pearson".}
 }
