@@ -19,7 +19,7 @@ Imports:
 	igraph,
 	FactoMineR,
 	Hmisc,
-	msa
-Suggests:
+	msa,	
 	magick,
 	leiden
+
