@@ -840,13 +840,13 @@ plot_variable_res_filter <- function(Dynamic = Dynamic, Save = FALSE){
   residues <- ini$AA
   rm(ini)
   
-  estadistics <- cbind(Dynamic$Clusters$Diferences, Dynamic$Clusters$Means,
+  estadistics <- cbind(Dynamic$Clusters$FrstRange, Dynamic$Clusters$Means,
                        1:length(Dynamic$Clusters$Means), 1:length(Dynamic$Clusters$Means))
   estadistics <- as.data.frame(estadistics)
-  colnames(estadistics)<- c("Diferences", "Means", "Res", "Color")
+  colnames(estadistics)<- c("FrstRange", "Means", "Res", "Color")
   for(i in 1:length(Dynamic$Clusters$Means)){
     estadistics$Res[i] <- paste(residues[i], "_", i, sep = "")
-    if((estadistics$Diferences[i] > quantile(estadistics$Diferences, probs = Dynamic$Clusters$MinFrstRange)) &
+    if((estadistics$FrstRange[i] > quantile(estadistics$FrstRange, probs = Dynamic$Clusters$MinFrstRange)) &
        (estadistics$Means[i] < -Dynamic$Clusters$FiltMean | estadistics$Means[i] > Dynamic$Clusters$FiltMean))
       estadistics$Color[i] <- "red"
     else estadistics$Color[i] <- "blue"
@@ -854,7 +854,7 @@ plot_variable_res_filter <- function(Dynamic = Dynamic, Save = FALSE){
   
   Graphic <- ggplot() + geom_point(aes(x = estadistics[estadistics$Color == "red",2], y = estadistics[estadistics$Color == "red",1], color = "red" ), size = 3)
   Graphic <- Graphic + geom_point(aes(x = estadistics[estadistics$Color == "blue",2], y = estadistics[estadistics$Color == "blue",1], color = "blue"), size = 3)
-  Graphic <- Graphic + geom_hline(yintercept = quantile(estadistics$Diferences, probs = Dynamic$Clusters$MinFrstRange), color = "red", linetype = "longdash")
+  Graphic <- Graphic + geom_hline(yintercept = quantile(estadistics$FrstRange, probs = Dynamic$Clusters$MinFrstRange), color = "red", linetype = "longdash")
   Graphic <- Graphic + geom_vline(xintercept = c(-Dynamic$Clusters$FiltMean,Dynamic$Clusters$FiltMean), color = "red", linetype = "longdash")
   Graphic <- Graphic + scale_color_manual("State", breaks = c("red", "blue"), labels = c("Variable", "Non variable"),
                                 values = c("red", "gray35"))
@@ -914,7 +914,7 @@ plot_clusters_pymol <- function(Dynamic, Clusters = "all"){
   write(paste("load ", Dynamic$PdbsDir, Dynamic$OrderList[1], ", structure", sep = ""), file = file)
   write("color grey, structure", file = file, append = T)
   
-  clusters <- unique(clusterData$Cluster)
+  clusters <- sort(unique(clusterData$Cluster))
   for (i in 1:length(clusters)) {
     residues <- paste(clusterData$Res[clusterData$Cluster == clusters[i]], collapse="+")
     write(paste("sele cluster", clusters[i], ",resi ", residues, sep = ""),
@@ -927,4 +927,16 @@ plot_clusters_pymol <- function(Dynamic, Clusters = "all"){
   system(paste("pymol ", file, sep = ""))
   
   file.remove(file)
+}
+#save_res_dynamic_clusters DESARROLLO----
+#' @title 
+#'
+#' @description
+#' 
+#' @param 
+#' @param 
+#' 
+#' @export
+save_res_dynamic_clusters <- function(){
+  
 }

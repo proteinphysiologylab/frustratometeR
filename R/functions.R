@@ -188,9 +188,10 @@ get_clusters <- function(Dynamic, Clusters = "all"){
   colnames(clusterData) <- c("AA", "Res", "Cluster")
   clusterData$Res <- as.numeric(clusterData$Res)
   clusterData$Cluster <- as.numeric(clusterData$Cluster)
-  clusterData <- cbind(clusterData, Dynamic$Clusters$Means[clusterData$Res], Dynamic$Clusters$Diferences[clusterData$Res])
-  colnames(clusterData) <- c("AA", "Res", "Cluster", "Mean", "FrstRange")
-  
+  clusterData <- cbind(clusterData, Dynamic$Clusters$Means[clusterData$Res],
+                       Dynamic$Clusters$Sd[clusterData$Res],
+                       Dynamic$Clusters$FrstRange[clusterData$Res])
+  colnames(clusterData) <- c("AA", "Res", "Cluster", "Mean", "Sd", "FrstRange")
   if(Clusters[1] != "all"){
     clusterData <- clusterData[clusterData$Cluster %in% Clusters, ]
   }
@@ -974,8 +975,9 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
   rownames(frustraData) <- paste(aa123(residues), "_", resnos, sep = "")
   
   #Model fitting and filter by difference and mean
-  diferences <- c()
+  frstrange <- c()
   means <- c()
+  sds <- c()
   fitted <- c()
   res <- c()
   for (i in 1:length(residues)){
@@ -983,11 +985,12 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
     colnames(res) <- c("Frustration","Frames")
     modelo <- loess(Frustration ~ Frames, data = res, span = LoessSpan, degree = 1, family="gaussian")
     fitted <- as.data.frame(cbind(fitted, modelo$fitted))
-    diferences <- c(diferences, max(modelo$fitted) - min(modelo$fitted))
+    frstrange <- c(frstrange, max(modelo$fitted) - min(modelo$fitted))
     means <- c(means, mean(modelo$fitted))
+    sds <- c(sds, sd(modelo$fitted))
   }
   
-  estadistics <- data.frame(Diferences = diferences, Means = means)
+  estadistics <- data.frame(Diferences = frstrange, Means = means)
   frustraData <- frustraData[(estadistics$Diferences > quantile(estadistics$Diferences, probs = MinFrstRange)) &
                       (estadistics$Means < -FiltMean | estadistics$Means > FiltMean) , ]
   
@@ -1015,7 +1018,8 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
   Dynamic$Clusters[["LeidenResol"]] <- LeidenResol
   Dynamic$Clusters[["Fitted"]] <- fitted
   Dynamic$Clusters[["Means"]] <- means
-  Dynamic$Clusters[["Diferences"]] <- diferences
+  Dynamic$Clusters[["FrstRange"]] <- frstrange
+  Dynamic$Clusters[["Sd"]] <- sds
   Dynamic$Clusters[["CorrType"]] <- tolower(CorrType)
   
   return(Dynamic)
