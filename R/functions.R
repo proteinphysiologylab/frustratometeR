@@ -188,6 +188,8 @@ get_clusters <- function(Dynamic, Clusters = "all"){
   colnames(clusterData) <- c("AA", "Res", "Cluster")
   clusterData$Res <- as.numeric(clusterData$Res)
   clusterData$Cluster <- as.numeric(clusterData$Cluster)
+  clusterData <- cbind(clusterData, Dynamic$Clusters$Means[clusterData$Res], Dynamic$Clusters$Diferences[clusterData$Res])
+  colnames(clusterData) <- c("AA", "Res", "Cluster", "Mean", "FrstRange")
   
   if(Clusters[1] != "all"){
     clusterData <- clusterData[clusterData$Cluster %in% Clusters, ]
@@ -665,6 +667,7 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
     stop("Resno of chain not exist")
   else if(is.na(atom.select(Pdb, resno = Resno, elety = "CA", value = TRUE)$atom$chain[1]))
     Chain = "A"
+  #if(!(tolower(Method) %in% c("threading", "modeller")))
   if(Split == FALSE & Method == "Modeller")  stop("Complex Modeling not available")
   
   #Output file
@@ -921,9 +924,9 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
 #' @param MinFrstRange Frustration dynamic range filter threshold. 0 <= MinFrstRange <= 1. Type: numeric. Default: 0.8.
 #' @param FiltMean Frustration Mean Filter Threshold. FiltMean >= 0. Type: numeric. Default: 0.5.
 #' @param Ncp Number of principal components to be used in PCA(). Ncp >= 1. Type: numeric. Default: 10.
-#' @param MinCorr Correlation filter threshold. 0 <= MinCorr <= 1. Type: numeric. Default: 0.8.
+#' @param MinCorr Correlation filter threshold. 0 <= MinCorr <= 1. Type: numeric. Default: 0.95.
 #' @param LeidenResol Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.45.
-#' @param CorrType Type of correlation index to compute. Values: "pearson" or "spearman". Type: character. Default: "pearson".
+#' @param CorrType Type of correlation index to compute. Values: "pearson" or "spearman". Type: character. Default: "spearman".
 #' 
 #' @return Dynamic Frustration Object and its Clusters attribute.
 #' 
@@ -934,11 +937,11 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "Threading"){
 #' @importFrom leiden leiden
 #' 
 #' @export
-detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrstRange = 0.8, FiltMean = 0.5, Ncp = 10, MinCorr = 0.8, LeidenResol = 1.45, CorrType = "pearson"){
+detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrstRange = 0.8, FiltMean = 0.5, Ncp = 10, MinCorr = 0.95, LeidenResol = 1.45, CorrType = "spearman"){
   
   if(Dynamic$Mode != "singleresidue")
     stop("This functionality is only available for the singleresidue index, run dynamic_frustration() with Mode = 'singleresidue'")
-  if(!(CorrType %in% c("pearson", "spearman")))
+  if(!(tolower(CorrType) %in% c("pearson", "spearman")))
     stop("Correlation type(CorrType) indicated isn't available or no exist, indicate 'pearson' or 'spearman'")
   
   libraries <- c("leiden", "igraph", "FactoMineR", "bio3d", "Hmisc")
@@ -1013,7 +1016,7 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
   Dynamic$Clusters[["Fitted"]] <- fitted
   Dynamic$Clusters[["Means"]] <- means
   Dynamic$Clusters[["Diferences"]] <- diferences
-  Dynamic$Clusters[["CorrType"]] <- CorrType
+  Dynamic$Clusters[["CorrType"]] <- tolower(CorrType)
   
   return(Dynamic)
 }
