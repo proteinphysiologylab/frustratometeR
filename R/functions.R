@@ -599,9 +599,20 @@ dynamic_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electro
 #' 
 #' @return Dynamic frustration object adding Mutations attribute for the residue of the indicated chain.
 #'
+#' @importFrom bio3d basename.pdb read.pdb
+#' 
 #' @export
 dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
-
+  
+  Pdb <- read.pdb(paste(Dynamic$PdbsDir, Dynamic$OrderList[1], sep = ""), ATOM.only = T, rm.alt = T, rm.insert = T)
+  if(length(atom.select(Pdb, resno = Resno, chain = Chain, elety = "CA")$atom) == 0){
+    if(!(Chain %in% unique(Pdb$atom$chain)))
+      stop(paste("Chain ", Chain, " doesn't exist. The chains are found: ", unique(Pdb$atom$chain), sep = ""))
+    else
+      stop(paste("Resno ", Resno, "of chain ", Chain," doesn't exist.", sep = ""))
+  }
+  rm(Pdb)
+  
   PlotsDir <- paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, sep = "")
   ResultFile <- paste(PlotsDir, "/", Dynamic$Mode, "_Res_", Resno, "_", Chain, sep = "")
   
@@ -633,10 +644,10 @@ dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
   Dynamic$ResiduesDynamic[[Chain]][[paste("Res_", Resno, sep = "")]] <- ResultFile
   
   cat("\n\n****Storage information****\n")
-  cat(paste("The frustration of the residue is stored in ", ResultFile, "\n", sep = ""))
+  cat(paste("The frustration of the residue is stored in ", ResultFile, "\n\n", sep = ""))
   #Graphics
   if(Graphics){
-    plot_dynamic_res(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Save = T)
+    plot_res_dynamics(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Save = T)
     if(Dynamic$Mode != "singleresidue")
       plot_dynamic_res_5Adens_proportion(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Save = T)
   }
@@ -948,9 +959,9 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
   libraries <- c("leiden", "igraph", "FactoMineR", "bio3d", "Hmisc")
   for(library in libraries){
     if(!requireNamespace(library, quietly = TRUE)){
-      cat(paste("Please install ", library," package to continue", sep = ""))
       if(library == "leiden")
           cat("To import 'leiden' is the next module must first be installed with: 'python3 -m pip install leidenalg'")
+      stop(paste("Please install ", library," package to continue", sep = ""))
     }
     else library(library, character.only = T)
   }
@@ -983,7 +994,7 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
   for (i in 1:length(residues)){
     res <- as.data.frame(cbind(t(frustraData[i, ]), 1:ncol(frustraData)))
     colnames(res) <- c("Frustration","Frames")
-    modelo <- loess(Frustration ~ Frames, data = res, span = LoessSpan, degree = 1, family="gaussian")
+    modelo <- loess(Frustration ~ Frames, data = res, span = LoessSpan, degree = 1, family = "gaussian")
     fitted <- as.data.frame(cbind(fitted, modelo$fitted))
     frstrange <- c(frstrange, max(modelo$fitted) - min(modelo$fitted))
     means <- c(means, mean(modelo$fitted))

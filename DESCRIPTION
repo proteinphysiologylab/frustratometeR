@@ -4,7 +4,7 @@ Title: frustratometeR
 Version: 0.1.0
 Authors: Atilio O. Rausch*, Freiberger Maria I.*, R. Gonzalo Parra
 Maintainer: Atilio O. Rausch <atiliorau@gmail.com>, R. Gonzalo Parra <gonzaloparra@embl.de>
-Description: Frustratometer an R package to calculate local energetic frustration
+Description: Frustratometer: an R-package to compute Local frustration in protein structures, point mutants and MD simulations
 License: GPL
 Encoding: UTF-8
 LazyData: TRUE
@@ -22,4 +22,6 @@ Imports:
 	msa,	
 	magick,
 	leiden
+Suggest:
+	gridExtra
 

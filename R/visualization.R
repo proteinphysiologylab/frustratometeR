@@ -335,83 +335,6 @@ plot_dynamic_res_5Adens_proportion <- function(Dynamic, Resno, Chain, Save = FAL
   
   return(Graphic)
 }
-#plot_dynamic_res----
-#' @title Plot Dynamic Res.
-#'
-#' @description Graph the local frustration of a specific residual in the dynamics.
-#'
-#' @param Dynamic Dynamic frustration object.
-#' @param Resno Specific residue. Type: numeric.
-#' @param Chain Specific chain. Type: character.
-#' @param Save If it is TRUE it saves the graph, otherwise it does not. Type: bool. Default: FALSE.
-#' 
-#' @return ggplot2 object.
-#' 
-#' @import ggplot2
-#' 
-#' @export
-#'
-plot_dynamic_res <- function(Dynamic, Resno, Chain, Save = FALSE){
-  
-  if(!is.null(Dynamic$ResiduesDynamic[[Chain]])){
-    if(is.null(Dynamic$ResiduesDynamic[[Chain]][[paste("Res_", Resno, sep = "")]]))
-      stop(paste("No analysis to ", Resno, " residue from ", Chain, " chain", sep = ""))
-  }
-  else  stop(paste("No analysis ",Chain," chain", sep = ""))
-  
-  FrustrationResults <- read.table(Dynamic$ResiduesDynamic[[Chain]][[paste("Res_", Resno, sep = "")]], header = T)
-  FrustrationResults <- as.data.frame(FrustrationResults)
-  
-  if(Dynamic$Mode == "configurational" | Dynamic$Mode == "mutational"){
-    FrustrationResults <- cbind(seq(1, dim(FrustrationResults)[1]), FrustrationResults)
-    colnames(FrustrationResults) <- c("Frame", "Res", "ChainRes", "Total", "nHighlyFrst", "nNeutrallyFrst",
-                                      "nMinimallyFrst", "relHighlyFrustrated", "relNeutralFrustrated", "relMinimallyFrustrated")
-    Maximum = max(c(max(FrustrationResults$nHighlyFrst), max(FrustrationResults$nMinimallyFrst),
-                    max(FrustrationResults$nNeutrallyFrst), max(FrustrationResults$Total)))
-    
-    Graphic <- ggplot() + geom_line(aes(x = FrustrationResults$Frame, y = FrustrationResults$nHighlyFrst, colour = "1"))
-    Graphic <- Graphic + geom_line(aes(x = FrustrationResults$Frame, y = FrustrationResults$nNeutrallyFrst, colour = "2"))
-    Graphic <- Graphic + geom_line(aes(x = FrustrationResults$Frame, y = FrustrationResults$nMinimallyFrst, colour = "3"))
-    Graphic <- Graphic + geom_line(aes(x =  FrustrationResults$Frame, y = FrustrationResults$Total, colour = "4" ))
-    Graphic <- Graphic + ylab("Local frustration density (5A sphere)") + xlab("Frame") + ggtitle(paste("Frustration of resid", Resno, Dynamic$Mode))
-    Graphic <- Graphic + scale_colour_manual(name = "", labels = c("Highly frustrated", "Neutral", "Minimally frustrated", "Total"), values = c("red", "gray", "green", "black"))
-    Graphic <- Graphic + scale_y_continuous(limits = c(0, Maximum), breaks = seq(0.0, Maximum, 5), labels = as.character(seq(0.0, Maximum, 5)))
-    Graphic <- Graphic + scale_x_continuous(breaks = seq(1, length(FrustrationResults$Frame), ceiling(length(FrustrationResults$Frame) * 0.05)))
-    Graphic <- Graphic + theme_classic() + theme(plot.title = element_text(size = 11, hjust = 0.5), axis.text.x = element_text(angle = 90))
-    
-    if(Save){
-      ggsave(plot = Graphic, paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic5adens_", Dynamic$Mode, "_Res", Resno, ".png", sep = ""), width = 10, height = 6)
-      cat(paste("Dynamic_res 5Adens plot is stored in ", Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic5adens_", Dynamic$Mode, "_Res", Resno, ".png\n", sep = ""))
-    }
-  }
-  else{
-    FrustrationResults <- cbind(seq(1, dim(FrustrationResults)[1]), FrustrationResults[, 8], seq(1, dim(FrustrationResults)[1]))
-    FrustrationResults <- as.data.frame(FrustrationResults)
-    FrustrationResults[,2] <- as.numeric(FrustrationResults[,2])
-    FrustrationResults[,1] <- as.numeric(FrustrationResults[,1])
-    FrustrationResults[which(FrustrationResults[, 2] >= 0.58), 3] <- "Minimally frustrated"
-    FrustrationResults[which((FrustrationResults[, 2] < 0.58) & (FrustrationResults[, 2] > (-1.0)) ), 3] <- "Neutral"
-    FrustrationResults[which(FrustrationResults[, 2] <= (-1.0)), 3] <- "Highly frustrated"
-    
-    colnames(FrustrationResults) <- c("Frame", "IndexFrst", "Type")
-    FrustrationResults$Type <- factor(x = FrustrationResults$Type, levels = c("Minimally frustrated", "Neutral", "Highly frustrated"))
-    
-   
-    Graphic <- ggplot() + geom_point(data = FrustrationResults,aes(x = Frame, y = IndexFrst, colour = Type))
-    Graphic <- Graphic + ylab("Index Frustration") + xlab("Frame") + ggtitle(paste("Index Frustration of resid", Resno, "Single residue"))
-    cols <- c("Minimally frustrated" = "green", "Neutral" = "gray", "Highly frustrated" = "red")
-    Graphic <- Graphic + scale_colour_manual(name = "", values = cols) + scale_y_reverse(limits = c(4, -4), breaks = seq(4.0, -4.0, -0.5), labels = as.character(seq(4.0, -4.0, -0.5)))
-    Graphic <- Graphic + scale_x_continuous(breaks = seq(1, length(FrustrationResults$Frame), ceiling(length(FrustrationResults$Frame) * 0.05)))
-    Graphic <- Graphic + theme_classic() + theme(plot.title = element_text(size = 11, hjust = 0.5), axis.text.x = element_text(angle = 90))
-    
-    if(Save){
-      ggsave(paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic_IndexFrustration_", Dynamic$Mode, "_Res", Resno, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
-      cat(paste("Dynamic_res plot is stored in ", Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic_IndexFrustration_", Dynamic$Mode, "_Res", Resno, ".png\n", sep = ""))
-    }
-  }
-  
-  return(Graphic)
-}
 #gif_contact_map----
 #' @title Contact map gif.
 #'
@@ -755,8 +678,10 @@ plot_dynamic_clusters_graph <- function(Dynamic){
   if(is.null(Dynamic$Clusters[["Graph"]]))
     stop("Cluster detection failed, run detect_dynamic_clusters()")
   
-  colorPalette = c("forestgreen", "firebrick3", "dodgerblue3", "darkorchid", "darkorange3", "orange", "blue", "aquamarine", "magenta",
-                      "brown", "gray", "wheat1", "azure4", "lightsalmon4", "navy", "sienna1", "gold4", "red4", "violetred")
+  colorPalette = c(rgb(0.5, 1, 1), rgb(0.8, 0.1, 0.3), rgb(1, 0.7, 0.2), rgb(0.2, 1.0, 0.2), rgb(1, 1, 0),
+                   rgb(1.00, 0.42, 0.42), rgb(0.2, 0.6, 0.2), rgb(0.75, 0.75, 1.0), rgb(1.0, 0.3, 0.3), rgb(0.55, 0.25, 0.60),
+                   rgb(1.0, 0.2, 0.2), rgb(1.0, 0.55, 0.15), rgb(0.3, 0.3, 1.0), rgb(0.2, 1.0, 0.2), rgb(0.00, 0.75, 0.75),
+                   rgb(0.6, 0.2, 0.2), rgb(0.70, 0.30, 0.40), rgb(0.24, 1.0, 0.00), rgb(0.47, 0.36, 0.89), rgb(1.0, 0.82, 0.13))
   Dynamic$Clusters$Graph <- set_vertex_attr(Dynamic$Clusters$Graph, index = V(Dynamic$Clusters$Graph) ,
                                             name = "color", value = colorPalette[Dynamic$Clusters$LeidenClusters$cluster])
   Dynamic$Clusters$Graph <- set_vertex_attr(Dynamic$Clusters$Graph, index = V(Dynamic$Clusters$Graph), 
@@ -768,8 +693,8 @@ plot_dynamic_clusters_graph <- function(Dynamic){
   plot.igraph(Dynamic$Clusters$Graph, layout = layout_with_kk(Dynamic$Clusters$Graph, dim = 2), vertex.label.dist = 2, edge.width = 1,
               vertex.color = V(Dynamic$Clusters$Graph)$color, vertex.size = 10, edge.color = "black", vertex.label.cex = 1, label.color = "black")
   par(fig=c(0, 1, 0, 1), new=TRUE)
-  legend(x = 0.8, y = 0.5, bty = "n", legend = paste(unique(Dynamic$Clusters$LeidenClusters$cluster), sep = ""), 
-         fill = colorPalette[unique(Dynamic$Clusters$LeidenClusters$cluster)], title = "Clusters")
+  legend(x = 0.8, y = 0.5, bty = "n", legend = paste(sort(unique(Dynamic$Clusters$LeidenClusters$cluster)), sep = ""), 
+         fill = colorPalette[sort(unique(Dynamic$Clusters$LeidenClusters$cluster))], title = "Clusters")
 }
 #plot_res_dynamics----
 #' @title Plot dynamics residues
@@ -789,25 +714,76 @@ plot_dynamic_clusters_graph <- function(Dynamic){
 #' @export
 plot_res_dynamics <- function(Dynamic = Dynamic, Resno, Chain, Save = FALSE){
   
-  Pdb <- read.pdb(paste(Dynamic$ResultsDir, basename.pdb(Dynamic$OrderList[1]), ".done/FrustrationData/", Dynamic$OrderList[1], sep = ''), 
-                  ATOM.only = T, rm.alt = T, rm.insert = T)
-  if(length(atom.select(Pdb, resno = Resno, chain = Chain, elety = "CA")$atom) == 0)
-    stop("Resno of chain not exist")
-  rm(Pdb)
-  if(is.null(Dynamic$Clusters[["Graph"]]))
-    stop("Cluster detection failed, run detect_dynamic_clusters()")
-  
-  DataFit <- cbind(seq(1, nrow(Dynamic$Clusters$Fitted)), Dynamic$Clusters$Fitted[,Resno])
-  Dynamic <- dynamic_res(Dynamic = Dynamic, Resno = Resno, Chain = Chain, Graphics = F)
-  Graphic <- plot_dynamic_res(Dynamic = Dynamic, Resno = Resno, Chain = Chain)
-  Graphic <- Graphic + geom_line(aes(x = DataFit[,1], y = DataFit[,2]), color = "blue")
-  
-  if(Save){
-    if(!dir.exists(paste(Dynamic$ResultsDir, "DynamicClusters/", sep = "")))  
-      dir.create(paste(Dynamic$ResultsDir, "DynamicClusters/", sep = ""))
-    ggsave(plot = Graphic, paste(Dynamic$ResultsDir, "DynamicClusters/Dynamic_fit_",Resno,"_",Chain,".png", sep = ""), width = 10, height = 6)
-    cat(paste("Plot cluster detection fit model is stored in ", Dynamic$ResultsDir, "DynamicClusters/Dynamic_fit_",Resno,"_",Chain,".png\n", sep = ""))
+  if(!is.null(Dynamic$ResiduesDynamic[[Chain]])){
+    if(is.null(Dynamic$ResiduesDynamic[[Chain]][[paste("Res_", Resno, sep = "")]]))
+      stop(paste("No analysis to ", Resno, " residue from ", Chain, " chain. Run dynamic_res().", sep = ""))
   }
+  else  stop(paste("No analysis ",Chain," chain. Run dynamic_res().", sep = ""))
+  
+  Pdb <- read.pdb(paste(Dynamic$PdbsDir, Dynamic$OrderList[1], sep = ""), ATOM.only = T, rm.alt = T, rm.insert = T)
+  AA <- atom.select(Pdb, resno = Resno, chain = Chain, elety = "CA", value = T)$atom$resid
+  rm(Pdb)
+  
+  FrustrationResults <- read.table(Dynamic$ResiduesDynamic[[Chain]][[paste("Res_", Resno, sep = "")]], header = T)
+  FrustrationResults <- as.data.frame(FrustrationResults)
+  
+  if(Dynamic$Mode == "configurational" | Dynamic$Mode == "mutational"){
+    FrustrationResults <- cbind(seq(1, dim(FrustrationResults)[1]), FrustrationResults)
+    colnames(FrustrationResults) <- c("Frame", "Res", "ChainRes", "Total", "nHighlyFrst", "nNeutrallyFrst",
+                                      "nMinimallyFrst", "relHighlyFrustrated", "relNeutralFrustrated", "relMinimallyFrustrated")
+    Maximum = max(c(max(FrustrationResults$nHighlyFrst), max(FrustrationResults$nMinimallyFrst),
+                    max(FrustrationResults$nNeutrallyFrst), max(FrustrationResults$Total)))
+    
+    Graphic <- ggplot() + geom_line(aes(x = FrustrationResults$Frame, y = FrustrationResults$nHighlyFrst, colour = "1"))
+    Graphic <- Graphic + geom_line(aes(x = FrustrationResults$Frame, y = FrustrationResults$nNeutrallyFrst, colour = "2"))
+    Graphic <- Graphic + geom_line(aes(x = FrustrationResults$Frame, y = FrustrationResults$nMinimallyFrst, colour = "3"))
+    Graphic <- Graphic + geom_line(aes(x =  FrustrationResults$Frame, y = FrustrationResults$Total, colour = "4" ))
+    Graphic <- Graphic + ylab("Local frustration density (5A sphere)") + xlab("Frame") + ggtitle(paste("Frustration of resid", AA, Resno, Dynamic$Mode))
+    Graphic <- Graphic + scale_colour_manual(name = "", labels = c("Highly frustrated", "Neutral", "Minimally frustrated", "Total"), values = c("red", "gray", "green", "black"))
+    Graphic <- Graphic + scale_y_continuous(limits = c(0, Maximum), breaks = seq(0.0, Maximum, 5), labels = as.character(seq(0.0, Maximum, 5)))
+    Graphic <- Graphic + scale_x_continuous(breaks = seq(1, length(FrustrationResults$Frame), ceiling(length(FrustrationResults$Frame) * 0.05)))
+    Graphic <- Graphic + theme_classic() + theme(plot.title = element_text(size = 11, hjust = 0.5), axis.text.x = element_text(angle = 90))
+    
+    if(Save){
+      ggsave(plot = Graphic, paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic5adens_", Dynamic$Mode, "_Res", Resno, ".png", sep = ""), width = 10, height = 6)
+      cat(paste("Dynamic_res 5Adens plot is stored in ", Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic5adens_", Dynamic$Mode, "_Res", Resno, ".png\n", sep = ""))
+    }
+  }
+  else{
+    FrustrationResults <- cbind(seq(1, dim(FrustrationResults)[1]), FrustrationResults[, 8], seq(1, dim(FrustrationResults)[1]))
+    FrustrationResults <- as.data.frame(FrustrationResults)
+    FrustrationResults[,2] <- as.numeric(FrustrationResults[,2])
+    FrustrationResults[,1] <- as.numeric(FrustrationResults[,1])
+    FrustrationResults[which(FrustrationResults[, 2] >= 0.58), 3] <- "Minimally frustrated"
+    FrustrationResults[which((FrustrationResults[, 2] < 0.58) & (FrustrationResults[, 2] > (-1.0)) ), 3] <- "Neutral"
+    FrustrationResults[which(FrustrationResults[, 2] <= (-1.0)), 3] <- "Highly frustrated"
+    
+    colnames(FrustrationResults) <- c("Frame", "IndexFrst", "Type")
+    FrustrationResults$Type <- factor(x = FrustrationResults$Type, levels = c("Minimally frustrated", "Neutral", "Highly frustrated"))
+    
+    
+    Graphic <- ggplot() + geom_point(data = FrustrationResults,aes(x = Frame, y = IndexFrst, colour = Type))
+    Graphic <- Graphic + ylab("Index Frustration") + xlab("Frame") + ggtitle(paste("Index Frustration of resid", AA, Resno, "Single residue"))
+    cols <- c("Minimally frustrated" = "green", "Neutral" = "gray", "Highly frustrated" = "red")
+    Graphic <- Graphic + scale_colour_manual(name = "", values = scales::alpha(cols, 0.6)) + scale_y_reverse(limits = c(4, -4), breaks = seq(4.0, -4.0, -0.5), labels = as.character(seq(4.0, -4.0, -0.5)))
+    Graphic <- Graphic + scale_x_continuous(breaks = seq(1, length(FrustrationResults$Frame), ceiling(length(FrustrationResults$Frame) * 0.05)))
+    Graphic <- Graphic + theme_classic() + theme(plot.title = element_text(size = 11, hjust = 0.5), axis.text.x = element_text(angle = 90))
+    
+    if(is.null(Dynamic$Clusters[["Fitted"]])){
+      modelo <- loess(FrustrationResults$IndexFrst ~ FrustrationResults$Frame, data = FrustrationResults, span = 0.05, degree = 1, family = "gaussian")
+      DataFit <- cbind(seq(1, length(modelo$fitted)), modelo$fitted)
+      cat("To make the graph, the Local Polynomial Regression Model was adjusted with Loesspan = 0.05. To use custom parameters, run previously detect_dynamic_clusters().\n\n")
+    }else{
+      DataFit <- cbind(seq(1, nrow(Dynamic$Clusters$Fitted)), Dynamic$Clusters$Fitted[,Resno])
+    }
+    Graphic <- Graphic + geom_line(aes(x = DataFit[,1], y = DataFit[,2]), color = "blue")
+    
+    if(Save){
+      ggsave(paste(Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic_IndexFrustration_", Dynamic$Mode, "_Res", Resno, ".png", sep = ""), plot = Graphic, width = 10, height = 6)
+      cat(paste("Dynamic_res plot is stored in ", Dynamic$ResultsDir, "Dynamic_plots_res_", Resno, "_", Chain, "/dynamic_IndexFrustration_", Dynamic$Mode, "_Res", Resno, ".png\n", sep = ""))
+    }
+  }
+  
   return(Graphic)
 }
 #plot_variable_res_filter----
@@ -928,15 +904,45 @@ plot_clusters_pymol <- function(Dynamic, Clusters = "all"){
   
   file.remove(file)
 }
-#save_res_dynamic_clusters DESARROLLO----
-#' @title 
+#save_res_dynamic_clusters----
+#' @title Save plots of the dynamics of the residues belonging to a cluster 
 #'
-#' @description
+#' @description It graphs the frustration dynamics of each residue belonging to the indicated clusters (Clusters) and stores the results in files in PDF format.
 #' 
-#' @param 
-#' @param 
+#' @param Dynamic Dynamic Frustration Object
+#' @param Clusters Indicates the clusters, for example, c(1, 2, 3), clusters 1, 2 and 3. Default: "all".
+#' @param Ncol Number of columns on each page of the file output. Default: 2.
+#' @param Nrow Number of rows on each page of the file output. Default: 2.
+#' 
+#' @importFrom gridExtra marrangeGrob
+#' @import ggplot2
 #' 
 #' @export
-save_res_dynamic_clusters <- function(){
+save_res_dynamic_clusters <- function(Dynamic, Clusters = "all", Ncol = 2, Nrow = 2){
   
+  if(!requireNamespace("gridExtra", quietly = TRUE))
+    stop("Please install gridExtra package to continue")
+  else library("gridExtra")
+  
+  ResultsDir <- paste(Dynamic$ResultsDir, "Dynamic_clusters_plots/", sep = "")
+  if(!dir.exists(ResultsDir))
+    dir.create(ResultsDir)
+  if(Clusters[1] == "all"){
+    Clusters <- unique(get_clusters(Dynamic = Dynamic)$Cluster)
+  }
+  for(cluster in Clusters)
+  {
+    plots<-list()
+    for(i in 1:nrow(get_clusters(Dynamic, Clusters = cluster)))
+    {
+      Dynamic <- dynamic_res(Dynamic = Dynamic, Resno = get_clusters(Dynamic, Clusters = cluster)[i,"Res"], Chain = "A", Graphics = F)
+      plot <- plot_res_dynamics(Dynamic = Dynamic, Resno = get_clusters(Dynamic, Clusters = cluster)[i,"Res"], Chain = "A")
+      plots[[i]] <- plot
+    }
+    ml <- marrangeGrob(plots, nrow = Nrow, ncol = Ncol, top = "",width = 20, height = 10)
+    ggsave(paste(ResultsDir, "cluster_", cluster, ".pdf", sep = ""), ml, width = 20, height = 10)
+    cat(paste("The output file cluster_", cluster, ".pdf was stored in ", ResultsDir, "\n\n", sep = "" ))
+    #Graphic <- gridExtra::grid.arrange(grobs = plots, ncol = Ncol)
+  }
+  cat(paste("All output files was stored in ", ResultsDir, "\n\n", sep = "" ))
 }

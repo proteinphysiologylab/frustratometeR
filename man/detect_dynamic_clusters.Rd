@@ -10,9 +10,9 @@ detect_dynamic_clusters(
   MinFrstRange = 0.8,
   FiltMean = 0.5,
   Ncp = 10,
-  MinCorr = 0.8,
+  MinCorr = 0.95,
   LeidenResol = 1.45,
-  CorrType = "pearson"
+  CorrType = "spearman"
 )
 }
 \arguments{
@@ -26,11 +26,11 @@ detect_dynamic_clusters(
 
 \item{Ncp}{Number of principal components to be used in PCA(). Ncp >= 1. Type: numeric. Default: 10.}
 
-\item{MinCorr}{Correlation filter threshold. 0 <= MinCorr <= 1. Type: numeric. Default: 0.8.}
+\item{MinCorr}{Correlation filter threshold. 0 <= MinCorr <= 1. Type: numeric. Default: 0.95.}
 
 \item{LeidenResol}{Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.45.}
 
-\item{CorrType}{Type of correlation index to compute. Values: "pearson" or "spearman". Type: character. Default: "pearson".}
+\item{CorrType}{Type of correlation index to compute. Values: "pearson" or "spearman". Type: character. Default: "spearman".}
 }
 \value{
 Dynamic Frustration Object and its Clusters attribute.
