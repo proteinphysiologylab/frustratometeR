@@ -15,8 +15,14 @@
 #' @export
 plot_5Andens <- function(Pdb, Chain = NULL, Save = FALSE){
   
+  if(Save != T & Save != F)
+    stop("Save must be a boolean value!")
   if(!is.null(Chain)){
-    if(!(Chain %in% unique(Pdb$atom$chain))) stop("Chain not exist!")
+    if(length(Chain) > 1)
+      stop("You must enter only one Chain!")
+    if(!all(Chain %in% unique(Pdb$atom$chain))) 
+      stop(paste("The Chain ", Chain, " doesn't exist! The Chains are: ",
+                                                          paste(unique(Pdb$atom$chain), collapse = " ", sep = ""), sep = ""))
   }
   if(!dir.exists(paste(Pdb$JobDir, "/Images", sep = "")))  
     dir.create(paste(Pdb$JobDir, "/Images", sep = ""))
@@ -43,7 +49,7 @@ plot_5Andens <- function(Pdb, Chain = NULL, Save = FALSE){
     Graphic <- Graphic + ylab("Local frustration density (5A sphere)") + xlab("Position")
     Graphic <- Graphic + scale_color_manual(name = "", labels = c("Highly frustrated", "Neutral", "Minimally frustrated", "Total"),
                                             values = c("red", "gray", "green", "black"))
-    Graphic <- Graphic + scale_y_continuous(breaks = seq(0, Maximum, 5)) + scale_x_continuous(breaks = seq(1 , length(AdensTable$Positions), trunc((length(AdensTable$Positions) - 1) / 10)))
+    Graphic <- Graphic + scale_y_continuous(breaks = seq(0, Maximum, 5)) + scale_x_continuous(breaks = seq(1 , length(AdensTable$PositionsTotal), trunc((length(AdensTable$PositionsTotal) - 1) / 10)))
     Graphic <- Graphic + theme(plot.title = element_text(size = 11, hjust = 0.5), panel.background = element_blank())
     
     if(Save){
@@ -57,15 +63,15 @@ plot_5Andens <- function(Pdb, Chain = NULL, Save = FALSE){
     Maximum = max(c(max(AdensTable$MaximallyFrst), max(AdensTable$MinimallyFrst),
                     max(AdensTable$NeutrallyFrst), max(AdensTable$Total)))
     
-    Graphic <- ggplot() + geom_line(aes(x = AdensTable$PositionsTotal, y = AdensTable$MaximallyFrst , colour = "a"))
-    Graphic <- Graphic + geom_line(aes(x = AdensTable$PositionsTotal, y = AdensTable$NeutrallyFrst , colour = "b"))
-    Graphic <- Graphic + geom_line(aes(x = AdensTable$PositionsTotal, y = AdensTable$MinimallyFrst , colour =  "c"))
-    Graphic <- Graphic + geom_line(aes(x = AdensTable$PositionsTotal, y = AdensTable$Total , colour = "d"))
+    Graphic <- ggplot() + geom_line(aes(x = AdensTable$Positions, y = AdensTable$MaximallyFrst , colour = "a"))
+    Graphic <- Graphic + geom_line(aes(x = AdensTable$Positions, y = AdensTable$NeutrallyFrst , colour = "b"))
+    Graphic <- Graphic + geom_line(aes(x = AdensTable$Positions, y = AdensTable$MinimallyFrst , colour =  "c"))
+    Graphic <- Graphic + geom_line(aes(x = AdensTable$Positions, y = AdensTable$Total , colour = "d"))
     Graphic <- Graphic + ggtitle(paste("Density arround 5A sphere (%) in", Pdb$PdbBase, "chain", Chain))
     Graphic <- Graphic + ylab("Local frustration density (5A sphere)") + xlab("Position")
     Graphic <- Graphic + scale_color_manual(name = "", labels = c("Highly frustrated", "Neutral", "Minimally frustrated", "Total"),
                                             values = c("red", "gray", "green", "black"))
-    Graphic <- Graphic + scale_y_continuous(breaks = seq(0, Maximum, 5)) + scale_x_continuous(breaks = seq(1, length(AdensTable$Positions), trunc((length(AdensTable$Positions) - 1) / 10)))
+    Graphic <- Graphic + scale_y_continuous(breaks = seq(0, Maximum, 5)) + scale_x_continuous(breaks = seq(AdensTable$Positions[1] , AdensTable$Positions[length(AdensTable$Positions)], trunc((length(AdensTable$Positions) - 1) / 10)))
     Graphic <- Graphic + theme(plot.title = element_text(size = 11, hjust = 0.5), panel.background = element_blank())
     
     if(Save){
@@ -94,9 +100,16 @@ plot_5Andens <- function(Pdb, Chain = NULL, Save = FALSE){
 #' @export
 plot_5Adens_proportions <- function(Pdb, Chain = NULL, Save = FALSE){
   
+  if(Save != T & Save != F)
+    stop("Save must be a boolean value!")
   if(!is.null(Chain)){
-    if(!(Chain %in% unique(Pdb$atom$chain))) stop("Chain not exist!")
+    if(length(Chain) > 1)
+      stop("You must enter only one Chain!")
+    if(!all(Chain %in% unique(Pdb$atom$chain))) 
+      stop(paste("The Chain ", Chain, " doesn't exist! The Chains are: ",
+                 paste(unique(Pdb$atom$chain), collapse = " ", sep = ""), sep = ""))
   }
+  
   if(!dir.exists(paste(Pdb$JobDir, "/Images", sep = "")))  
     dir.create(paste(Pdb$JobDir, "/Images", sep = ""))
   
@@ -160,8 +173,14 @@ plot_5Adens_proportions <- function(Pdb, Chain = NULL, Save = FALSE){
 #' @export
 plot_contact_map <- function(Pdb, Chain = NULL, Save = FALSE){
   
+  if(Save != T & Save != F)
+    stop("Save must be a boolean value!")
   if(!is.null(Chain)){
-    if(!(Chain %in% unique(Pdb$atom$chain))) stop("Chain not exist!")
+    if(length(Chain) > 1)
+      stop("You must enter only one Chain!")
+    if(!all(Chain %in% unique(Pdb$atom$chain))) 
+      stop(paste("The Chain ", Chain, " doesn't exist! The Chains are: ",
+                 paste(unique(Pdb$atom$chain), collapse = " ", sep = ""), sep = ""))
   }
   if(!dir.exists(paste(Pdb$JobDir, "/Images", sep = ""))) 
     dir.create(paste(Pdb$JobDir, "/Images", sep = ""))
@@ -292,6 +311,8 @@ view_frustration_pymol <- function(Pdb){
 #' @export
 plot_dynamic_res_5Adens_proportion <- function(Dynamic, Resno, Chain, Save = FALSE){
   
+  if(Save != T & Save != F)
+    stop("Save must be a boolean value!")
   if(!is.null(Dynamic$ResiduesDynamic[[Chain]])){
     if(is.null(Dynamic$ResiduesDynamic[[Chain]][[paste("Res_", Resno, sep = "")]]))
       stop(paste("No analysis to ", Resno, " residue from ", Chain, " chain", sep = ""))
@@ -349,8 +370,10 @@ plot_dynamic_res_5Adens_proportion <- function(Dynamic, Resno, Chain, Save = FAL
 #' @export
 gif_contact_map <- function(Dynamic, Show = FALSE){
   
+  if(Show != T & Show != F)
+    stop("Show must be a boolean value!")
   if(!requireNamespace("magick", quietly = TRUE)){
-    stop("Please install magick package to continue")
+    stop("Please install magick package to continue!")
   }
   else library(magick)
   
@@ -388,8 +411,10 @@ gif_contact_map <- function(Dynamic, Show = FALSE){
 #' @export
 gif_5adens_proportions <- function(Dynamic, Show = FALSE){
   
+  if(Show != T & Show != F)
+    stop("Show must be a boolean value!")
   if(!requireNamespace("magick", quietly = TRUE)){
-    stop("Please install magick package to continue")
+    stop("Please install magick package to continue!")
   }
   else library(magick)
   
@@ -475,10 +500,15 @@ frustra_movie <- function(Dynamic){
 #' @importFrom bio3d aa321
 #'
 #' @export
-plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALSE){
+plot_delta_frus <- function(Pdb, Resno, Chain, Method = "threading", Save = FALSE){
   
+  if(Save != T & Save != F)
+    stop("Save must be a boolean value!")
   if(Pdb$Mode != "singleresidue")
     stop("This graph is available for singleresidue index, run calculate_frustration() with Mode = 'singleresidue' and mutate_res()")
+  Method <- tolower(Method)
+  if(!any(Method %in% c("threading", "modeller")))
+    stop(paste(Method, " it isn't a method of mutation. The methods are: threading or modeller!", sep = ""))
   if(!is.null(Pdb$Mutations[[Method]])){
     if(is.null(Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain, sep = "")]]))
       stop(paste("Not mutated to ", Resno, " residue from ", Chain, " chain", sep = ""))
@@ -556,8 +586,13 @@ plot_delta_frus <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALS
 #' @importFrom bio3d aa321 aa123 atom.select
 #'
 #' @export
-plot_mutate_res <- function(Pdb, Resno, Chain, Method = "Threading", Save = FALSE){
+plot_mutate_res <- function(Pdb, Resno, Chain, Method = "threading", Save = FALSE){
   
+  if(Save != T & Save != F)
+    stop("Save must be a boolean value!")
+  Method <- tolower(Method)
+  if(!any(Method %in% c("threading", "modeller")))
+    stop(paste(Method, " it isn't a method of mutation. The methods are: threading or modeller!", sep = ""))
   if(!is.null(Pdb$Mutations[[Method]])){
     if(is.null(Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain, sep = "")]]))
       stop(paste("Not mutated to ", Resno, " residue from ", Chain, " chain", sep = ""))
@@ -714,6 +749,8 @@ plot_dynamic_clusters_graph <- function(Dynamic){
 #' @export
 plot_res_dynamics <- function(Dynamic = Dynamic, Resno, Chain, Save = FALSE){
   
+  if(Save != T & Save != F)
+    stop("Save must be a boolean value!")
   if(!is.null(Dynamic$ResiduesDynamic[[Chain]])){
     if(is.null(Dynamic$ResiduesDynamic[[Chain]][[paste("Res_", Resno, sep = "")]]))
       stop(paste("No analysis to ", Resno, " residue from ", Chain, " chain. Run dynamic_res().", sep = ""))
@@ -803,11 +840,13 @@ plot_res_dynamics <- function(Dynamic = Dynamic, Resno, Chain, Save = FALSE){
 #' @export
 plot_variable_res_filter <- function(Dynamic = Dynamic, Save = FALSE){
   
+  if(Save != T & Save != F)
+    stop("Save must be a boolean value!")
   if(is.null(Dynamic$Clusters[["Graph"]]))
     stop("Cluster detection failed, run detect_dynamic_clusters()")
   
   if(!requireNamespace("ggrepel", quietly = TRUE)){
-    stop("Please install ggrepel package to continue")
+    stop("Please install ggrepel package to continue!")
   }
   else library(ggrepel)
   
@@ -921,7 +960,7 @@ plot_clusters_pymol <- function(Dynamic, Clusters = "all"){
 save_res_dynamic_clusters <- function(Dynamic, Clusters = "all", Ncol = 2, Nrow = 2){
   
   if(!requireNamespace("gridExtra", quietly = TRUE))
-    stop("Please install gridExtra package to continue")
+    stop("Please install gridExtra package to continue!")
   else library("gridExtra")
   
   ResultsDir <- paste(Dynamic$ResultsDir, "Dynamic_clusters_plots/", sep = "")

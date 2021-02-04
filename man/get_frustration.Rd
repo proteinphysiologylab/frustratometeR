@@ -9,9 +9,9 @@ get_frustration(Pdb, Resno = NULL, Chain = NULL)
 \arguments{
 \item{Pdb}{Pdb frustration object obtained by calculate_frustration().}
 
-\item{Resno}{Specific residue in Pdb. Type: numeric. Default: NULL.}
+\item{Resno}{Specific residues in Pdb. Type: numeric. Default: NULL.}
 
-\item{Chain}{Specific chain in Pdb. Type: character. Default: NULL.}
+\item{Chain}{Specific chains in Pdb. Type: character. Default: NULL.}
 }
 \value{
 Frustration table. Type: data frame.

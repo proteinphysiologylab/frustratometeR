@@ -4,7 +4,7 @@
 \alias{mutate_res}
 \title{Frustration of mutated residue}
 \usage{
-mutate_res(Pdb, Resno, Chain, Split = TRUE, Method = "Threading")
+mutate_res(Pdb, Resno, Chain, Split = TRUE, Method = "threading")
 }
 \arguments{
 \item{Pdb}{Pdb frustration object.}

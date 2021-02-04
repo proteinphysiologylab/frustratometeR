@@ -4,7 +4,7 @@
 \alias{plot_delta_frus}
 \title{Delta frustration of mutated residue}
 \usage{
-plot_delta_frus(Pdb, Resno, Chain, Method = "Threading", Save = FALSE)
+plot_delta_frus(Pdb, Resno, Chain, Method = "threading", Save = FALSE)
 }
 \arguments{
 \item{Pdb}{Pdb frustration object}

@@ -21,7 +21,7 @@ calculate_frustration(
 
 \item{PdbID}{PdbID of the protein structure. Default: NULL.}
 
-\item{Chain}{Chain of the protein structure. Type: character. Default: NULL.}
+\item{Chain}{Chain or Chains of the protein structure. Type: character/vector of characters. Default: NULL.}
 
 \item{Electrostatics_K}{K constant to use in the electrostatics Mode. Type: numeric. Default: NULL (no electrostatics is considered).}
 
