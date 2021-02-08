@@ -1,4 +1,5 @@
 #! /bin/bash
-echo "FrustratometeR"
 
-docker run -v $1:/pdb -it proteinphysiologylab/frustratometer env KEY_MODELLER=$4 R -e "library(frustratometeR)" -e "dir_frustration(PdbsDir = '/pdb/', Mode = '$2', ResultsDir = '/pdb/')"
+docker run -v $1:/pdb --rm -it proteinphysiologylab/frustratometer:latest /bin/bash -c "sh script1.sh inicio $2 $3"
+cd $1
+sudo chown -R $(whoami)
