@@ -1041,7 +1041,7 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
   }
   frustraData <- as.data.frame(frustraData)
   colnames(frustraData) <- paste("frame_", 1:length(Dynamic$OrderList), sep = "")
-  rownames(frustraData) <- paste(aa123(residues), "_", resnos, sep = "")
+  rownames(frustraData) <- paste(aa123(as.character(residues)), "_", resnos, sep = "")
   
   #Model fitting and filter by difference and mean
   frstrange <- c()
