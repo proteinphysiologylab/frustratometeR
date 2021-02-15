@@ -7,11 +7,11 @@
 detect_dynamic_clusters(
   Dynamic = Dynamic,
   LoessSpan = 0.05,
-  MinFrstRange = 0.8,
-  FiltMean = 0.5,
+  MinFrstRange = 0.7,
+  FiltMean = 0.15,
   Ncp = 10,
   MinCorr = 0.95,
-  LeidenResol = 1.45,
+  LeidenResol = 1,
   CorrType = "spearman"
 )
 }
@@ -20,15 +20,15 @@ detect_dynamic_clusters(
 
 \item{LoessSpan}{Parameter α > 0 that controls the degree of smoothing of the loess() function of model fit. Type: numeric. Default: 0.05.}
 
-\item{MinFrstRange}{Frustration dynamic range filter threshold. 0 <= MinFrstRange <= 1. Type: numeric. Default: 0.8.}
+\item{MinFrstRange}{Frustration dynamic range filter threshold. 0 <= MinFrstRange <= 1. Type: numeric. Default: 0.7.}
 
-\item{FiltMean}{Frustration Mean Filter Threshold. FiltMean >= 0. Type: numeric. Default: 0.5.}
+\item{FiltMean}{Frustration Mean Filter Threshold. FiltMean >= 0. Type: numeric. Default: 0.15.}
 
 \item{Ncp}{Number of principal components to be used in PCA(). Ncp >= 1. Type: numeric. Default: 10.}
 
 \item{MinCorr}{Correlation filter threshold. 0 <= MinCorr <= 1. Type: numeric. Default: 0.95.}
 
-\item{LeidenResol}{Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.45.}
+\item{LeidenResol}{Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.}
 
 \item{CorrType}{Type of correlation index to compute. Values: "pearson" or "spearman". Type: character. Default: "spearman".}
 }

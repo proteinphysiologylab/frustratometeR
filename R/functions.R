@@ -287,6 +287,12 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   
   if(is.null(ResultsDir)) 
     ResultsDir <- paste(tempdir(), "/", sep = "")
+  else if(!dir.exists(ResultsDir)){
+    if(strsplit(ResultsDir, "")[length(strsplit(ResultsDir, ""))] != "/")
+      ResultsDir <- paste0(ResultsDir, "/")
+    dir.create(ResultsDir)
+    cat(paste("The results directory ", ResultsDir," has been created.\n\n", sep = ""))
+  }
   if(is.null(PdbFile) & is.null(PdbID))
     stop("You must indicate PdbID or PdbFile!")
   if(!is.null(Electrostatics_K))
@@ -334,8 +340,6 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
     PdbBase <- paste(basename.pdb(PdbFile), "_", paste(Chain, collapse = "", sep = ""), sep = "")
   }
   else PdbBase <- basename.pdb(PdbFile)
-  
-  
   
   #Creates JobDir
   JobDir <- paste(ResultsDir, PdbBase, ".done/", sep = "")
@@ -500,6 +504,14 @@ dir_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electrostat
   
   if(is.null(ResultsDir)) 
     ResultsDir <- paste(tempdir(), "/", sep = "")
+  else if(!dir.exists(ResultsDir)){
+    if(strsplit(ResultsDir, "")[length(strsplit(ResultsDir, ""))] != "/")
+      ResultsDir <- paste0(ResultsDir, "/")
+    dir.create(ResultsDir)
+    cat(paste("The results directory ", ResultsDir," has been created.\n\n", sep = ""))
+  }
+  if(strsplit(PdbsDir, "")[length(strsplit(PdbsDir, ""))] != "/")
+    PdbsDir <- paste0(PdbsDir, "/")
   if(!is.null(Electrostatics_K))
     if(!is.numeric(Electrostatics_K))
       stop("Electrostatic_K must be a numeric value!")
@@ -586,6 +598,14 @@ dynamic_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electro
   
   if(is.null(ResultsDir)) 
     ResultsDir <- paste(tempdir(), "/", sep = "")
+  else if(!dir.exists(ResultsDir)){
+    if(strsplit(ResultsDir, "")[length(strsplit(ResultsDir, ""))] != "/")
+      ResultsDir <- paste0(ResultsDir, "/")
+    dir.create(ResultsDir)
+    cat(paste("The results directory ", ResultsDir," has been created.\n\n", sep = ""))
+  }
+  if(strsplit(PdbsDir, "")[length(strsplit(PdbsDir, ""))] != "/")
+    PdbsDir <- paste0(PdbsDir, "/")
   if(!is.null(Electrostatics_K))
     if(!is.numeric(Electrostatics_K))
       stop("Electrostatic_K must be a numeric value!")
@@ -596,12 +616,11 @@ dynamic_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electro
     stop(paste(Mode, "frustration index doesn't exist. The frustration indexes are: configurational, mutational or singleresidue!", sep = ""))
   if(GIFs != T & GIFs != F)
     stop("Graphics must be a boolean value!")
-  
-  cat("-----------------------------Object Dynamic Frustration-----------------------------\n")
-  if(is.null(ResultsDir)) 
-    ResultsDir <- paste(tempdir(), "/", sep = "")
   if(is.null(OrderList)) 
     OrderList <- as.vector(list.files(path = PdbsDir))
+  
+  cat("-----------------------------Object Dynamic Frustration-----------------------------\n")
+  
   Dynamic <- c()
   Dynamic$Mode <- Mode
   Dynamic$Chain <- Chain
@@ -991,11 +1010,11 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "threading"){
 #'
 #' @param Dynamic Dynamic Frustration Object.
 #' @param LoessSpan Parameter α > 0 that controls the degree of smoothing of the loess() function of model fit. Type: numeric. Default: 0.05.
-#' @param MinFrstRange Frustration dynamic range filter threshold. 0 <= MinFrstRange <= 1. Type: numeric. Default: 0.8.
-#' @param FiltMean Frustration Mean Filter Threshold. FiltMean >= 0. Type: numeric. Default: 0.5.
+#' @param MinFrstRange Frustration dynamic range filter threshold. 0 <= MinFrstRange <= 1. Type: numeric. Default: 0.7.
+#' @param FiltMean Frustration Mean Filter Threshold. FiltMean >= 0. Type: numeric. Default: 0.15.
 #' @param Ncp Number of principal components to be used in PCA(). Ncp >= 1. Type: numeric. Default: 10.
 #' @param MinCorr Correlation filter threshold. 0 <= MinCorr <= 1. Type: numeric. Default: 0.95.
-#' @param LeidenResol Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.45.
+#' @param LeidenResol Parameter that defines the coarseness of the cluster. LeidenResol > 0. Type: numeric. Default: 1.
 #' @param CorrType Type of correlation index to compute. Values: "pearson" or "spearman". Type: character. Default: "spearman".
 #' 
 #' @return Dynamic Frustration Object and its Clusters attribute.
@@ -1007,7 +1026,7 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "threading"){
 #' @importFrom leiden leiden
 #' 
 #' @export
-detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrstRange = 0.8, FiltMean = 0.5, Ncp = 10, MinCorr = 0.95, LeidenResol = 1.45, CorrType = "spearman"){
+detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrstRange = 0.7, FiltMean = 0.15, Ncp = 10, MinCorr = 0.95, LeidenResol = 1, CorrType = "spearman"){
   
   if(Dynamic$Mode != "singleresidue")
     stop("This functionality is only available for the singleresidue index, run dynamic_frustration() with Mode = 'singleresidue'")
@@ -1032,6 +1051,8 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
   rm(ini)
   
   #Loading data
+  cat("-----------------------------Loading data-----------------------------\n")
+  
   frustraData <- c()
   read <- c()
   for(i in 1:length(Dynamic$OrderList)){
@@ -1044,6 +1065,8 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
   rownames(frustraData) <- paste(aa123(as.character(residues)), "_", resnos, sep = "")
   
   #Model fitting and filter by difference and mean
+  cat("-----------------------------Model fitting and filtering by dynamic range and frustration mean-----------------------------\n")
+  
   frstrange <- c()
   means <- c()
   sds <- c()
@@ -1064,15 +1087,21 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
                       (estadistics$Means < -FiltMean | estadistics$Means > FiltMean) , ]
   
   #Principal component analysis
+  
+  cat("-----------------------------Principal component analysis-----------------------------\n")
   pca <- PCA(frustraData, ncp = Ncp, graph = F)
   
   Cor <- as.matrix(rcorr(t(pca$ind$coord[,]), type = CorrType))
   Cor[[1]][lower.tri(Cor[[1]], diag = T)] <- 0
-  
   Cor[[1]][!(Cor[[1]] < (-MinCorr)) & !(Cor[[1]] > (MinCorr)) | Cor[[3]] > 0.05] <- 0
+  
+  cat("-----------------------------Undirected graph-----------------------------\n")
+  
   net <- graph_from_adjacency_matrix(adjmatrix = Cor[[1]], diag = F, mode = "undirected", weighted = T)
   
   #Leiden Clustering
+  cat("-----------------------------Leiden Clustering-----------------------------\n")
+  
   cluster <- data.frame(cluster = leiden(net, resolution_parameter = LeidenResol))
   cluster <- as.data.frame(cluster[-as.vector(V(net)[igraph::degree(net) == 0]), ])
   net <- delete_vertices(net, V(net)[igraph::degree(net) == 0])
@@ -1091,5 +1120,9 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
   Dynamic$Clusters[["Sd"]] <- sds
   Dynamic$Clusters[["CorrType"]] <- tolower(CorrType)
   
+  if(is.null(Dynamic$Clusters[["Graph"]]))
+    cat("The process was not completed successfully!")
+  else cat("The process has finished successfully!")
+    
   return(Dynamic)
 }

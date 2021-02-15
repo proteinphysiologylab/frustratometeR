@@ -726,7 +726,7 @@ plot_dynamic_clusters_graph <- function(Dynamic){
   par(fig=c(0, 0.85, 0, 1))
   #svglite("/home/hacha/Documentos/grafo.svg",width = 20,height = 20)
   plot.igraph(Dynamic$Clusters$Graph, layout = layout_with_kk(Dynamic$Clusters$Graph, dim = 2), vertex.label.dist = 2, edge.width = 1,
-              vertex.color = V(Dynamic$Clusters$Graph)$color, vertex.size = 10, edge.color = "black", vertex.label.cex = 1, label.color = "black")
+              vertex.color = V(Dynamic$Clusters$Graph)$color, vertex.size = 10, edge.color = "black", vertex.label.cex = 1, vertex.label.color = "black")
   par(fig=c(0, 1, 0, 1), new=TRUE)
   legend(x = 0.8, y = 0.5, bty = "n", legend = paste(sort(unique(Dynamic$Clusters$LeidenClusters$cluster)), sep = ""), 
          fill = colorPalette[sort(unique(Dynamic$Clusters$LeidenClusters$cluster))], title = "Clusters")
