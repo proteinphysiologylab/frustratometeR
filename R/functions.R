@@ -288,7 +288,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   if(is.null(ResultsDir)) 
     ResultsDir <- paste(tempdir(), "/", sep = "")
   else if(!dir.exists(ResultsDir)){
-    if(strsplit(ResultsDir, "")[length(strsplit(ResultsDir, ""))] != "/")
+    if(strsplit(ResultsDir, "")[[1]][length(strsplit(ResultsDir, "")[[1]])] != "/")
       ResultsDir <- paste0(ResultsDir, "/")
     dir.create(ResultsDir)
     cat(paste("The results directory ", ResultsDir," has been created.\n\n", sep = ""))
@@ -505,12 +505,12 @@ dir_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electrostat
   if(is.null(ResultsDir)) 
     ResultsDir <- paste(tempdir(), "/", sep = "")
   else if(!dir.exists(ResultsDir)){
-    if(strsplit(ResultsDir, "")[length(strsplit(ResultsDir, ""))] != "/")
+    if(strsplit(ResultsDir, "")[[1]][length(strsplit(ResultsDir, "")[[1]])] != "/")
       ResultsDir <- paste0(ResultsDir, "/")
     dir.create(ResultsDir)
     cat(paste("The results directory ", ResultsDir," has been created.\n\n", sep = ""))
   }
-  if(strsplit(PdbsDir, "")[length(strsplit(PdbsDir, ""))] != "/")
+  if(strsplit(PdbsDir, "")[[1]][length(strsplit(PdbsDir, "")[[1]])] != "/")
     PdbsDir <- paste0(PdbsDir, "/")
   if(!is.null(Electrostatics_K))
     if(!is.numeric(Electrostatics_K))
@@ -599,12 +599,12 @@ dynamic_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electro
   if(is.null(ResultsDir)) 
     ResultsDir <- paste(tempdir(), "/", sep = "")
   else if(!dir.exists(ResultsDir)){
-    if(strsplit(ResultsDir, "")[length(strsplit(ResultsDir, ""))] != "/")
+    if(strsplit(ResultsDir, "")[[1]][length(strsplit(ResultsDir, "")[[1]])] != "/")
       ResultsDir <- paste0(ResultsDir, "/")
     dir.create(ResultsDir)
     cat(paste("The results directory ", ResultsDir," has been created.\n\n", sep = ""))
   }
-  if(strsplit(PdbsDir, "")[length(strsplit(PdbsDir, ""))] != "/")
+  if(strsplit(Pdbs, "")[[1]][length(strsplit(Pdbs, "")[[1]])] != "/")
     PdbsDir <- paste0(PdbsDir, "/")
   if(!is.null(Electrostatics_K))
     if(!is.numeric(Electrostatics_K))
