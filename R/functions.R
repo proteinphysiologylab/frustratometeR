@@ -667,7 +667,7 @@ dynamic_res <- function(Dynamic, Resno, Chain, Graphics = TRUE){
   
   if(Graphics != T & Graphics != F)
     stop("Graphics must be a boolean value!")
-  Pdb <- read.pdb(paste(Dynamic$PdbsDir, Dynamic$OrderList[1], sep = ""), ATOM.only = T, rm.alt = T, rm.insert = T)
+  Pdb <- read.pdb(paste(Dynamic$ResultsDir, basename.pdb(Dynamic$OrderList[1]), ".done/FrustrationData/", Dynamic$OrderList[1], sep = ""), ATOM.only = T, rm.alt = T, rm.insert = T)
   if(length(atom.select(Pdb, resno = Resno, chain = Chain, elety = "CA")$atom) == 0){
     if(!(Chain %in% unique(Pdb$atom$chain)))
       stop(paste("Chain ", Chain, " doesn't exist. The chains are found: ", paste(unique(Pdb$atom$chain), collapse = " ", sep = ""), sep = ""))
