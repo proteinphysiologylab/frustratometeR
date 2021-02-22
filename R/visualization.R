@@ -930,12 +930,12 @@ plot_clusters_pymol <- function(Dynamic, Clusters = "all"){
   write("color grey, structure", file = file, append = T)
   
   clusters <- sort(unique(clusterData$Cluster))
-  for (i in 1:length(clusters)) {
-    residues <- paste(clusterData$Res[clusterData$Cluster == clusters[i]], collapse="+")
-    write(paste("sele cluster", clusters[i], ",resi ", residues, sep = ""),
+  for (i in clusters) {
+    residues <- paste(clusterData$Res[clusterData$Cluster == i], collapse="+")
+    write(paste("sele cluster", i, ",resi ", residues, sep = ""),
           file = file, append = T)
-    write(paste("color ", colorPalette[i], ", cluster", clusters[i], sep = ""), file = file, append = T)
-    write(paste("show sticks, cluster", clusters[i], sep = ""), file = file, append = T)
+    write(paste("color ", colorPalette[i], ", cluster", i, sep = ""), file = file, append = T)
+    write(paste("show sticks, cluster", i, sep = ""), file = file, append = T)
   }
   write("deselect", file = file, append = T)
   
