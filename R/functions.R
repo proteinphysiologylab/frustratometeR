@@ -605,7 +605,7 @@ dynamic_frustration <- function(PdbsDir, OrderList = NULL, Chain = NULL, Electro
   }
   if(strsplit(ResultsDir, "")[[1]][length(strsplit(ResultsDir, "")[[1]])] != "/")
       ResultsDir <- paste0(ResultsDir, "/")
-  if(strsplit(Pdbs, "")[[1]][length(strsplit(Pdbs, "")[[1]])] != "/")
+  if(strsplit(PdbsDir, "")[[1]][length(strsplit(PdbsDir, "")[[1]])] != "/")
     PdbsDir <- paste0(PdbsDir, "/")
   if(!is.null(Electrostatics_K))
     if(!is.numeric(Electrostatics_K))
