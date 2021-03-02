@@ -863,7 +863,6 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "threading"){
     if(!requireNamespace("msa", quietly = TRUE)){
       stop("Please install msa package from Bioconductor to continue!")
     }
-    else library(msa)
     
     AAvector <- c('L', 'D', 'I', 'N', 'T', 'V', 'A', 'G', 'E', 'R', 'K', 'H', 'Q', 'S', 'P', 'F', 'Y', 'M', 'W', 'C');
     
@@ -1041,7 +1040,6 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
           cat("To import 'leiden' is the next module must first be installed with: 'python3 -m pip install leidenalg'")
       stop(paste("Please install ", library," package to continue", sep = ""))
     }
-    else library(library, character.only = T)
   }
   
   #Loading residues and resno
