@@ -705,7 +705,7 @@ plot_mutate_res <- function(Pdb, Resno, Chain, Method = "threading", Save = FALS
 #'
 #' @param Dynamic Dynamic Frustration Object
 #' 
-#' @importFrom igraph plot.igraph set_vertex_attr V
+#' @importFrom igraph plot.igraph set_vertex_attr V layout_with_kk
 #' 
 #' @export
 plot_dynamic_clusters_graph <- function(Dynamic){
@@ -728,7 +728,7 @@ plot_dynamic_clusters_graph <- function(Dynamic){
   plot.igraph(Dynamic$Clusters$Graph, layout = layout_with_kk(Dynamic$Clusters$Graph, dim = 2), vertex.label.dist = 2, edge.width = 1,
               vertex.color = V(Dynamic$Clusters$Graph)$color, vertex.size = 10, edge.color = "black", vertex.label.cex = 1, vertex.label.color = "black")
   par(fig=c(0, 1, 0, 1), new=TRUE)
-  legend(x = 0.8, y = 0.5, bty = "n", legend = paste(sort(unique(Dynamic$Clusters$LeidenClusters$cluster)), sep = ""), 
+  legend(x = 0.8, y = 0.1, bty = "n", legend = paste(sort(unique(Dynamic$Clusters$LeidenClusters$cluster)), sep = ""), 
          fill = colorPalette[sort(unique(Dynamic$Clusters$LeidenClusters$cluster))], title = "Clusters")
 }
 #plot_res_dynamics----
