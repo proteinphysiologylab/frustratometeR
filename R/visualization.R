@@ -242,7 +242,7 @@ plot_contact_map <- function(Pdb, Chain = NULL, Save = FALSE){
     posNEW[i, 3] <- posNEW[i, 2] - posNEW[i, 1] + 1
   }
   
-  total.positions <- sum(apply(positions, 1, function(x){x[2] - x[1] + 1}))
+  total.positions <- sum(apply(posNEW, 1, function(x){x[2] - x[1] + 1}))
   matrz <- matrix(NA, ncol = total.positions, nrow = total.positions)
   for(i in 1:nrow(datos)){
     matrz[datos$pos2[i], datos$pos1[i]] <- datos$FrstIndex[i]
