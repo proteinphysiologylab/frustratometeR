@@ -974,8 +974,8 @@ save_res_dynamic_clusters <- function(Dynamic, Clusters = "all", Ncol = 2, Nrow 
     plots<-list()
     for(i in 1:nrow(get_clusters(Dynamic, Clusters = cluster)))
     {
-      Dynamic <- dynamic_res(Dynamic = Dynamic, Resno = get_clusters(Dynamic, Clusters = cluster)[i,"Res"], Chain = "A", Graphics = F)
-      plot <- plot_res_dynamics(Dynamic = Dynamic, Resno = get_clusters(Dynamic, Clusters = cluster)[i,"Res"], Chain = "A")
+      Dynamic <- dynamic_res(Dynamic = Dynamic, Resno = get_clusters(Dynamic, Clusters = cluster)[i,"Res"], Chain = Dynamic$Chain, Graphics = F)
+      plot <- plot_res_dynamics(Dynamic = Dynamic, Resno = get_clusters(Dynamic, Clusters = cluster)[i,"Res"], Chain = Dynamic$Chain)
       plots[[i]] <- plot
     }
     ml <- marrangeGrob(plots, nrow = Nrow, ncol = Ncol, top = "",width = 20, height = 10)
