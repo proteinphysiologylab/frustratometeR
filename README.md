@@ -1,4 +1,4 @@
-# FrustratometeR
+# frustratometeR
 An R package for calculating energetic local frustration in protein structures. Additionally to the functionalities present at the web server, frustratometeR offers the possibility to analyse frustration across molecular dynamics simulations and to assess the effect of aminoacid variants.
 
 # Installation 
