@@ -1145,7 +1145,7 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
 #' @importFrom bio3d write.pdb atom.select get.seq read.fasta seqbind seqaln pdbseq
 #' 
 #' @export
-    mutate_res_only <- function (Pdb, Resno, Chain, Split = TRUE, Method = "threading",ResToMut) 
+mutate_res_only <- function (Pdb, Resno, Chain, Split = TRUE, Method = "threading",ResToMut) 
 {
   res_letter<-c("L", "D", "I", "N", "T", "V", "A", "G", 
        "E", "R", "K", "H", "Q", "S", "P", "F", "Y", "M", 
