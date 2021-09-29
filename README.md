@@ -8,6 +8,9 @@ An R package for calculating energetic local frustration in protein structures. 
 `devtools::install_github("proteinphysiologylab/frustratometeR")`
 
 # Dependencies
+** If you are using MacOs, FrustratometeR is compatible with systems using MacOS version 10.15 or higher.
+** If you are using UBUNTU, FrustratometeR is compatible with Ubuntu 16 or higher.
+
 
 **R packages (R version >= 3.6.3 required. Compatible with R 4.0.X)**
 
