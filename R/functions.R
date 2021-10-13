@@ -365,6 +365,12 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   #MSE to MET filter
   Pdb$atom$type[which(Pdb$atom$resid == "MSE")] <- "ATOM"
   Pdb$atom$resid[which(Pdb$atom$resid == "MSE")] <- "MET"
+  #HIE to HIS filter
+  Pdb$atom$type[which(Pdb$atom$resid == "HIE")] <- "ATOM"
+  Pdb$atom$resid[which(Pdb$atom$resid == "HIE")] <- "HIS"
+  #CIX to CYS filter
+  Pdb$atom$type[which(Pdb$atom$resid == "CYX")] <- "ATOM"
+  Pdb$atom$resid[which(Pdb$atom$resid == "CYX")] <- "CYS"
 
   # Save equivalences
   Pdb[["PdbBase"]] <- PdbBase
