@@ -351,17 +351,6 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   
   cat("-----------------------------Filtering-----------------------------\n")
   
-  # Here we filter remove non-protein atoms.
-  #The Protein atom from bio3d::aa.table$aa3
-  #"ALA" "ARG" "ASN" "ASP" "CYS" "GLN" "GLU" "GLY" "HIS" "ILE" "LEU" "LYS" "MET" "PHE"
-  #"PRO" "SER" "THR" "TRP" "TYR" "VAL" "ABA" "ASH" "CIR" "CME" "CMT" "CSD" "CSO" "CSW"
-  #"CSX" "CYM" "CYX" "DDE" "GLH" "HID" "HIE" "HIP" "HSD" "HSE" "HSP" "IAS" "KCX" "LYN"
-  #"MHO" "MLY" "MSE" "OCS" "PFF" "PTR" "SEP" "TPO"
-  Pdb <- atom.select(Pdb, "protein", value = T)
-  
-  #Fix chain NA
-  Pdb$atom$chain[is.na(Pdb$atom$chain[])] <- "A"
-
   #MSE to MET filter
   Pdb$atom$type[which(Pdb$atom$resid == "MSE")] <- "ATOM"
   Pdb$atom$resid[which(Pdb$atom$resid == "MSE")] <- "MET"
@@ -374,6 +363,17 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   #CY1 to CYS filter
   Pdb$atom$type[which(Pdb$atom$resid == "CY1")] <- "ATOM"
   Pdb$atom$resid[which(Pdb$atom$resid == "CY1")] <- "CYS"
+  
+  # Here we filter remove non-protein atoms.
+  #The Protein atom from bio3d::aa.table$aa3
+  #"ALA" "ARG" "ASN" "ASP" "CYS" "GLN" "GLU" "GLY" "HIS" "ILE" "LEU" "LYS" "MET" "PHE"
+  #"PRO" "SER" "THR" "TRP" "TYR" "VAL" "ABA" "ASH" "CIR" "CME" "CMT" "CSD" "CSO" "CSW"
+  #"CSX" "CYM" "CYX" "DDE" "GLH" "HID" "HIE" "HIP" "HSD" "HSE" "HSP" "IAS" "KCX" "LYN"
+  #"MHO" "MLY" "MSE" "OCS" "PFF" "PTR" "SEP" "TPO"
+  Pdb <- atom.select(Pdb, "protein", value = T)
+  
+  #Fix chain NA
+  Pdb$atom$chain[is.na(Pdb$atom$chain[])] <- "A"
 
   # Save equivalences
   Pdb[["PdbBase"]] <- PdbBase
