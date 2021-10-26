@@ -312,15 +312,11 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   #system(paste0("rm -r ", tempfolder, "/*"))
   
   tempfolder <- tempdir()
-  #Chain
-  if(is.null(Chain))  boolsplit = F
-  else  boolsplit = T
   
   if(is.null(PdbFile)){
     #Get URL and download
     cat("-----------------------------Download files-----------------------------\n")
-    pdbURL <- get.pdb(id = PdbID, split = boolsplit, URLonly = TRUE)
-    system(paste("wget --no-check-certificate -P ", tempfolder, pdbURL, " -q --progress=bar:force:noscroll --show-progress", sep = ' '))
+    pdbURL <- get.pdb(id = PdbID, split = F, URLonly = F, path = tempfolder)
     PdbFile <- paste(tempfolder, "/", PdbID, ".pdb", sep = "")    
   }
   
