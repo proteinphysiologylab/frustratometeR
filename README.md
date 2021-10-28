@@ -44,6 +44,19 @@ An R package for calculating energetic local frustration in protein structures. 
 (you need to install a licenced version of modeller in order to use some of the frustratometeR functionalities, https://salilab.org/modeller/)
 modeller needs to be available via python3. To check if this is working execute python3 and try to do "from modeller import * " after installing modeller. We suggest to install modeller using conda environments. 
 
+if modeller does not work from RStudio, you can use reticulate to tell R which conda environment to use.
+
+`library(reticulate)`
+
+`use_python("/url/bin/python3")`
+
+`use_condaenv("condaenvironment") `
+
+`Sys.setenv(RETICULATE_PYTHON = "/url/bin/python3")`
+
+`reticulate::py_config()`
+
+
 # Minimum code to calculate frustration in a protein
 `library(frustratometeR)`
 
