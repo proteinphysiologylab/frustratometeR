@@ -418,8 +418,31 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
                  "_Linux ; ./lmp_serial_", SeqDist, "_Linux < ", Pdb$PdbBase, ".in", sep = ""))
   }
   else if(OperativeSystem == "osx"){
-    system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, "_MacOS ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
-                 "_MacOS ; ./lmp_serial_", SeqDist, "_MacOS < ", Pdb$PdbBase, ".in", sep = ""))
+    tryCatch(
+      {
+        message("TRY:")
+        
+        system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, "_MacOS ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
+                     "_MacOS ; ./lmp_serial_", SeqDist, "_MacOS < ", Pdb$PdbBase, ".in", sep = "")) 
+      },
+      error=function(cond) {
+        message("Se duplicó el último atomo ERROR")
+        f <- file(Pdb$PdbBase, open = "r")
+        document <- readLines(f)
+        document[length(document) + 1] <- document[length(document)]
+        write(document, file = Pdb$PdbBase)
+        close(f)
+        message("Se duplicó el último atomo ERROR")
+  
+        # Choose a return value in case of error
+        return(NA)
+      },
+      warning=function(cond) {
+        message(paste("TIRA WARNING?", url))
+        message(cond)
+        # Choose a return value in case of warning
+        return(NULL)
+      })
   }
  
   system(paste("perl ", Pdb$scriptsDir, "/RenumFiles.pl ", Pdb$PdbBase, " ", Pdb$JobDir, " ", Pdb$Mode, sep = "" ))
