@@ -432,6 +432,10 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
         document[length(document) + 1] <- document[length(document)]
         write(document, file = Pdb$PdbBase)
         close(f)
+        
+        system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, "_MacOS ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
+                     "_MacOS ; ./lmp_serial_", SeqDist, "_MacOS < ", Pdb$PdbBase, ".in", sep = "")) 
+        
         message("Se duplicó el último atomo ERROR")
   
         # Choose a return value in case of error
