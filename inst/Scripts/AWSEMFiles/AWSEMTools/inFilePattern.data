@@ -36,7 +36,6 @@ thermo		1000
 dump		1 all atom 1000 dump.lammpstrj
 
 dump_modify	1 sort id
-comm_modify	mode single cutoff 15.665
 
 reset_timestep	0
 run		10000
