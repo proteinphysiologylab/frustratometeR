@@ -423,7 +423,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
     empty = rownames(info[info$size == 0, ])
     if(empty == paste(Pdb$JobDir, "tertiary_frustration.dat", sep = "")){
       
-      print(paste0(Pdb$JobDir,Pdb$PdbBase,".pdb"))
+      #print(paste0(Pdb$JobDir,Pdb$PdbBase,".pdb"))
       Pdbaux<-read.pdb(paste0(Pdb$JobDir,Pdb$PdbBase,".pdb"), maxlines = -1, multi = FALSE, rm.insert = FALSE,
                rm.alt = TRUE, ATOM.only = FALSE, hex = FALSE, verbose = TRUE)
       last_res<-tail(Pdbaux$atom, n = 1)
@@ -432,11 +432,11 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
 
       length(Pdbaux$xyz)
       Pdbaux$xyz<-c(Pdbaux$xyz, Pdbaux$xyz[(ncol(Pdbaux$xyz)-2):ncol(Pdbaux$xyz)])
-      print(tail(Pdbaux$atom))
+      #print(tail(Pdbaux$atom))
     
       write.pdb(Pdbaux, file = paste0(Pdb$JobDir,Pdb$PdbBase,".pdb"))
 
-      print(paste("python3 ", Pdb$scriptsDir, "/MissingAtoms.py ",  Pdb$JobDir, Pdb$PdbBase, ".pdb", sep=""))
+      #print(paste("python3 ", Pdb$scriptsDir, "/MissingAtoms.py ",  Pdb$JobDir, Pdb$PdbBase, ".pdb", sep=""))
       system(paste("python3 ", Pdb$scriptsDir, "/MissingAtoms.py ",  Pdb$JobDir, Pdb$PdbBase, ".pdb", sep=""))
       system(paste("mv ", Pdb$JobDir, Pdb$PdbBase, ".pdb_completed", " ", Pdb$JobDir, Pdb$PdbBase, ".pdb", sep=""))
 
@@ -476,7 +476,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
         system(paste0("mv ", paste0(Pdb$JobDir, "auxxxx "), paste0(Pdb$JobDir,"tertiary_frustration.dat")))
      }
       
-      message("Se duplicó el último atomo ERROR")
+      message("patched...")
     }
   }
   
