@@ -286,13 +286,12 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
                                   Mode = "configurational", Graphics = TRUE, Visualization = TRUE, ResultsDir = NULL){
   
   if(is.null(ResultsDir)) 
-    ResultsDir <- paste(tempdir(), "/", sep = "")
-  else if(!dir.exists(ResultsDir)){
+    {ResultsDir <- paste(tempdir(), "/", sep = "")}  else if(!dir.exists(ResultsDir)){
     dir.create(ResultsDir)
     cat(paste("The results directory ", ResultsDir," has been created.\n\n", sep = ""))
   }
   if(strsplit(ResultsDir, "")[[1]][length(strsplit(ResultsDir, "")[[1]])] != "/")
-     ResultsDir <- paste0(ResultsDir, "/")
+    ResultsDir <- paste0(ResultsDir, "/")
   
   if(is.null(PdbFile) & is.null(PdbID))
     stop("You must indicate PdbID or PdbFile!")
@@ -335,8 +334,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
                  paste(unique(Pdb$atom$chain), collapse = " ", sep = ""), "\n", sep = ""))
     }
     PdbBase <- paste(basename.pdb(PdbFile), "_", paste(Chain, collapse = "", sep = ""), sep = "")
-  }
-  else PdbBase <- basename.pdb(PdbFile)
+  }  else PdbBase <- basename.pdb(PdbFile)
   
   #Creates JobDir
   JobDir <- paste(ResultsDir, PdbBase, ".done/", sep = "")
@@ -370,7 +368,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   
   #Fix chain NA
   Pdb$atom$chain[is.na(Pdb$atom$chain[])] <- "A"
-
+  
   # Save equivalences
   Pdb[["PdbBase"]] <- PdbBase
   Pdb[["JobDir"]] <- JobDir
@@ -379,7 +377,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   Pdb[["equivalences"]] <- equivalences
   
   write.pdb(Pdb, paste(JobDir, PdbBase, ".pdb", sep = ""), end = F)
-
+  
   if(complete_backbone(Pdb)){
     Pdb <- read.pdb(PdbFile, ATOM.only = T, rm.alt = T, rm.insert = T)
     write.pdb(Pdb, paste(JobDir, PdbBase, ".pdb", sep = ""), end = F)
@@ -395,7 +393,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   cat("-----------------------------Preparing files-----------------------------\n")
   system(paste("sh ", Pdb$scriptsDir, "/AWSEMFiles/AWSEMTools/PdbCoords2Lammps.sh ", Pdb$PdbBase, " ", Pdb$PdbBase, " ", Pdb$scriptsDir, sep = ""))
   system(paste("cp ", Pdb$scriptsDir, "/AWSEMFiles/*.dat* ", Pdb$JobDir, sep = ""))
-
+  
   cat("-----------------------------Setting options-----------------------------\n")
   replace_Expr("run\t\t10000", "run\t\t0", paste(Pdb$JobDir, Pdb$PdbBase, ".in", sep = ""))
   replace_Expr("mutational", Pdb$Mode, paste(Pdb$JobDir, "fix_backbone_coeff.data", sep = ""))
@@ -410,33 +408,78 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
     system(paste("python3 ", Pdb$scriptsDir, "/Pdb2Gro.py ", Pdb$PdbBase, ".pdb ", Pdb$PdbBase, ".pdb.gro; perl ",
                  Pdb$scriptsDir, "/GenerateChargeFile.pl ", Pdb$PdbBase, ".pdb.gro > ", JobDir, "charge_on_residues.dat", sep = ""))
   }
-
+  
   cat("-----------------------------Calculating-----------------------------\n")
   OperativeSystem <- get_os()
   if(OperativeSystem == "linux"){
-     system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, "_Linux ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
+    system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, "_Linux ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
                  "_Linux ; ./lmp_serial_", SeqDist, "_Linux < ", Pdb$PdbBase, ".in", sep = ""))
-  }
-  else if(OperativeSystem == "osx"){
+  } else if(OperativeSystem == "osx"){
     
-      suppressMessages(system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, "_MacOS ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
-                     "_MacOS ; ./lmp_serial_", SeqDist, "_MacOS < ", Pdb$PdbBase, ".in", sep = "")))
+    suppressMessages(system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, "_MacOS ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
+                                  "_MacOS ; ./lmp_serial_", SeqDist, "_MacOS < ", Pdb$PdbBase, ".in", sep = "")))
+    
+    info = file.info(paste(Pdb$JobDir, "tertiary_frustration.dat", sep = ""))
+    empty = rownames(info[info$size == 0, ])
+    if(empty == paste(Pdb$JobDir, "tertiary_frustration.dat", sep = "")){
       
-      info = file.info(paste(Pdb$JobDir, "tertiary_frustration.dat", sep = ""))
-      empty = rownames(info[info$size == 0, ])
-      if(empty == paste(Pdb$JobDir, "tertiary_frustration.dat", sep = "")){
-        f <- file(Pdb$PdbBase, open = "r")
-        document <- readLines(f)
-        document[length(document) + 1] <- document[length(document)]
-        write(document, file = Pdb$PdbBase)
-        close(f)
-        system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, "_MacOS ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
-                     "_MacOS ; ./lmp_serial_", SeqDist, "_MacOS < ", Pdb$PdbBase, ".in", sep = "")) 
-        
-        message("Se duplicó el último atomo ERROR")
+      print(paste0(Pdb$JobDir,Pdb$PdbBase,".pdb"))
+      Pdbaux<-read.pdb(paste0(Pdb$JobDir,Pdb$PdbBase,".pdb"), maxlines = -1, multi = FALSE, rm.insert = FALSE,
+               rm.alt = TRUE, ATOM.only = FALSE, hex = FALSE, verbose = TRUE)
+      last_res<-tail(Pdbaux$atom, n = 1)
+      last_res$resno<-last_res$resno+1
+      Pdbaux$atom<-rbind(Pdbaux$atom, last_res)
+
+      length(Pdbaux$xyz)
+      Pdbaux$xyz<-c(Pdbaux$xyz, Pdbaux$xyz[(ncol(Pdbaux$xyz)-2):ncol(Pdbaux$xyz)])
+      print(tail(Pdbaux$atom))
+    
+      write.pdb(Pdbaux, file = paste0(Pdb$JobDir,Pdb$PdbBase,".pdb"))
+
+      print(paste("python3 ", Pdb$scriptsDir, "/MissingAtoms.py ",  Pdb$JobDir, Pdb$PdbBase, ".pdb", sep=""))
+      system(paste("python3 ", Pdb$scriptsDir, "/MissingAtoms.py ",  Pdb$JobDir, Pdb$PdbBase, ".pdb", sep=""))
+      system(paste("mv ", Pdb$JobDir, Pdb$PdbBase, ".pdb_completed", " ", Pdb$JobDir, Pdb$PdbBase, ".pdb", sep=""))
+
+      system(paste("sh ", Pdb$scriptsDir, "/AWSEMFiles/AWSEMTools/PdbCoords2Lammps.sh ", Pdb$PdbBase, " ", Pdb$PdbBase, " ", Pdb$scriptsDir, sep = ""))
+      system(paste("cp ", Pdb$scriptsDir, "/AWSEMFiles/*.dat* ", Pdb$JobDir, sep = ""))
+      
+      cat("-----------------------------Setting options-----------------------------\n")
+      replace_Expr("run\t\t10000", "run\t\t0", paste(Pdb$JobDir, Pdb$PdbBase, ".in", sep = ""))
+      replace_Expr("mutational", Pdb$Mode, paste(Pdb$JobDir, "fix_backbone_coeff.data", sep = ""))
+      
+      if(!is.null(Electrostatics_K))
+      {
+        cat("-----------------------------Setting electrostatics-----------------------------\n")
+        replace_Expr("\\[DebyeHuckel\\]-", "\\[DebyeHuckel\\]", paste(Pdb$JobDir, "fix_backbone_coeff.data", sep = ""))
+        replace_Expr("4.15 4.15 4.15", paste(Electrostatics_K, Electrostatics_K, Electrostatics_K, sep = " "),
+                     paste(Pdb$JobDir, "fix_backbone_coeff.data", sep = ""))
+        print("Setting electrostatics...")
+        system(paste("python3 ", Pdb$scriptsDir, "/Pdb2Gro.py ", Pdb$PdbBase, ".pdb ", Pdb$PdbBase, ".pdb.gro; perl ",
+                     Pdb$scriptsDir, "/GenerateChargeFile.pl ", Pdb$PdbBase, ".pdb.gro > ", JobDir, "charge_on_residues.dat", sep = ""))
       }
+      system(paste("cp ", Pdb$scriptsDir, "/lmp_serial_", SeqDist, "_MacOS ", Pdb$JobDir, "; chmod +x lmp_serial_", SeqDist,
+                   "_MacOS ; ./lmp_serial_", SeqDist, "_MacOS < ", Pdb$PdbBase, ".in", sep = ""))
+      
+      
+      if(Mode!="singleresidue")
+      {
+        dat_file<-read.table(paste0(Pdb$JobDir,"tertiary_frustration.dat"))
+        fake_res<-max(c(dat_file[,1], dat_file[,2]))
+        
+        system(paste0("awk '{if($1!=",fake_res," && $2!=",fake_res,") print}' ", paste0(Pdb$JobDir,"tertiary_frustration.dat"), ">",  paste0(Pdb$JobDir, "auxxxx")  ))
+        system(paste0("mv ", paste0(Pdb$JobDir, "auxxxx "), paste0(Pdb$JobDir,"tertiary_frustration.dat")))
+      }else{
+        dat_file<-read.table(paste0(Pdb$JobDir,"tertiary_frustration.dat"))
+        fake_res<-max(dat_file[,1])
+        
+        system(paste0("awk '{if($1!=",fake_res, ") print}' ", paste0(Pdb$JobDir,"tertiary_frustration.dat"), ">",  paste0(Pdb$JobDir, "auxxxx")  ))
+        system(paste0("mv ", paste0(Pdb$JobDir, "auxxxx "), paste0(Pdb$JobDir,"tertiary_frustration.dat")))
+     }
+      
+      message("Se duplicó el último atomo ERROR")
+    }
   }
- 
+  
   system(paste("perl ", Pdb$scriptsDir, "/RenumFiles.pl ", Pdb$PdbBase, " ", Pdb$JobDir, " ", Pdb$Mode, sep = "" ))
   
   if(Pdb$Mode == "configurational" | Pdb$Mode == "mutational"){
@@ -456,9 +499,9 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
     cat("-----------------------------Images-----------------------------\n")
     Images <- paste(Pdb$JobDir, "Images", sep = "")
     if (!dir.exists(Images))  dir.create(Images)
-      plot_5Andens(Pdb, Save = T)
-      plot_5Adens_proportions(Pdb, Save = T)
-      plot_contact_map(Pdb, Save = T)
+    plot_5Andens(Pdb, Save = T)
+    plot_5Adens_proportions(Pdb, Save = T)
+    plot_contact_map(Pdb, Save = T)
   }
   
   if(Visualization & Mode != "singleresidue"){
@@ -486,20 +529,20 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   files <- read.table(paste(JobDir, "output", sep = ""), header = F)
   files[,1] <- as.character(files[, 1])
   for(i in seq(1, dim(files)[1])){
-  	finalCharacter <- substr(files[i, 1], nchar(files[i, 1]), nchar(files[i, 1]))
-  	if(finalCharacter != '/' & finalCharacter != '.'){
-  		system(paste("rm -f ", files[i, 1], sep = ""));
-  	}
+    finalCharacter <- substr(files[i, 1], nchar(files[i, 1]), nchar(files[i, 1]))
+    if(finalCharacter != '/' & finalCharacter != '.'){
+      system(paste("rm -f ", files[i, 1], sep = ""));
+    }
   }
   setwd(tempfolder)
   
   #We delete temporary files
-   if(!is.null(Chain))
-   {
-   	system(paste("rm -f -R ", tempfolder, "/split_chain", sep = "" ))
-   }
-   system(paste("rm -f ", tempfolder, "/", PdbID, ".pdb", sep = "" ))
-
+  if(!is.null(Chain))
+  {
+    system(paste("rm -f -R ", tempfolder, "/split_chain", sep = "" ))
+  }
+  system(paste("rm -f ", tempfolder, "/", PdbID, ".pdb", sep = "" ))
+  
   return(Pdb)
 }
 #dir_frustration----
