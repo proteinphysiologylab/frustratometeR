@@ -56,6 +56,9 @@ if modeller does not work from RStudio, you can use reticulate to tell R which c
 
 `reticulate::py_config()`
 
+you have to replace "/url/bin/python3" with the location of your python. You can get that location by doing which python3 in a system terminal. 
+
+you have to replace "condaenvironment" with the conda environment where you installed modeller. 
 
 # Minimum code to calculate frustration in a protein
 `library(frustratometeR)`
