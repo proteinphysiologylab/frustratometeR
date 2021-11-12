@@ -655,7 +655,6 @@ plot_mutate_res <- function(Pdb, Resno, Chain, Method = "threading", Save = FALS
     Contacts <- as.data.frame(Contacts)
     colnames(Contacts) <- c("Res", "Chain", "Index")
     
-    View(Contacts)
     Contacts$Res <- as.numeric(Contacts$Res)
     Resid <- atom.select(Pdb, resno = Contacts$Res, elety = "CA", chain = Mutation$Chain, value = T)$atom$resid
     
