@@ -758,6 +758,8 @@ plot_res_dynamics <- function(Dynamic = Dynamic, Resno, Chain, Save = FALSE){
   else  stop(paste("No analysis ",Chain," chain. Run dynamic_res().", sep = ""))
   
   Pdb <- read.pdb(paste(Dynamic$PdbsDir, Dynamic$OrderList[1], sep = ""), ATOM.only = T, rm.alt = T, rm.insert = T)
+  #Fix chain NA
+  Pdb$atom$chain[is.na(Pdb$atom$chain[])] <- "A"
   AA <- atom.select(Pdb, resno = Resno, chain = Chain, elety = "CA", value = T)$atom$resid
   rm(Pdb)
   
