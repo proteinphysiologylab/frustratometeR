@@ -69,12 +69,13 @@ you have to replace "condaenvironment" with the conda environment where you inst
 
 ## **You can find an example of how to use the package at:**
 
-https://github.com/proteinphysiologylab/FrustraEvo/Examples
+https://github.com/proteinphysiologylab/frustratometeR/tree/master/Examples
+
 
 ## **You can also find useful examples in our wiki!!:**
 
-https://github.com/proteinphysiologylab/FrustraEvo/wiki
+https://github.com/proteinphysiologylab/frustratometeR/wiki
 
 ## **You can find the data used in the Wiki examples at:**
 
-https://github.com/proteinphysiologylab/FrustraEvo/Data
+https://github.com/proteinphysiologylab/frustratometer-data.git
