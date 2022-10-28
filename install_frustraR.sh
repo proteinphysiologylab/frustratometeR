@@ -2,13 +2,9 @@
 #FROM ubuntu:22.04
 
 #MAINTAINER Freiberger Maria Ines
-#For R installation
+#For R 
 
 apt-get update
-apt install -y --no-install-recommends software-properties-common dirmngr
-apt-get install wget
-wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
-add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
 apt install -y r-base r-base-core r-recommended r-base-dev
 
 #For frustraR package installation
