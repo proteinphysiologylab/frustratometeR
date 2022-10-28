@@ -36,6 +36,7 @@ Rscript -e "install.packages('FactoMineR', dependencies = TRUE)"
 Rscript -e "install.packages('Hmisc', dependencies = TRUE)"
 Rscript -e "install.packages('magick', dependencies = TRUE)"
 Rscript -e "install.packages('leiden', dependencies = TRUE)"
+Rscript -e "options(timeout=9999999)"
 Rscript -e "devtools::install_github('proteinphysiologylab/frustratometeR')"
 
 
