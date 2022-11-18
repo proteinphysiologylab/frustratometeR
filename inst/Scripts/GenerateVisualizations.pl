@@ -15,12 +15,12 @@ $namePdb =~ tr/".\-"/"__"/;
 
 open(PML, ">$ARGV[2]/$ARGV[1].pdb\_$ARGV[3].pml");
 print PML 
-"load $ARGV[2]/VisualizationScrips/$ARGV[1].pdb, $namePdb
+"load $ARGV[1].pdb, $namePdb
 hide line,$namePdb
 unset dynamic_measures
 show cartoon,$namePdb
 color grey,$namePdb
-run $ARGV[2]/VisualizationScrips/draw_links.py
+run draw_links.py
 ";
 #----------------------
 #----------------------
