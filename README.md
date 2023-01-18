@@ -43,7 +43,7 @@ ONLY for UBUNTU 22.04 and for R version 4.X.X: To install frustratometeR from th
 `sudo apt-get install perl`
 
 **modeller**
-(you need to install a licenced version of modeller in order to use some of the frustratometeR functionalities, https://salilab.org/modeller/)
+(you need to install a licenced version of modeller in order to use some of the frustratometeR functionalities, https://salilab.org/modeller/, we recommend to install the latest release)
 modeller needs to be available via python3. To check if this is working execute python3 and try to do "from modeller import * " after installing modeller. We suggest to install modeller using conda environments. 
 
 if modeller does not work from RStudio, you can use reticulate to tell R which conda environment to use. Execute these lines before you execute the frustration functions.
