@@ -83,4 +83,4 @@ https://github.com/proteinphysiologylab/frustratometeR/wiki
 https://github.com/proteinphysiologylab/frustratometer-data.git
 
 ## ** Google Collab Notebook to try FrustratometeR online **
-https://colab.research.google.com/drive/1U3OtrAmMprDFqSjDNpz6NePERfTPV3tI#scrollTo=cY0pX8mOAQ00
+https://github.com/proteinphysiologylab/frustratometeR/blob/master/FrustratometeR_Colab.ipynb
