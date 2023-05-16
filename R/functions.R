@@ -885,7 +885,7 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "threading"){
     if(pos != 0)
       ID <- substr(Pdb$PdbBase, 1, pos-1)
     
-    sequence <- get.seq(ids = c(ID), db = "PDB", outfile = paste(Pdb$JobDir, "seqs.fasta", sep = ""))
+    #sequence <- get.seq(ids = c(ID), db = "PDB", outfile = paste(Pdb$JobDir, "seqs.fasta", sep = ""))
     fasta <- read.fasta(paste(Pdb$JobDir, "seqs.fasta", sep = ""))
     
     Seq <- c()
