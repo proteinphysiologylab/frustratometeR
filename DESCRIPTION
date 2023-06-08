@@ -3,7 +3,7 @@ Type: Package
 Title: frustratometeR
 Version: 0.1.0
 Authors: Atilio O. Rausch*, Freiberger Maria I.*, R. Gonzalo Parra
-Maintainer: Atilio O. Rausch <atiliorau@gmail.com>, R. Gonzalo Parra <gonzaloparra@embl.de>
+Maintainer: Atilio O. Rausch <atiliorau@gmail.com>, Freiberger Maria I. <mariaines.freiberger@gmail.com>, R. Gonzalo Parra <gonzalo.parra@bsc.es>
 Description: Frustratometer: an R-package to compute Local frustration in protein structures, point mutants and MD simulations
 License: GPL
 Encoding: UTF-8
