@@ -476,9 +476,9 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   files[,1] <- as.character(files[, 1])
   for(i in seq(1, dim(files)[1])){
   	finalCharacter <- substr(files[i, 1], nchar(files[i, 1]), nchar(files[i, 1]))
-  	if(finalCharacter != '/' & finalCharacter != '.'){
-  		system(paste("rm -f ", files[i, 1], sep = ""));
-  	}
+  	#if(finalCharacter != '/' & finalCharacter != '.'){
+  		#system(paste("rm -f ", files[i, 1], sep = ""));
+  	#}
   }
   setwd(tempfolder)
 
