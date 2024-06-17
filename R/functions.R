@@ -411,17 +411,8 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
 
   # Añadir las líneas adicionales al final del archivo
   additional_lines <- c(
-    "write_data data.polymer",
-    "write_data data.*",
-    "write_dump all atom dump.atom",
-    "write_dump subgroup atom dump.run.bin", 
-    "write_dump all custom dump.myforce.* id type x y vx fx",
-    "write_dump flow custom dump.%.myforce id type c_myF[3] v_ke modify sort id",
-    "write_dump all xyz system.xyz modify sort id element O H",
-    "write_dump all image snap*.jpg type type size 960 960 modify backcolor white",
-    "write_dump all image snap*.jpg element element &",
-    "bond atom 0.3 shiny 0.1 ssao yes 6345 0.2 size 1600 1600 &",
-     "modify backcolor white element C C O H N C C C O H H S O H"
+     "write_data data.final",
+     "write_dump all atom dump.final"
   )
 
   # Concatenar las líneas adicionales al contenido original
