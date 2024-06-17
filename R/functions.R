@@ -403,6 +403,23 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   cat("-----------------------------Setting options-----------------------------\n")
   replace_Expr("run\t\t10000", "run\t\t0", paste(Pdb$JobDir, Pdb$PdbBase, ".in", sep = ""))
   replace_Expr("mutational", Pdb$Mode, paste(Pdb$JobDir, "fix_backbone_coeff.data", sep = ""))
+  # Definir el nombre del archivo de entrada de LAMMPS
+  input_filename <- paste(Pdb$JobDir, Pdb$PdbBase, ".in", sep = "")
+
+  # Leer el contenido actual del archivo de entrada
+  input_lines <- readLines(input_filename)
+
+  # Añadir las líneas adicionales al final del archivo
+  additional_lines <- c(
+    "write_data data.polymer",
+    "write_data data.*"
+  )
+
+  # Concatenar las líneas adicionales al contenido original
+  modified_input <- c(input_lines, additional_lines)
+
+  # Escribir el contenido modificado de vuelta al archivo de entrada
+  writeLines(modified_input, input_filename)
 
   if(!is.null(Electrostatics_K))
   {
