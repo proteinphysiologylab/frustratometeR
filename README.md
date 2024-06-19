@@ -62,6 +62,17 @@ you have to replace "/url/bin/python3" with the location of your python. You can
 
 you have to replace "condaenvironment" with the conda environment where you installed modeller. 
 
+It also might be needed to export the environment variables:
+
+`find /usr/lib/modellerXX.X/  -name ”modeller”`
+
+`find /usr/lib/modellerXX.X/  -name ”_modeller.so”`
+
+`export PYTHONPATH:$PYTHONPATH:/path/to/modeller/`
+
+`export PYTHONPATH:$PYTHONPATH:/path/to/_modeller/`
+
+
 # Minimum code to calculate frustration in a protein
 `library(frustratometeR)`
 
