@@ -20,7 +20,9 @@ ONLY for UBUNTU 22.04 and for R version 4.X.X: To install frustratometeR from th
 
 `install.packages(c("usethis", "devtools"))`
 
-**Python 3**
+**Python 3** 
+
+You will need Python 3.7 (3.9 preferred)
 
 * numpy 
 `python3 -m pip install numpy`
