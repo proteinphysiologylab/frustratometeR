@@ -478,7 +478,7 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   	finalCharacter <- substr(files[i, 1], nchar(files[i, 1]), nchar(files[i, 1]))
   	if(finalCharacter != '/' & finalCharacter != '.'){
   		system(paste("rm -f ", files[i, 1], sep = ""));
-  	#}
+  	}
   }
   setwd(tempfolder)
 
@@ -1142,3 +1142,360 @@ detect_dynamic_clusters <- function(Dynamic = Dynamic, LoessSpan = 0.05, MinFrst
 
   return(Dynamic)
 }
+
+    
+    #mutate_res_only ----
+#' @title Frustration of mutated residue
+#'
+#' @description Calculate the local energy frustration to a specific amino acid identity in the Resno position and Chain chain.
+#' Use the frustration index indicated in the Pdb object.
+#'
+#' @param Pdb Pdb frustration object.
+#' @param Chain Chain of the residue to be mutated. Type: character. Default: NULL.
+#' @param Resno Resno of the residue to be mutated. Type: numeric. Default: NULL.
+#' @param Split Split that you are going to calculate frustration. If it is TRUE specific string, if it is FALSE full complex. Default: TRUE.
+#' @param Method Method indicates the method to use to perform the mutation (Threading or Modeller). Default: Threading
+#' @param ResToMut amino acid identity to mutate to
+#' @return Returns Pdb frustration object with corresponding Mutation attribute
+#'
+#' @import msa
+#' @importFrom bio3d write.pdb atom.select get.seq read.fasta seqbind seqaln pdbseq
+#'
+#' @export
+
+
+mutate_res_only <- function (Pdb, Resno, Chain, ResToMut, Split = T, Method = "threading")
+{
+  res_letter<-c("L", "D", "I", "N", "T", "V", "A", "G",
+                "E", "R", "K", "H", "Q", "S", "P", "F", "Y", "M",
+                "W", "C")
+
+  res_id<-c("LEU", "ASP", "ILE", "ASN", "THR", "VAL",
+            "ALA", "GLY", "GLU", "ARG", "LYS", "HIS", "GLN",
+            "SER", "PRO", "PHE", "TYR", "MET", "TRP", "CYS")
+
+  res_name=data.frame(row.names=res_letter , val=res_id)
+
+  if (length(atom.select(Pdb, resno = Resno, chain = Chain,
+                         elety = "CA")$atom) == 0)
+    stop("Resno of chain doesn't exist!")
+  else if (is.na(atom.select(Pdb, resno = Resno, elety = "CA",
+                             value = TRUE)$atom$chain[1]))
+    Chain = "A"
+  if (Split != T & Split != F)
+    stop("Split must be a boolean value!")
+  Method <- tolower(Method)
+  if (!any(Method %in% c("threading", "modeller")))
+    stop(paste(Method, " it isn't a method of mutation. The methods are: threading or modeller!",
+               sep = ""))
+  if (Split == FALSE & Method == "modeller")
+    stop("Complex modeling with Modeller isn't available!")
+  FrustraMutFile <- paste(Pdb$JobDir, "MutationsData/", Pdb$Mode,
+                          "_Res", Resno, "_", Method, "_", Chain, ".txt", sep = "")
+  if (!dir.exists(paste(Pdb$JobDir, "MutationsData", sep = "")))
+    dir.create(paste(Pdb$JobDir, "MutationsData", sep = ""))
+  setwd(paste(Pdb$JobDir, "MutationsData", sep = ""))
+  if (file.exists(FrustraMutFile)) {
+    file.remove(FrustraMutFile)
+    file.create(FrustraMutFile)
+  }
+  if (Pdb$Mode == "configurational" | Pdb$Mode == "mutational")
+    write("Res1 Res2 ChainRes1 ChainRes2 AA1 AA2 FrstIndex FrstState",
+          file = FrustraMutFile, append = TRUE)
+  else if (Pdb$Mode == "singleresidue")
+    write("Res ChainRes AA FrstIndex", file = FrustraMutFile,
+          append = TRUE)
+  colClasses <- c()
+  if (Pdb$Mode == "singleresidue")
+    colClasses <- c("integer", "character", "numeric", "character",
+                    "numeric", "numeric", "numeric", "numeric")
+  else if (Pdb$Mode == "configurational" | Pdb$Mode == "mutational")
+    colClasses <- c("integer", "integer", "character", "character",
+                    "numeric", "numeric", "character", "character",
+                    "numeric", "numeric", "numeric", "numeric", "character",
+                    "character")
+  if (Method == "threading") {
+    AAvector <- c(res_name[ResToMut,])
+    Glycine <- FALSE
+    indexTotales <- atom.select(Pdb, chain = Chain, resno = Resno)
+    indexBackboneGly <- atom.select(Pdb, chain = Chain,
+                                    resno = Resno, elety = c("N", "CA", "C", "O"))
+    if (Pdb$atom$resid[indexTotales$atom[1]] == "GLY")
+      Glycine = TRUE
+    else Glycine = FALSE
+    if (Glycine)
+      indexBackbone <- atom.select(Pdb, chain = Chain,
+                                   resno = Resno, elety = c("N", "CA", "C", "O"))
+    else indexBackbone <- atom.select(Pdb, chain = Chain,
+                                      resno = Resno, elety = c("N", "CA", "C", "O", "CB"))
+    rename <- c()
+    for (AA in AAvector) {
+      cat("\n-----------------------------Getting variant ",
+          AA, "-----------------------------\n")
+      PdbMut <- Pdb
+      if (AA != Pdb$atom$resid[indexTotales$atom[1]] &
+          !Glycine) {
+        if (AA != "GLY") {
+          diffAtom <- setdiff(indexTotales$atom, indexBackbone$atom)
+          diffxyz <- setdiff(indexTotales$xyz, indexBackbone$xyz)
+        }
+        else {
+          diffAtom <- setdiff(indexTotales$atom, indexBackboneGly$atom)
+          diffxyz <- setdiff(indexTotales$xyz, indexBackboneGly$xyz)
+        }
+        if (length(diffAtom) > 0)
+          PdbMut$atom <- PdbMut$atom[-diffAtom, ]
+        if (length(diffxyz) > 0)
+          PdbMut$xyz <- PdbMut$xyz[-diffxyz]
+      }
+      rename <- atom.select(PdbMut, chain = Chain, resno = Resno)
+      PdbMut$atom$resid[rename$atom] <- AA
+      if (Split == TRUE)
+        write.pdb(PdbMut, paste(Pdb$JobDir, Pdb$PdbBase,
+                                "_", Resno, "_", AA, ".pdb", sep = ""))
+      else write.pdb(PdbMut, paste(Pdb$JobDir, Pdb$PdbBase,
+                                   "_", Resno, "_", AA, "_", Chain, ".pdb", sep = ""))
+      cat("----------------------------Calculating frustration-----------------------------\n")
+      if (Split == TRUE)
+        calculate_frustration(PdbFile = paste(Pdb$JobDir,
+                                              Pdb$PdbBase, "_", Resno, "_", AA, ".pdb",
+                                              sep = ""), Mode = Pdb$Mode, ResultsDir = Pdb$JobDir,
+                              Graphics = F, Visualization = F, Chain = Chain)
+      else calculate_frustration(PdbFile = paste(Pdb$JobDir,
+                                                 Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain,
+                                                 ".pdb", sep = ""), Mode = Pdb$Mode, ResultsDir = Pdb$JobDir,
+                                 Graphics = FALSE, Visualization = F)
+      cat("----------------------------Storing-----------------------------\n")
+      if (Pdb$Mode == "singleresidue") {
+        system(paste("mv ", Pdb$JobDir, Pdb$PdbBase,
+                     "_", Resno, "_", AA, "_", Chain, ".done/FrustrationData/",
+                     Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain,
+                     ".pdb_singleresidue ", Pdb$JobDir, "MutationsData/",
+                     sep = ""))
+        frustraTable <- read.table(paste(Pdb$JobDir,
+                                         "MutationsData/", Pdb$PdbBase, "_", Resno,
+                                         "_", AA, "_", Chain, ".pdb_singleresidue",
+                                         sep = ""), header = T, colClasses = colClasses)
+        frustraTable <- frustraTable[frustraTable$ChainRes ==
+                                       Chain & frustraTable$Res == Resno, c(1, 2,
+                                                                            4, 8)]
+        write(paste(frustraTable[, 1], frustraTable[,
+                                                    2], frustraTable[, 3], frustraTable[, 4]),
+              file = FrustraMutFile, append = TRUE)
+      }
+      else if (Pdb$Mode == "configurational" | Pdb$Mode ==
+               "mutational") {
+        system(paste("mv ", Pdb$JobDir, Pdb$PdbBase,
+                     "_", Resno, "_", AA, "_", Chain, ".done/FrustrationData/",
+                     Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain,
+                     ".pdb_", Pdb$Mode, " ", Pdb$JobDir, "MutationsData/",
+                     sep = ""))
+        frustraTable <- read.table(paste(Pdb$JobDir,
+                                         "MutationsData/", Pdb$PdbBase, "_", Resno,
+                                         "_", AA, "_", Chain, ".pdb_", Pdb$Mode, sep = ""),
+                                   header = T, colClasses = colClasses)
+        frustraTable <- frustraTable[frustraTable$ChainRes1 ==
+                                       Chain & frustraTable$Res1 == Resno | frustraTable$ChainRes2 ==
+                                       Chain & frustraTable$Res2 == Resno, c(1, 2,
+                                                                             3, 4, 7, 8, 12, 14)]
+        write(paste(frustraTable[, 1], frustraTable[,
+                                                    2], frustraTable[, 3], frustraTable[, 4],
+                    frustraTable[, 5], frustraTable[, 6], frustraTable[,
+                                                                       7], frustraTable[, 8]), file = FrustraMutFile,
+              append = TRUE)
+      }
+      #file.remove(paste(Pdb$JobDir, "MutationsData/",
+      #                  Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain,
+      #                  ".pdb_", Pdb$Mode, sep = ""))
+      system(paste("rm -R ", Pdb$JobDir, Pdb$PdbBase,
+                   "_", Resno, "_", AA, "_", Chain, ".done/", sep = ""))
+      system(paste("cd ", Pdb$JobDir, " ; rm *pdb", sep = ""))
+    }
+  }
+  else if (Method == "modeller") {
+    if (!requireNamespace("msa", quietly = TRUE)) {
+      stop("Please install msa package from Bioconductor to continue!")
+    }
+    AAvector <- c(res_name[ResToMut,])
+    cat("-----------------------------Getting sequence-----------------------------\n")
+    pos <- 0
+    ID <- Pdb$PdbBase
+    for (i in 1:length(strsplit(x = Pdb$PdbBase, "")[[1]])) {
+      if (strsplit(x = Pdb$PdbBase, "")[[1]][i] == "_")
+        pos <- i
+    }
+    if (pos != 0)
+      ID <- substr(Pdb$PdbBase, 1, pos - 1)
+    sequence <- get.seq(ids = c(ID), db = "PDB", outfile = paste(Pdb$JobDir,
+                                                                 "seqs.fasta", sep = ""))
+    fasta <- read.fasta(paste(Pdb$JobDir, "seqs.fasta",
+                              sep = ""))
+    Seq <- c()
+    rowname <- c()
+    for (i in 1:length(fasta$id)) {
+      Seq <- rbind(Seq, fasta$ali[i, ])
+      rowname <- c(rowname, paste(substr(fasta$id[i],
+                                         nchar(fasta$id[i]), nchar(fasta$id[i]))))
+    }
+    rownames(Seq) <- toupper(rowname)
+    cat("-----------------------------Equivalences-----------------------------\n")
+    SeqPdb <- as.data.frame(pdbseq(Pdb, atom.select(Pdb,
+                                                    chain = Chain, elety = "CA")))
+    SeqPdb <- cbind(SeqPdb, as.numeric(row.names(SeqPdb)),
+                    1:length(SeqPdb[, 1]))
+    colnames(SeqPdb) <- c("AA", "resno", "index")
+    aln <- seqbind(Seq[Chain, 1:table(Seq[Chain, ] == "-")[1]],
+                   SeqPdb$AA)
+    align <- seqaln(aln, outfile = tempfile(), exefile = "msa")
+    SeqGap <- align$ali["seq2", ]
+    SeqGap <- cbind(SeqGap, rep(0, length(SeqGap)), 1:length(SeqGap))
+    j <- 1
+    for (i in 1:length(SeqGap[, 1])) {
+      if (SeqGap[i, 1] != "-" && SeqGap[i, 1] == SeqPdb$AA[j]) {
+        SeqGap[i, 2] <- SeqPdb$resno[j]
+        j <- j + 1
+      }
+    }
+    pos <- as.numeric(SeqGap[SeqGap[, 2] == Resno, 3])
+    system(paste("cp ", Pdb$scriptsDir, "/align2d.py ",
+                 Pdb$JobDir, sep = ""))
+    system(paste("cp ", Pdb$scriptsDir, "/make_ali.py ",
+                 Pdb$JobDir, sep = ""))
+    system(paste("cp ", Pdb$scriptsDir, "/model-single.py ",
+                 Pdb$JobDir, sep = ""))
+    system(paste("cp ", Pdb$PdbPath, " ", Pdb$JobDir, sep = ""))
+    for (AA in AAvector) {
+      cat("\n-----------------------------Getting variant ",
+          AA, "-----------------------------\n")
+      if (Split) {
+        write(">Modelo", file = paste(Pdb$JobDir, "Modelo.fa",
+                                      sep = ""))
+        SeqMut = Seq[Chain, 1:table(Seq[Chain, ] ==
+                                      "-")[1]]
+        SeqMut[pos] <- AA
+        write(paste(as.vector(SeqMut), collapse = ""),
+              file = paste(Pdb$JobDir, "Modelo.fa", sep = ""),
+              append = TRUE)
+      }
+      cat("-----------------------------Aligning-----------------------------\n")
+      system(paste("cd ", Pdb$JobDir, " ;python3 make_ali.py Modelo",
+                   sep = ""))
+      if (Split)
+        system(paste("cd ", Pdb$JobDir, " ;python3 align2d.py ",
+                     Pdb$PdbBase, " Modelo ", Chain, sep = ""))
+      cat("-----------------------------Modeling-----------------------------\n")
+      system(paste("cd ", Pdb$JobDir, " ;python3 model-single.py ",
+                   Pdb$PdbBase, " Modelo", sep = ""))
+      system(paste("cd ", Pdb$JobDir, " ;mv Modelo.B99990001.pdb ",
+                   Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA,
+                   "_", Chain, ".pdb", sep = ""))
+      system(paste("cd ", Pdb$JobDir, " ;rm *D00000001 *ini *rsr *sch *V99990001 *ali *pap *fa"))
+      cat("----------------------------Calculating frustration-----------------------------\n")
+      calculate_frustration(PdbFile = paste(Pdb$JobDir,
+                                            Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain,
+                                            ".pdb", sep = ""), Mode = Pdb$Mode, ResultsDir = Pdb$JobDir,
+                            Graphics = F, Visualization = F)
+      cat("----------------------------Storing-----------------------------\n")
+      if (Pdb$Mode == "singleresidue") {
+        system(paste("mv ", Pdb$JobDir, Pdb$PdbBase,
+                     "_", Resno, "_", AA, "_", Chain, ".done/FrustrationData/",
+                     Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain,
+                     ".pdb_singleresidue ", Pdb$JobDir, "MutationsData/",
+                     sep = ""))
+        frustraTable <- read.table(paste(Pdb$JobDir,
+                                         "MutationsData/", Pdb$PdbBase, "_", Resno,
+                                         "_", AA, "_", Chain, ".pdb_singleresidue",
+                                         sep = ""), header = T, colClasses = colClasses)
+        frustraTable <- frustraTable[frustraTable$Res ==
+                                       pos, c(1, 2, 4, 8)]
+        write(paste(frustraTable[, 1], frustraTable[,
+                                                    2], frustraTable[, 3], frustraTable[, 4]),
+              file = FrustraMutFile, append = TRUE)
+      }
+      else if (Pdb$Mode == "configurational" | Pdb$Mode ==
+               "mutational") {
+        system(paste("mv ", Pdb$JobDir, Pdb$PdbBase,
+                     "_", Resno, "_", AA, "_", Chain, ".done/FrustrationData/",
+                     Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain,
+                     ".pdb_", Pdb$Mode, " ", Pdb$JobDir, "MutationsData/",
+                     sep = ""))
+        frustraTable <- read.table(paste(Pdb$JobDir,
+                                         "MutationsData/", Pdb$PdbBase, "_", Resno,
+                                         "_", AA, "_", Chain, ".pdb_", Pdb$Mode, sep = ""),
+                                   header = T, colClasses = colClasses)
+        frustraTable <- frustraTable[frustraTable$Res1 ==
+                                       pos | frustraTable$Res2 == pos, c(1, 2, 3,
+                                                                         4, 7, 8, 12, 14)]
+        write(paste(frustraTable[, 1], frustraTable[,
+                                                    2], frustraTable[, 3], frustraTable[, 4],
+                    frustraTable[, 5], frustraTable[, 6], frustraTable[,
+                                                                       7], frustraTable[, 8]), file = FrustraMutFile,
+              append = TRUE)
+      }
+      #file.remove(paste(Pdb$JobDir, "MutationsData/",
+      #                  Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain,
+      #                  ".pdb_", Pdb$Mode, sep = ""))
+      system(paste("rm -R ", Pdb$JobDir, Pdb$PdbBase,
+                   "_", Resno, "_", AA, "_", Chain, ".done/", sep = ""))
+      system(paste("cd ", Pdb$JobDir, " ; rm ", Pdb$PdbBase,
+                   "_*", sep = ""))
+    }
+    system(paste("cd ", Pdb$JobDir, " ; rm *pdb seqs.fasta *py",
+                 sep = ""))
+    cat("----------------------------Renumbering-----------------------------\n")
+    if (Pdb$Mode == "singleresidue") {
+      data <- read.table(paste(Pdb$JobDir, "MutationsData/singleresidue_Res",
+                               Resno, "_", Method, "_", Chain, ".txt", sep = ""),
+                         header = T)
+      data[, 2] <- Chain
+      for (i in 1:length(data[, 1])) {
+        data[i, 1] <- SeqGap[as.numeric(data[i, 1]),
+                             2]
+      }
+      write.table(data, paste(Pdb$JobDir, "MutationsData/singleresidue_Res",
+                              Resno, "_", Method, "_", Chain, ".txt", sep = ""),
+                  col.names = T, row.names = F, quote = F)
+    }
+    else if (Pdb$Mode == "configurational") {
+      data <- read.table(paste(Pdb$JobDir, "MutationsData/configurational_Res",
+                               Resno, "_", Method, "_", Chain, ".txt", sep = ""),
+                         header = T)
+      data[, c(3, 4)] <- Chain
+      for (i in 1:length(data[, 1])) {
+        data[i, 1] <- SeqGap[as.numeric(data[i, 1]),
+                             2]
+        data[i, 2] <- SeqGap[as.numeric(data[i, 2]),
+                             2]
+      }
+      write.table(data, paste(Pdb$JobDir, "MutationsData/configurational_Res",
+                              Resno, "_", Method, "_", Chain, ".txt", sep = ""),
+                  col.names = T, row.names = F, quote = F)
+    }
+    else if (Pdb$Mode == "mutational") {
+      data <- read.table(paste(Pdb$JobDir, "MutationsData/mutational_Res",
+                               Resno, "_", Method, "_", Chain, ".txt", sep = ""),
+                         header = T)
+      data[, c(3, 4)] <- Chain
+      for (i in 1:length(data[, 1])) {
+        data[i, 1] <- SeqGap[as.numeric(data[i, 1]),
+                             2]
+        data[i, 2] <- SeqGap[as.numeric(data[i, 2]),
+                             2]
+      }
+      write.table(data, paste(Pdb$JobDir, "MutationsData/mutational_Res",
+                              Resno, "_", Method, "_", Chain, ".txt", sep = ""),
+                  col.names = T, row.names = F, quote = F)
+    }
+  }
+  Pdb$Mutations[[Method]][[paste("Res_", Resno, "_", Chain,
+                                 sep = "")]] <- data.frame(Method = Method, Res = Resno,
+                                                           Chain = Chain, File = paste(Pdb$JobDir, "MutationsData/",
+                                                                                       Pdb$Mode, "_Res", Resno, "_", Method, "_", Chain,
+                                                                                       ".txt", sep = ""))
+  cat("\n\n****Storage information****\n")
+  cat(paste("The frustration of the residue is stored in ",
+            Pdb$JobDir, "MutationsData/mutational_Res", Resno, "_",
+            Method, "_", Chain, ".txt\n", sep = ""))
+  return(Pdb)
+ }
+
