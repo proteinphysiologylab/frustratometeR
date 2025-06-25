@@ -363,10 +363,12 @@ calculate_frustration <- function(PdbFile = NULL, PdbID = NULL, Chain = NULL, El
   #CY1 to CYS filter
   Pdb$atom$type[which(Pdb$atom$resid == "CY1")] <- "ATOM"
   Pdb$atom$resid[which(Pdb$atom$resid == "CY1")] <- "CYS"
-
-    #KCX to LYS filter
+  #KCX to LYS filter
   Pdb$atom$type[which(Pdb$atom$resid == "KCX")] <- "ATOM"
   Pdb$atom$resid[which(Pdb$atom$resid == "KCX")] <- "LYS"
+  #HSD to HIS filter
+  Pdb$atom$type[which(Pdb$atom$resid == "HSD")] <- "ATOM"
+  Pdb$atom$resid[which(Pdb$atom$resid == "HSD")] <- "HIS"
 
   # Here we filter remove non-protein atoms.
   #The Protein atom from bio3d::aa.table$aa3
