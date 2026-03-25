@@ -844,7 +844,7 @@ mutate_res <- function(Pdb, Resno, Chain, Split = TRUE, Method = "threading"){
       if(Split == TRUE) calculate_frustration( PdbFile = paste(Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, ".pdb", sep = ""),
                                                Mode = Pdb$Mode, ResultsDir = Pdb$JobDir, Graphics = F, Visualization = F, Chain = Chain)
       else  calculate_frustration(PdbFile = paste(Pdb$JobDir, Pdb$PdbBase, "_", Resno, "_", AA, "_", Chain, ".pdb", sep = ""),
-                                  Mode = Pdb$Mode, ResultsDir = Pdb$JobDir, Graphics = FALSE, Visualization = F)
+                                  Mode = Pdb$Mode, ResultsDir = Pdb$JobDir, SeqDist=Pdb$SeqDist, Graphics = FALSE, Visualization = F)
 
       cat("----------------------------Storing-----------------------------\n")
       if(Pdb$Mode == "singleresidue"){
